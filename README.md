@@ -12,6 +12,7 @@ import 'dart:async';
 import 'package:wallet_core/wallet_core.dart';
 
 final rpc = 'https://rpc.fusenet.io';
+final networkId = 122;
 final pkey = '...';
 
 Future<bool> approvalCallback() async {
@@ -19,7 +20,7 @@ Future<bool> approvalCallback() async {
 }
 
 void main() async {
-  Web3 web3 = Web3(rpc, approvalCallback);
+  Web3 web3 = Web3(rpc, networkId, approvalCallback);
   
   await web3.setCredentials(pkey);
 

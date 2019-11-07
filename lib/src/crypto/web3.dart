@@ -7,10 +7,12 @@ class Web3 {
   Web3Client _client;
   Future<bool> _approveCb;
   Credentials _credentials;
+  int _networkId;
 
-  Web3(String url, Future<bool> approveCb()) {
+  Web3(String url, int networkId, Future<bool> approveCb()) {
     _client = new Web3Client(url, new Client());
     _approveCb = approveCb();
+    _networkId = networkId;
   }
 
   Future<void> setCredentials(String pkey) async {
@@ -19,7 +21,7 @@ class Web3 {
 
   Future<String> sendTransactionAndWaitForReceipt(Transaction transaction) async {
     print('sendTransactionAndWaitForReceipt');    
-    String txHash = await _client.sendTransaction(_credentials, transaction, chainId: await _client.getNetworkId());
+    String txHash = await _client.sendTransaction(_credentials, transaction, chainId: _networkId);
     TransactionReceipt receipt = await _client.getTransactionReceipt(txHash);
     num delay = 1;
     num retries = 5;
