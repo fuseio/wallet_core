@@ -1,0 +1,12 @@
+name: wallet_core
+author: Lior Rabin <lior9586@gmail.com>
+version: 0.0.1+5
+homepage: https://github.com/fuseio/wallet_core
+description: wallet core package
+environment: 
+  sdk: '>=2.0.0-dev.68.0 <3.0.0'
+dependencies: 
+  web3dart: ^1.2.1
+  http: ^0.12.0
+  flutter: 
+    sdk: flutter
