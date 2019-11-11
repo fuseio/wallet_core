@@ -6,7 +6,6 @@ import 'package:hex/hex.dart';
 import 'package:web3dart/web3dart.dart';
 
 class Web3 {
-
   Web3Client _client;
   Future<bool> _approveCb;
   Credentials _credentials;
@@ -34,16 +33,18 @@ class Web3 {
     _credentials = await _client.credentialsFromPrivateKey(privateKey);
   }
 
-  Future<String> sendTransactionAndWaitForReceipt(Transaction transaction) async {
-    print('sendTransactionAndWaitForReceipt');    
-    String txHash = await _client.sendTransaction(_credentials, transaction, chainId: _networkId);
+  Future<String> sendTransactionAndWaitForReceipt(
+      Transaction transaction) async {
+    print('sendTransactionAndWaitForReceipt');
+    String txHash = await _client.sendTransaction(_credentials, transaction,
+        chainId: _networkId);
     TransactionReceipt receipt = await _client.getTransactionReceipt(txHash);
     num delay = 1;
     num retries = 5;
-    while(receipt == null) {
+    while (receipt == null) {
       print('waiting for receipt');
       await Future.delayed(new Duration(seconds: delay));
-      delay*=2;
+      delay *= 2;
       retries--;
       if (retries == 0) {
         throw 'transaction $txHash not mined...';
@@ -53,13 +54,13 @@ class Web3 {
       } catch (err) {
         print('could not get $txHash receipt, try again');
       }
-      
     }
     return txHash;
   }
 
   Future<String> transferNative(String receiverAddress, num amountInWei) async {
-    print('transferNative --> receiver: $receiverAddress, amountInWei: $amountInWei');
+    print(
+        'transferNative --> receiver: $receiverAddress, amountInWei: $amountInWei');
 
     bool isApproved = await _approveCb;
     if (!isApproved) {
@@ -67,12 +68,11 @@ class Web3 {
     }
 
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
-    EtherAmount amount = EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(amountInWei));
+    EtherAmount amount =
+        EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(amountInWei));
 
-    String txHash = await sendTransactionAndWaitForReceipt(Transaction(
-      to: receiver,
-      value: amount
-    ));
+    String txHash = await sendTransactionAndWaitForReceipt(
+        Transaction(to: receiver, value: amount));
     print('transction $txHash successful');
     return txHash;
   }

@@ -1,5 +1,4 @@
 class Graph {
-
   String _url;
 
   Graph(String url) {

@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:http/http.dart';
 
 class API {
-
   String _base;
   Client _client;
   String _jwtToken;
@@ -16,7 +15,7 @@ class API {
   }
 
   Map<String, dynamic> responseHandler(Response response) {
-    switch(response.statusCode) {
+    switch (response.statusCode) {
       case 200:
         Map<String, dynamic> obj = json.decode(response.body);
         return obj;
@@ -28,20 +27,23 @@ class API {
     }
   }
 
-  Future <Map<String, dynamic>> get(String endpoint, {bool private}) async {
+  Future<Map<String, dynamic>> get(String endpoint, {bool private}) async {
     Response response;
     if (private != null && private) {
-      response = await _client.get('$_base/$endpoint', headers: {"Authorization": "Bearer $_jwtToken"});  
+      response = await _client.get('$_base/$endpoint',
+          headers: {"Authorization": "Bearer $_jwtToken"});
     } else {
       response = await _client.get('$_base/$endpoint');
     }
     return responseHandler(response);
   }
 
-  Future<Map<String, dynamic>> post(String endpoint, {dynamic body, bool private}) async {
+  Future<Map<String, dynamic>> post(String endpoint,
+      {dynamic body, bool private}) async {
     Response response;
     if (private != null && private) {
-      response = await _client.post('$_base/$endpoint', headers: {"Authorization": "Bearer $_jwtToken"}, body: body);    
+      response = await _client.post('$_base/$endpoint',
+          headers: {"Authorization": "Bearer $_jwtToken"}, body: body);
     } else {
       response = await _client.post('$_base/$endpoint', body: body);
     }
@@ -49,7 +51,8 @@ class API {
   }
 
   Future<bool> loginRequest(String phoneNumber) async {
-    Map<String, dynamic> resp = await post('login/request', body: {"phoneNumber": phoneNumber});
+    Map<String, dynamic> resp =
+        await post('login/request', body: {"phoneNumber": phoneNumber});
     if (resp["response"] == "ok") {
       return true;
     } else {
@@ -57,8 +60,10 @@ class API {
     }
   }
 
-  Future<String> loginVerify(String phoneNumber, String verificationCode) async {
-    Map<String, dynamic> resp = await post('login/verify', body: {"phoneNumber": phoneNumber, "code": verificationCode});
+  Future<String> loginVerify(
+      String phoneNumber, String verificationCode) async {
+    Map<String, dynamic> resp = await post('login/verify',
+        body: {"phoneNumber": phoneNumber, "code": verificationCode});
     if (resp["token"] != "") {
       _jwtToken = resp["token"];
       return _jwtToken;
@@ -68,7 +73,8 @@ class API {
   }
 
   Future<bool> createWallet(String accountAddress) async {
-    Map<String, dynamic> resp = await post('wallets/$accountAddress', private: true);
+    Map<String, dynamic> resp =
+        await post('wallets/$accountAddress', private: true);
     if (resp["response"] == "ok") {
       return true;
     } else {
