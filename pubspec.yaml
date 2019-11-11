@@ -1,6 +1,6 @@
 name: wallet_core
 author: Lior Rabin <lior9586@gmail.com>
-version: 0.0.1+8
+version: 0.0.1+9
 homepage: https://github.com/fuseio/wallet_core
 description: wallet core package
 environment: 
@@ -8,6 +8,7 @@ environment:
 dependencies: 
   bip32: ^1.0.5
   bip39: ^1.0.3
+  hex: ^0.1.2
   web3dart: ^1.2.1
   http: ^0.12.0
   flutter: 
