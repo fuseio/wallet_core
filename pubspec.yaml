@@ -1,8 +1,8 @@
 name: wallet_core
 author: Lior Rabin <lior9586@gmail.com>
-version: 0.0.1+12
+version: 0.0.1+13
 homepage: https://github.com/fuseio/wallet_core
-description: wallet core package
+description: Fuse wallet core for Etherum based networks
 environment: 
   sdk: '>=2.0.0-dev.68.0 <3.0.0'
 dependencies: 
