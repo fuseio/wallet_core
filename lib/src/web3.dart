@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:http/http.dart';
+import 'package:bip32/bip32.dart' as bip32;
+import 'package:bip39/bip39.dart' as bip39;
+import 'package:hex/hex.dart';
 import 'package:web3dart/web3dart.dart';
 
 class Web3 {
@@ -7,16 +10,28 @@ class Web3 {
   Web3Client _client;
   Future<bool> _approveCb;
   Credentials _credentials;
-  int _networkId;
+  num _networkId;
 
-  Web3(String url, int networkId, Future<bool> approveCb()) {
+  Web3(String url, num networkId, Future<bool> approveCb()) {
     _client = new Web3Client(url, new Client());
     _approveCb = approveCb();
     _networkId = networkId;
   }
 
-  Future<void> setCredentials(String pkey) async {
-    _credentials = await _client.credentialsFromPrivateKey(pkey);
+  String generateMnemonic() {
+    return bip39.generateMnemonic();
+  }
+
+  String privateKeyFromMnemonic(String mnemonic) {
+    String seed = bip39.mnemonicToSeedHex(mnemonic);
+    bip32.BIP32 root = bip32.BIP32.fromSeed(HEX.decode(seed));
+    bip32.BIP32 child = root.derivePath("m/44'/60'/0'/0/0");
+    String privateKey = HEX.encode(child.privateKey);
+    return privateKey;
+  }
+
+  Future<void> setCredentials(String privateKey) async {
+    _credentials = await _client.credentialsFromPrivateKey(privateKey);
   }
 
   Future<String> sendTransactionAndWaitForReceipt(Transaction transaction) async {
@@ -43,16 +58,16 @@ class Web3 {
     return txHash;
   }
 
-  Future<String> transferNative(String _receiver, num _amountInWei) async {
-    print('transferNative --> receiver: $_receiver, amountInWei: $_amountInWei');
+  Future<String> transferNative(String receiverAddress, num amountInWei) async {
+    print('transferNative --> receiver: $receiverAddress, amountInWei: $amountInWei');
 
     bool isApproved = await _approveCb;
     if (!isApproved) {
       throw 'transaction not approved';
     }
 
-    EthereumAddress receiver = EthereumAddress.fromHex(_receiver);
-    EtherAmount amount = EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(_amountInWei));
+    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
+    EtherAmount amount = EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(amountInWei));
 
     String txHash = await sendTransactionAndWaitForReceipt(Transaction(
       to: receiver,
@@ -62,12 +77,12 @@ class Web3 {
     return txHash;
   }
 
-  Future<EthereumAddress> getAddress() async {
-    return _credentials.extractAddress();
+  Future<String> getAddress() async {
+    return (await _credentials.extractAddress()).toString();
   }
 
   Future<EtherAmount> getBalance() async {
-    EthereumAddress address = await getAddress();
+    EthereumAddress address = await _credentials.extractAddress();
     return _client.getBalance(address);
   }
 }
