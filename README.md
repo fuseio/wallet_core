@@ -1,12 +1,6 @@
 # wallet_core
 
 ### basic usage example
-
-* Initiate the core package with rpc url and approval callback.
-* Set credentials using private key.
-* Get address and balance.
-* Transfer native token to another address.
-
 ```
 import 'dart:async';
 import 'dart:convert';

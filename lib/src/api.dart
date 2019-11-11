@@ -8,7 +8,7 @@ class API {
 
   String _base;
   Client _client;
-  String _jwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZU51bWJlciI6Iis5NzI1NDYzMjYzNjYiLCJpYXQiOjE1NzM0ODA4NzgsImV4cCI6MTU3NDA4NTY3OH0.UiMEU9r0gjHLh2EJC_SH97Ys2jycj7CqiQJVIGliFbU";
+  String _jwtToken;
 
   API(String base) {
     _base = base;
