@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:math';
+
 import 'package:http/http.dart';
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:resource/resource.dart';
 
 class Web3 {
   Web3Client _client;
@@ -33,7 +36,11 @@ class Web3 {
     _credentials = await _client.credentialsFromPrivateKey(privateKey);
   }
 
-  Future<String> sendTransactionAndWaitForReceipt(
+  Future<String> getAddress() async {
+    return (await _credentials.extractAddress()).toString();
+  }
+
+  Future<String> _sendTransactionAndWaitForReceipt(
       Transaction transaction) async {
     print('sendTransactionAndWaitForReceipt');
     String txHash = await _client.sendTransaction(_credentials, transaction,
@@ -58,9 +65,14 @@ class Web3 {
     return txHash;
   }
 
-  Future<String> transferNative(String receiverAddress, num amountInWei) async {
+  Future<EtherAmount> getBalance() async {
+    EthereumAddress address = await _credentials.extractAddress();
+    return _client.getBalance(address);
+  }
+
+  Future<String> transfer(String receiverAddress, num amountInWei) async {
     print(
-        'transferNative --> receiver: $receiverAddress, amountInWei: $amountInWei');
+        'transfer --> receiver: $receiverAddress, amountInWei: $amountInWei');
 
     bool isApproved = await _approveCb;
     if (!isApproved) {
@@ -71,18 +83,57 @@ class Web3 {
     EtherAmount amount =
         EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(amountInWei));
 
-    String txHash = await sendTransactionAndWaitForReceipt(
+    String txHash = await _sendTransactionAndWaitForReceipt(
         Transaction(to: receiver, value: amount));
     print('transction $txHash successful');
     return txHash;
   }
 
-  Future<String> getAddress() async {
-    return (await _credentials.extractAddress()).toString();
+  Future<DeployedContract> _contract(String contractName, String contractAddress) async {
+    Resource abiFile = new Resource("package:wallet_core/abis/$contractName.json");
+    String abi = await abiFile.readAsString();
+    DeployedContract contract = DeployedContract(ContractAbi.fromJson(abi, contractName), EthereumAddress.fromHex(contractAddress));
+    return contract;
   }
 
-  Future<EtherAmount> getBalance() async {
-    EthereumAddress address = await _credentials.extractAddress();
-    return _client.getBalance(address);
+  Future<List<dynamic>> _readFromContract(String contractName, String contractAddress, String functionName, List<dynamic> params) async {
+    DeployedContract contract = await _contract(contractName, contractAddress);
+    return await _client.call(contract: contract, function: contract.function(functionName), params: params);
+  }
+
+  Future<String> _callContract(String contractName, String contractAddress, String functionName, List<dynamic> params) async {
+    DeployedContract contract = await _contract(contractName, contractAddress);
+    Transaction tx = Transaction.callContract(
+      contract: contract,
+      function: contract.function(functionName),
+      parameters: params
+    );
+    return await _sendTransactionAndWaitForReceipt(tx);
+  }
+
+  Future<dynamic> getTokenDetails(String tokenAddress) async {
+    return {
+      "name": (await _readFromContract('BasicToken', tokenAddress, 'name', [])).first,
+      "symbol": (await _readFromContract('BasicToken', tokenAddress, 'symbol', [])).first,
+      "decimals": (await _readFromContract('BasicToken', tokenAddress, 'decimals', [])).first
+    };
+  }
+
+  Future<dynamic> getTokenBalance(String tokenAddress, {String address}) async {
+    List<dynamic> params = [];
+    if (address != null && address != "") {
+      params = [EthereumAddress.fromHex(address)];
+    } else {
+      params = [EthereumAddress.fromHex(await getAddress())];
+    }
+    return (await _readFromContract('BasicToken', tokenAddress, 'balanceOf', params)).first;
+  }
+
+  Future<String> tokenTransfer(String tokenAddress, String receiverAddress, num tokensAmount) async {
+    dynamic tokenDetails = await getTokenDetails(tokenAddress);
+    num tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
+    
+    return await _callContract('BasicToken', tokenAddress, 'transfer', [EthereumAddress.fromHex(receiverAddress), amount]);
   }
 }

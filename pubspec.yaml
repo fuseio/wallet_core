@@ -8,8 +8,9 @@ environment:
 dependencies: 
   bip32: ^1.0.5
   bip39: ^1.0.3
-  hex: ^0.1.2
-  web3dart: ^1.2.1
-  http: ^0.12.0
   flutter: 
     sdk: flutter
+  hex: ^0.1.2
+  http: ^0.12.0
+  resource: ^2.1.6
+  web3dart: ^1.2.1
