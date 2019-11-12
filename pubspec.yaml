@@ -1,6 +1,6 @@
 name: wallet_core
 author: Lior Rabin <lior9586@gmail.com>
-version: 0.0.1+13
+version: 0.0.1+14
 homepage: https://github.com/fuseio/wallet_core
 description: Fuse wallet core for Etherum based networks
 environment: 
@@ -8,9 +8,9 @@ environment:
 dependencies: 
   bip32: ^1.0.5
   bip39: ^1.0.3
-  flutter: 
-    sdk: flutter
   hex: ^0.1.2
   http: ^0.12.0
   resource: ^2.1.6
   web3dart: ^1.2.1
+  flutter: 
+    sdk: flutter
