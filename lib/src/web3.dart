@@ -71,8 +71,7 @@ class Web3 {
   }
 
   Future<String> transfer(String receiverAddress, num amountInWei) async {
-    print(
-        'transfer --> receiver: $receiverAddress, amountInWei: $amountInWei');
+    print('transfer --> receiver: $receiverAddress, amountInWei: $amountInWei');
 
     bool isApproved = await _approveCb;
     if (!isApproved) {
@@ -89,33 +88,46 @@ class Web3 {
     return txHash;
   }
 
-  Future<DeployedContract> _contract(String contractName, String contractAddress) async {
-    Resource abiFile = new Resource("package:wallet_core/abis/$contractName.json");
+  Future<DeployedContract> _contract(
+      String contractName, String contractAddress) async {
+    Resource abiFile =
+        new Resource("package:wallet_core/abis/$contractName.json");
     String abi = await abiFile.readAsString();
-    DeployedContract contract = DeployedContract(ContractAbi.fromJson(abi, contractName), EthereumAddress.fromHex(contractAddress));
+    DeployedContract contract = DeployedContract(
+        ContractAbi.fromJson(abi, contractName),
+        EthereumAddress.fromHex(contractAddress));
     return contract;
   }
 
-  Future<List<dynamic>> _readFromContract(String contractName, String contractAddress, String functionName, List<dynamic> params) async {
+  Future<List<dynamic>> _readFromContract(String contractName,
+      String contractAddress, String functionName, List<dynamic> params) async {
     DeployedContract contract = await _contract(contractName, contractAddress);
-    return await _client.call(contract: contract, function: contract.function(functionName), params: params);
+    return await _client.call(
+        contract: contract,
+        function: contract.function(functionName),
+        params: params);
   }
 
-  Future<String> _callContract(String contractName, String contractAddress, String functionName, List<dynamic> params) async {
+  Future<String> _callContract(String contractName, String contractAddress,
+      String functionName, List<dynamic> params) async {
     DeployedContract contract = await _contract(contractName, contractAddress);
     Transaction tx = Transaction.callContract(
-      contract: contract,
-      function: contract.function(functionName),
-      parameters: params
-    );
+        contract: contract,
+        function: contract.function(functionName),
+        parameters: params);
     return await _sendTransactionAndWaitForReceipt(tx);
   }
 
   Future<dynamic> getTokenDetails(String tokenAddress) async {
     return {
-      "name": (await _readFromContract('BasicToken', tokenAddress, 'name', [])).first,
-      "symbol": (await _readFromContract('BasicToken', tokenAddress, 'symbol', [])).first,
-      "decimals": (await _readFromContract('BasicToken', tokenAddress, 'decimals', [])).first
+      "name": (await _readFromContract('BasicToken', tokenAddress, 'name', []))
+          .first,
+      "symbol":
+          (await _readFromContract('BasicToken', tokenAddress, 'symbol', []))
+              .first,
+      "decimals":
+          (await _readFromContract('BasicToken', tokenAddress, 'decimals', []))
+              .first
     };
   }
 
@@ -126,14 +138,18 @@ class Web3 {
     } else {
       params = [EthereumAddress.fromHex(await getAddress())];
     }
-    return (await _readFromContract('BasicToken', tokenAddress, 'balanceOf', params)).first;
+    return (await _readFromContract(
+            'BasicToken', tokenAddress, 'balanceOf', params))
+        .first;
   }
 
-  Future<String> tokenTransfer(String tokenAddress, String receiverAddress, num tokensAmount) async {
+  Future<String> tokenTransfer(
+      String tokenAddress, String receiverAddress, num tokensAmount) async {
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
     num tokenDecimals = int.parse(tokenDetails["decimals"].toString());
     BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
-    
-    return await _callContract('BasicToken', tokenAddress, 'transfer', [EthereumAddress.fromHex(receiverAddress), amount]);
+
+    return await _callContract('BasicToken', tokenAddress, 'transfer',
+        [EthereumAddress.fromHex(receiverAddress), amount]);
   }
 }
