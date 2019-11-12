@@ -16,6 +16,7 @@ class API {
   }
 
   Map<String, dynamic> _responseHandler(Response response) {
+    print('response: ${response.statusCode}, ${response.reasonPhrase}');
     switch (response.statusCode) {
       case 200:
         Map<String, dynamic> obj = json.decode(response.body);
@@ -74,6 +75,12 @@ class API {
   }
 
   Future<bool> createWallet(String accountAddress) async {
+    dynamic wallet = await getWallet();
+    if (wallet != null && wallet["walletAddress"] != null) {
+      print('Wallet already exists - wallet: $wallet');
+      return true;
+    }
+
     Map<String, dynamic> resp =
         await _post('wallets/$accountAddress', private: true);
     if (resp["response"] == "ok") {
