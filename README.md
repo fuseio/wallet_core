@@ -4,4 +4,4 @@ Fuse wallet core for Etherum based networks
 
 ## Usage
 
-See `example` folder
+See [`example`](/example) folder
