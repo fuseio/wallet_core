@@ -1,3 +1,5 @@
+library web3;
+
 import 'dart:async';
 import 'dart:math';
 

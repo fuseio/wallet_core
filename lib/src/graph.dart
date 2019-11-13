@@ -1,3 +1,5 @@
+library graph;
+
 class Graph {
   String _url;
 
