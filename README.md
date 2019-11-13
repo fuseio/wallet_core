@@ -4,4 +4,4 @@ Fuse wallet core for Etherum based networks
 
 ## Usage
 
-See [`example`](/example) folder
+See [`example`](https://github.com/fuseio/wallet_core/tree/master/example) folder

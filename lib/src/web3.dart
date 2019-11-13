@@ -5,6 +5,7 @@ import 'package:http/http.dart';
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:resource/resource.dart';
 
@@ -13,8 +14,14 @@ const num NETWORK_ID = 122;
 
 const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
     '0xbA01716EAD7989a00cC3b2AE6802b54eaF40fb72';
+
+const String NATIVE_TOKEN_ADDRESS =
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // For sending native (ETH/FUSE) using TransferManager
+
 const String COMMUNITY_MANAGER_CONTRACT_ADDRESS =
     '0x306BB3f40BEa3710cAc4BD9F1Ef052aD999d7233';
+const String TRANSFER_MANAGER_CONTRACT_ADDRESS =
+    '0xBbE1EcEE01bBa382088E243624aE69C4D7F378A8';
 
 class Web3 {
   Web3Client _client;
@@ -53,7 +60,12 @@ class Web3 {
     print('sendTransactionAndWaitForReceipt');
     String txHash = await _client.sendTransaction(_credentials, transaction,
         chainId: _networkId);
-    TransactionReceipt receipt = await _client.getTransactionReceipt(txHash);
+    TransactionReceipt receipt;
+    try {
+      receipt = await _client.getTransactionReceipt(txHash);
+    } catch (err) {
+      print('could not get $txHash receipt, try again');
+    }
     num delay = 1;
     num retries = 5;
     while (receipt == null) {
@@ -73,9 +85,14 @@ class Web3 {
     return txHash;
   }
 
-  Future<EtherAmount> getBalance() async {
-    EthereumAddress address = await _credentials.extractAddress();
-    return _client.getBalance(address);
+  Future<EtherAmount> getBalance({String address}) async {
+    EthereumAddress a;
+    if (address != null && address != "") {
+      a = EthereumAddress.fromHex(address);
+    } else {
+      a = EthereumAddress.fromHex(await getAddress());
+    }
+    return await _client.getBalance(a);
   }
 
   Future<String> transfer(String receiverAddress, num amountInWei) async {
@@ -118,6 +135,10 @@ class Web3 {
 
   Future<String> _callContract(String contractName, String contractAddress,
       String functionName, List<dynamic> params) async {
+    bool isApproved = await _approveCb;
+    if (!isApproved) {
+      throw 'transaction not approved';
+    }
     DeployedContract contract = await _contract(contractName, contractAddress);
     Transaction tx = Transaction.callContract(
         contract: contract,
@@ -153,21 +174,60 @@ class Web3 {
 
   Future<String> tokenTransfer(
       String tokenAddress, String receiverAddress, num tokensAmount) async {
+    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
     num tokenDecimals = int.parse(tokenDetails["decimals"].toString());
     BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
-
-    return await _callContract('BasicToken', tokenAddress, 'transfer',
-        [EthereumAddress.fromHex(receiverAddress), amount]);
+    return await _callContract(
+        'BasicToken', tokenAddress, 'transfer', [receiver, amount]);
   }
 
   Future<String> joinCommunity(String walletAddress,
       {String communityAddress}) async {
-    return await _callContract('CommunityManager',
-        COMMUNITY_MANAGER_CONTRACT_ADDRESS, 'joinCommunity', [
-      EthereumAddress.fromHex(walletAddress),
-      EthereumAddress.fromHex(
-          communityAddress ?? DEFAULT_COMMUNITY_CONTRACT_ADDRESS)
-    ]);
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress community = EthereumAddress.fromHex(
+        communityAddress ?? DEFAULT_COMMUNITY_CONTRACT_ADDRESS);
+    return await _callContract(
+        'CommunityManager',
+        COMMUNITY_MANAGER_CONTRACT_ADDRESS,
+        'joinCommunity',
+        [wallet, community]);
+  }
+
+  Future<EtherAmount> cashGetBalance(String walletAddress) async {
+    return await getBalance(address: walletAddress);
+  }
+
+  Future<String> cashTransfer(
+      String walletAddress, String receiverAddress, num amountInWei) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress token = EthereumAddress.fromHex(NATIVE_TOKEN_ADDRESS);
+    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
+    BigInt amount = BigInt.from(amountInWei);
+    return await _callContract(
+        'TransferManager',
+        TRANSFER_MANAGER_CONTRACT_ADDRESS,
+        'transferToken',
+        [wallet, token, receiver, amount, hexToBytes('0x')]);
+  }
+
+  Future<String> cashTokenTransfer(String walletAddress, String tokenAddress,
+      String receiverAddress, num tokensAmount) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
+    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
+    dynamic tokenDetails = await getTokenDetails(tokenAddress);
+    num tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
+    return await _callContract(
+        'TransferManager',
+        TRANSFER_MANAGER_CONTRACT_ADDRESS,
+        'transferToken',
+        [wallet, token, receiver, amount, hexToBytes('0x')]);
+  }
+
+  Future<dynamic> cashGetTokenBalance(
+      String walletAddress, String tokenAddress) async {
+    return getTokenBalance(tokenAddress, address: walletAddress);
   }
 }

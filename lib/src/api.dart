@@ -103,7 +103,7 @@ class API {
         "updatedAt": resp["data"]["updatedAt"]
       };
     } else {
-      throw 'Error! Get wallet request failed';
+      return {};
     }
   }
 }
