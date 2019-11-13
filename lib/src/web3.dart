@@ -8,16 +8,24 @@ import 'package:hex/hex.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:resource/resource.dart';
 
+const String RPC_URL = 'https://rpc.fusenet.io';
+const num NETWORK_ID = 122;
+
+const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
+    '0xbA01716EAD7989a00cC3b2AE6802b54eaF40fb72';
+const String COMMUNITY_MANAGER_CONTRACT_ADDRESS =
+    '0xcdf2B268af739E817E2403e13feE7c3df2928d17';
+
 class Web3 {
   Web3Client _client;
   Future<bool> _approveCb;
   Credentials _credentials;
   num _networkId;
 
-  Web3(String url, num networkId, Future<bool> approveCb()) {
-    _client = new Web3Client(url, new Client());
+  Web3(Future<bool> approveCb(), {String url, num networkId}) {
+    _client = new Web3Client(url ?? RPC_URL, new Client());
     _approveCb = approveCb();
-    _networkId = networkId;
+    _networkId = networkId ?? NETWORK_ID;
   }
 
   String generateMnemonic() {
@@ -151,5 +159,15 @@ class Web3 {
 
     return await _callContract('BasicToken', tokenAddress, 'transfer',
         [EthereumAddress.fromHex(receiverAddress), amount]);
+  }
+
+  Future<String> joinCommunity(String walletAddress,
+      {String communityAddress}) async {
+    return await _callContract('CommunityManager',
+        COMMUNITY_MANAGER_CONTRACT_ADDRESS, 'joinCommunity', [
+      EthereumAddress.fromHex(walletAddress),
+      EthereumAddress.fromHex(
+          communityAddress ?? DEFAULT_COMMUNITY_CONTRACT_ADDRESS)
+    ]);
   }
 }

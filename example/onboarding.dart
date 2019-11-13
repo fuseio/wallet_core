@@ -4,17 +4,13 @@ import 'dart:io';
 
 import 'package:wallet_core/wallet_core.dart';
 
-const String RPC_ENDPOINT = 'https://rpc.fusenet.io';
-const num NETWORK_ID = 122;
-const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api/v2';
-
 Future<bool> approvalCallback() async {
   return true;
 }
 
 void main() async {
   // init web3 module
-  Web3 web3 = new Web3(RPC_ENDPOINT, NETWORK_ID, approvalCallback);
+  Web3 web3 = new Web3(approvalCallback);
 
   // generate mnemonic
   String mnemonic = web3.generateMnemonic();
@@ -32,7 +28,7 @@ void main() async {
   print('account address: $accountAddress');
 
   // init api module
-  API api = new API(API_BASE_URL);
+  API api = new API();
 
   // login
   print('enter phone number and press ENTER');
@@ -53,4 +49,12 @@ void main() async {
   // get wallet
   dynamic wallet = await api.getWallet();
   print('wallet: $wallet');
+
+  // join default community
+  await web3.joinCommunity(wallet["walletAddress"]);
+
+  // join community
+  String communityAddress = '0xd4751Ad16b44410990a767E7c2A7bF0aF17f7d85';
+  await web3.joinCommunity(wallet["walletAddress"],
+      communityAddress: communityAddress);
 }

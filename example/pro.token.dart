@@ -5,16 +5,13 @@ import 'dart:math';
 
 import 'package:wallet_core/wallet_core.dart';
 
-const String RPC_ENDPOINT = 'https://rpc.fusenet.io';
-const num NETWORK_ID = 122;
-
 Future<bool> approvalCallback() async {
   return true;
 }
 
 void main() async {
   // init web3 module
-  Web3 web3 = new Web3(RPC_ENDPOINT, NETWORK_ID, approvalCallback);
+  Web3 web3 = new Web3(approvalCallback);
 
   print('enter private key and press ENTER');
   String privateKey = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));

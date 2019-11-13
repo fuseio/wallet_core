@@ -5,13 +5,15 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 
+const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api/v2';
+
 class API {
   String _base;
   Client _client;
   String _jwtToken;
 
-  API(String base) {
-    _base = base;
+  API({String base}) {
+    _base = base ?? API_BASE_URL;
     _client = new Client();
   }
 
