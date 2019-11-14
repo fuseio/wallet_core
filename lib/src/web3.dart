@@ -69,14 +69,14 @@ class Web3 {
       print('could not get $txHash receipt, try again');
     }
     num delay = 1;
-    num retries = 5;
+    num retries = 10;
     while (receipt == null) {
       print('waiting for receipt');
       await Future.delayed(new Duration(seconds: delay));
       delay *= 2;
       retries--;
       if (retries == 0) {
-        throw 'transaction $txHash not mined...';
+        throw 'transaction $txHash not mined yet...';
       }
       try {
         receipt = await _client.getTransactionReceipt(txHash);
