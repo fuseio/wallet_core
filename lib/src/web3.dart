@@ -61,11 +61,11 @@ class Web3 {
     _networkId = networkId ?? NETWORK_ID;
   }
 
-  String generateMnemonic() {
+  static String generateMnemonic() {
     return bip39.generateMnemonic();
   }
 
-  String privateKeyFromMnemonic(String mnemonic) {
+  static String privateKeyFromMnemonic(String mnemonic) {
     String seed = bip39.mnemonicToSeedHex(mnemonic);
     bip32.BIP32 root = bip32.BIP32.fromSeed(HEX.decode(seed));
     bip32.BIP32 child = root.derivePath("m/44'/60'/0'/0/0");

@@ -9,16 +9,16 @@ Future<bool> approvalCallback() async {
 }
 
 void main() async {
-  // init web3 module
-  Web3 web3 = new Web3(approvalCallback);
-
   // generate mnemonic
-  String mnemonic = web3.generateMnemonic();
+  String mnemonic = Web3.generateMnemonic();
   print('mnemonic: $mnemonic');
 
   // get private key from mnemonic
-  String privateKey = web3.privateKeyFromMnemonic(mnemonic);
+  String privateKey = Web3.privateKeyFromMnemonic(mnemonic);
   print('privateKey: $privateKey');
+
+  // init web3 module
+  Web3 web3 = new Web3(approvalCallback);
 
   // set web3 credentials with private key
   await web3.setCredentials(privateKey);
