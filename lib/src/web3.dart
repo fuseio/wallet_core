@@ -11,7 +11,7 @@ import 'package:hex/hex.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
-const String RPC_URL = 'https://rpc.fusenet.io';
+const String RPC_URL = 'https://rpc.fuse.io';
 const num NETWORK_ID = 122;
 
 const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
