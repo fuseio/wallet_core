@@ -206,6 +206,10 @@ class Web3 {
         'BasicToken', tokenAddress, 'transfer', [receiver, amount]);
   }
 
+  String getDefaultCommunity() {
+    return DEFAULT_COMMUNITY_CONTRACT_ADDRESS;
+  }
+
   Future<String> joinCommunity(String walletAddress,
       {String communityAddress}) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
