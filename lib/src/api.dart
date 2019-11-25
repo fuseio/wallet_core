@@ -4,8 +4,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:wallet_core/src/web3.dart';
 
-const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api/v2';
+const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api';
 
 class API {
   String _base;
@@ -32,6 +33,7 @@ class API {
   }
 
   Future<Map<String, dynamic>> _get(String endpoint, {bool private}) async {
+    print('GET $endpoint');
     Response response;
     if (private != null && private) {
       response = await _client.get('$_base/$endpoint',
@@ -44,6 +46,7 @@ class API {
 
   Future<Map<String, dynamic>> _post(String endpoint,
       {dynamic body, bool private}) async {
+    print('POST $endpoint $body');
     Response response;
     if (private != null && private) {
       response = await _client.post('$_base/$endpoint',
@@ -56,7 +59,7 @@ class API {
 
   Future<bool> loginRequest(String phoneNumber) async {
     Map<String, dynamic> resp =
-        await _post('login/request', body: {"phoneNumber": phoneNumber});
+        await _post('v2/login/request', body: {"phoneNumber": phoneNumber});
     if (resp["response"] == "ok") {
       return true;
     } else {
@@ -66,7 +69,7 @@ class API {
 
   Future<String> loginVerify(
       String phoneNumber, String verificationCode) async {
-    Map<String, dynamic> resp = await _post('login/verify',
+    Map<String, dynamic> resp = await _post('v2/login/verify',
         body: {"phoneNumber": phoneNumber, "code": verificationCode});
     if (resp["token"] != "") {
       _jwtToken = resp["token"];
@@ -84,7 +87,7 @@ class API {
     }
 
     Map<String, dynamic> resp =
-        await _post('wallets/$accountAddress', private: true);
+        await _post('v2/wallets/$accountAddress', private: true);
     if (resp["response"] == "ok") {
       return true;
     } else {
@@ -93,7 +96,7 @@ class API {
   }
 
   Future<dynamic> getWallet() async {
-    Map<String, dynamic> resp = await _get('wallets', private: true);
+    Map<String, dynamic> resp = await _get('v2/wallets', private: true);
     if (resp != null && resp["data"] != null) {
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
@@ -104,6 +107,16 @@ class API {
       };
     } else {
       return {};
+    }
+  }
+
+  Future<dynamic> getCommunity({String communityAddress}) async {
+    String community = communityAddress ?? Web3.getDefaultCommunity();
+    Map<String, dynamic> resp = await _get('v1/communities/$community');
+    if (resp != null && resp["data"] != null) {
+      return resp["data"];
+    } else {
+      throw 'Error! Get community request failed - communityAddress: $community';
     }
   }
 }

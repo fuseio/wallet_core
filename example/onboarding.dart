@@ -50,11 +50,21 @@ void main() async {
   dynamic wallet = await api.getWallet();
   print('wallet: $wallet');
 
+  String walletAddress = wallet["walletAddress"];
+
+  // get default community details
+  dynamic community = await api.getCommunity();
+  print('community: $community');
+
   // join default community
-  await web3.joinCommunity(wallet["walletAddress"]);
+  await web3.joinCommunity(walletAddress);
+
+  String communityAddress = '0xd4751Ad16b44410990a767E7c2A7bF0aF17f7d85';
+
+  // get community details
+  community = await api.getCommunity(communityAddress: communityAddress);
+  print('community: $community');
 
   // join community
-  String communityAddress = '0xd4751Ad16b44410990a767E7c2A7bF0aF17f7d85';
-  await web3.joinCommunity(wallet["walletAddress"],
-      communityAddress: communityAddress);
+  await web3.joinCommunity(walletAddress, communityAddress: communityAddress);
 }

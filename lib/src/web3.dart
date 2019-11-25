@@ -206,7 +206,7 @@ class Web3 {
         'BasicToken', tokenAddress, 'transfer', [receiver, amount]);
   }
 
-  String getDefaultCommunity() {
+  static String getDefaultCommunity() {
     return DEFAULT_COMMUNITY_CONTRACT_ADDRESS;
   }
 
@@ -221,14 +221,10 @@ class Web3 {
         'joinCommunity',
         [wallet, community]);
   }
-  
+
   // "old" join community
   Future<String> join(String communityAddress) async {
-    return await _callContract(
-        'Community',
-        communityAddress,
-        'join',
-        []);
+    return await _callContract('Community', communityAddress, 'join', []);
   }
 
   Future<EtherAmount> cashGetBalance(String walletAddress) async {

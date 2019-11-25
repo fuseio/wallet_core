@@ -10,7 +10,7 @@ Future<bool> approvalCallback() async {
 
 void main() async {
   /* Fuse */
-  
+
   // init web3 module
   Web3 web3 = new Web3(approvalCallback);
 
@@ -43,7 +43,8 @@ void main() async {
   /* Ropsten */
 
   // init web3 module
-  Web3 web3Ropsten = new Web3(approvalCallback, url: 'https://ropsten.infura.io', networkId: 3);
+  Web3 web3Ropsten = new Web3(approvalCallback,
+      url: 'https://ropsten.infura.io', networkId: 3);
 
   // set web3 credentials with same private key
   await web3Ropsten.setCredentials(privateKey);
