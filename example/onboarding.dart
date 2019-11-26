@@ -52,19 +52,42 @@ void main() async {
 
   String walletAddress = wallet["walletAddress"];
 
+  // init graph module
+  Graph graph = new Graph();
+
   // get default community details
-  dynamic community = await api.getCommunity();
+  dynamic community = await graph.getCommunityByAddress();
   print('community: $community');
 
-  // join default community
-  await web3.joinCommunity(walletAddress);
+  // get default community token
+  dynamic token = await graph.getTokenOfCommunity();
+  print('token: $token');
 
-  String communityAddress = '0xd4751Ad16b44410990a767E7c2A7bF0aF17f7d85';
+  // check if member of default community
+  bool isMember = await graph.isCommunityMember(walletAddress, community["entitiesList"]["address"]);
+  print('isMember: $isMember');
+
+  if (!isMember) {
+    // join default community
+    await web3.joinCommunity(walletAddress);
+  }
+  
+  String communityAddress = '0xc6Dae191309BB5efC1b15B96c68A197A0c600145';
 
   // get community details
-  community = await api.getCommunity(communityAddress: communityAddress);
+  community = await graph.getCommunityByAddress(communityAddress: communityAddress);
   print('community: $community');
 
-  // join community
-  await web3.joinCommunity(walletAddress, communityAddress: communityAddress);
+  // get community token
+  token = await graph.getTokenOfCommunity(communityAddress: communityAddress);
+  print('token: $token');
+
+  // check if member of community
+  isMember = await graph.isCommunityMember(walletAddress, community["entitiesList"]["address"]);
+  print('isMember: $isMember');
+
+  if (!isMember) {
+    // join community
+    await web3.joinCommunity(walletAddress, communityAddress: communityAddress);
+  }
 }
