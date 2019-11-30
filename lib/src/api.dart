@@ -11,6 +11,8 @@ class API {
   String _base;
   Client _client;
   String _jwtToken;
+  String phoneNumber;
+  String accountAddress;
 
   API({String base}) {
     _base = base ?? API_BASE_URL;
@@ -67,18 +69,20 @@ class API {
   }
 
   Future<String> loginVerify(
-      String phoneNumber, String verificationCode) async {
+      String phoneNumber, String verificationCode, String accountAddress) async {
     Map<String, dynamic> resp = await _post('v2/login/verify',
-        body: {"phoneNumber": phoneNumber, "code": verificationCode});
+        body: {"phoneNumber": phoneNumber, "code": verificationCode, "accountAddress" : accountAddress});
     if (resp["token"] != "") {
       _jwtToken = resp["token"];
+      phoneNumber = phoneNumber;
+      accountAddress = accountAddress;
       return _jwtToken;
     } else {
       throw 'Error! Login verify failed - phoneNumber: $phoneNumber, verificationCode: $verificationCode';
     }
   }
 
-  Future<bool> createWallet(String accountAddress) async {
+  Future<bool> createWallet() async {
     dynamic wallet = await getWallet();
     if (wallet != null && wallet["walletAddress"] != null) {
       print('Wallet already exists - wallet: $wallet');
@@ -86,7 +90,7 @@ class API {
     }
 
     Map<String, dynamic> resp =
-        await _post('v2/wallets/$accountAddress', private: true);
+        await _post('v2/wallets', private: true);
     if (resp["response"] == "ok") {
       return true;
     } else {
