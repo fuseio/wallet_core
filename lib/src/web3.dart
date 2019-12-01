@@ -3,6 +3,7 @@ library web3;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:http/http.dart';
 import 'package:bip32/bip32.dart' as bip32;
@@ -257,5 +258,16 @@ class Web3 {
         TRANSFER_MANAGER_CONTRACT_ADDRESS,
         'transferToken',
         [wallet, token, receiver, amount, hexToBytes('0x')]);
+  }
+
+  Future<dynamic> cashGetTokenBalance(
+      String walletAddress, String tokenAddress) async {
+    return getTokenBalance(tokenAddress, address: walletAddress);
+  }
+
+
+  String signOffChain(String signer, String from, String to, num amountInWei, num nonce, num gasPrice, num gasLimit) {
+    List<int> input = null;
+    keccak256(Uint8List.fromList(input));
   }
 }
