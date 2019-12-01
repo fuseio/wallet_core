@@ -119,4 +119,85 @@ class Graph {
       return BigInt.from(num.parse(result.data["accounts"][0]["tokens"][0]["balance"]));
     }
   }
+
+  Future<dynamic> getTransfers(String accountAddress, String tokenAddress) async {
+    QueryResult result = await _clientFuse.query(QueryOptions(
+      document: r'''
+      query getTransfers($account: String!, $token: String!) {
+          transfersIn: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
+            tokenAddress: $token,
+            to: $account
+          }) {
+            id,
+            blockNumber,
+            txHash,
+            tokenAddress,
+            from,
+            to,
+            value,
+            data
+          }
+
+          transfersOut: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
+            tokenAddress: $token,
+            from: $account
+          }) {
+            id,
+            blockNumber,
+            txHash,
+            tokenAddress,
+            from,
+            to,
+            value,
+            data
+          }
+      }
+      ''',
+      variables: <String, dynamic>{
+        'account': accountAddress,
+        'token': tokenAddress,
+        'n': 20
+      },
+    ));
+    if (result.hasErrors) {
+      throw 'Error! Get transfers request failed - accountAddress: $accountAddress, tokenAddress: $tokenAddress';
+    } else {
+      List transfers = [];
+
+      for (num i=0; i < result.data["transfersIn"].length; i++) {
+        dynamic t = result.data["transfersIn"][i];
+        transfers.add({
+          "blockNumber": num.parse(t["blockNumber"]),
+          "data": t["data"] ?? null,
+          "from": t["from"],
+          "id": t["id"],
+          "to": t["to"],
+          "tokenAddress": t["tokenAddress"],
+          "txHash": t["txHash"],
+          "value": BigInt.from(num.parse(t["value"])),
+          "type": "RECEIVE"
+        });
+      }
+
+      for (num i=0; i < result.data["transfersOut"].length; i++) {
+        dynamic t = result.data["transfersOut"][i];
+        transfers.add({
+          "blockNumber": num.parse(t["blockNumber"]),
+          "data": t["data"] ?? null,
+          "from": t["from"],
+          "id": t["id"],
+          "to": t["to"],
+          "tokenAddress": t["tokenAddress"],
+          "txHash": t["txHash"],
+          "value": BigInt.from(num.parse(t["value"])),
+          "type": "SEND"
+        });
+      }
+      transfers.sort((a,b) => b["blockNumber"].compareTo(a["blockNumber"]));
+      return {
+        "count": transfers.length,
+        "data": transfers
+      };
+    }
+  }
 }
