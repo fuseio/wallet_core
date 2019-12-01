@@ -258,9 +258,4 @@ class Web3 {
         'transferToken',
         [wallet, token, receiver, amount, hexToBytes('0x')]);
   }
-
-  Future<dynamic> cashGetTokenBalance(
-      String walletAddress, String tokenAddress) async {
-    return getTokenBalance(tokenAddress, address: walletAddress);
-  }
 }

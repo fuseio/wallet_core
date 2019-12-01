@@ -13,9 +13,9 @@ class Graph {
   GraphQLClient _clientMainnet;
 
   Graph({String url}) {
-    _clientFuse = GraphQLClient(cache: InMemoryCache(), link: HttpLink(uri: '${url ?? BASE_URL}/fuse-qa'));
-    _clientRopsten = GraphQLClient(cache: InMemoryCache(), link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ropsten'));
-    _clientMainnet = GraphQLClient(cache: InMemoryCache(), link: HttpLink(uri: '${url ?? BASE_URL}/fuse-mainnet'));
+    _clientFuse = GraphQLClient(link: HttpLink(uri: '${url ?? BASE_URL}/fuse-qa'), cache: InMemoryCache());
+    _clientRopsten = GraphQLClient(link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ropsten'), cache: InMemoryCache());
+    _clientMainnet = GraphQLClient(link: HttpLink(uri: '${url ?? BASE_URL}/fuse-mainnet'), cache: InMemoryCache());
   }
 
   Future<dynamic> getCommunityByAddress({String communityAddress}) async {
@@ -72,7 +72,7 @@ class Graph {
   }
 
   Future<bool> isCommunityMember(String accountAddress, String entitiesListAddress) async {
-    String id = '${entitiesListAddress}_${accountAddress}';
+    String id = '${entitiesListAddress}_$accountAddress';
 
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
@@ -93,6 +93,30 @@ class Graph {
       throw 'Error! Is community member request failed - accountAddress: $accountAddress, entitiesListAddress: $entitiesListAddress';
     } else {
       return result.data["communityEntities"].length > 0;
+    }
+  }
+
+  Future<BigInt> getTokenBalance(String accountAddress, String tokenAddress) async {
+    QueryResult result = await _clientFuse.query(QueryOptions(
+      document: r'''
+      query getTokenBalance($account: String!, $token: String!) {
+          accounts(where:{address: $account}) {
+            id
+            tokens(where:{tokenAddress: $token}){
+              balance
+            }
+          }
+      }
+      ''',
+      variables: <String, dynamic>{
+        'account': accountAddress,
+        'token': tokenAddress
+      },
+    ));
+    if (result.hasErrors) {
+      throw 'Error! Get token balance request failed - accountAddress: $accountAddress, tokenAddress: $tokenAddress';
+    } else {
+      return BigInt.from(num.parse(result.data["accounts"][0]["tokens"][0]["balance"]));
     }
   }
 }

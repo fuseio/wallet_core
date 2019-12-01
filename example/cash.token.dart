@@ -35,16 +35,19 @@ void main() async {
   dynamic tokenDecimals = int.parse(tokenDetails["decimals"].toString());
   tokenDecimals = BigInt.from(pow(10, tokenDecimals));
 
+  // init graph module
+  Graph graph = new Graph();
+
   // get own token balance before transfer
   dynamic tokenBalance =
-      await web3.cashGetTokenBalance(walletAddress, tokenAddress);
+      await graph.getTokenBalance(walletAddress, tokenAddress);
   tokenBalance = (tokenBalance / tokenDecimals).toStringAsFixed(2);
   print(
       '$walletAddress has $tokenBalance $tokenName($tokenSymbol) tokens before transfer');
 
   // get receiver token balance before transfer
   tokenBalance =
-      await web3.getTokenBalance(tokenAddress, address: receiverAddress);
+      await graph.getTokenBalance(receiverAddress, tokenAddress);
   tokenBalance = (tokenBalance / tokenDecimals).toStringAsFixed(2);
   print(
       '$receiverAddress has $tokenBalance $tokenName($tokenSymbol) tokens before transfer');
@@ -55,14 +58,14 @@ void main() async {
   print('transction $txHash successful');
 
   // get own token balance after transfer
-  tokenBalance = await web3.cashGetTokenBalance(walletAddress, tokenAddress);
+  tokenBalance = await graph.getTokenBalance(walletAddress, tokenAddress);
   tokenBalance = (tokenBalance / tokenDecimals).toStringAsFixed(2);
   print(
       '$walletAddress has $tokenBalance $tokenName($tokenSymbol) tokens after transfer');
 
   // get receiver token balance after transfer
   tokenBalance =
-      await web3.getTokenBalance(tokenAddress, address: receiverAddress);
+      await graph.getTokenBalance(receiverAddress, tokenAddress);
   tokenBalance = (tokenBalance / tokenDecimals).toStringAsFixed(2);
   print(
       '$receiverAddress has $tokenBalance $tokenName($tokenSymbol) tokens after transfer');
