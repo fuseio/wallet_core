@@ -11,8 +11,8 @@ class API {
   String _base;
   Client _client;
   String _jwtToken;
-  String phoneNumber;
-  String accountAddress;
+  String _phoneNumber;
+  String _accountAddress;
 
   API({String base}) {
     _base = base ?? API_BASE_URL;
@@ -74,8 +74,8 @@ class API {
         body: {"phoneNumber": phoneNumber, "code": verificationCode, "accountAddress" : accountAddress});
     if (resp["token"] != "") {
       _jwtToken = resp["token"];
-      phoneNumber = phoneNumber;
-      accountAddress = accountAddress;
+      _phoneNumber = phoneNumber;
+      _accountAddress = accountAddress;
       return _jwtToken;
     } else {
       throw 'Error! Login verify failed - phoneNumber: $phoneNumber, verificationCode: $verificationCode';
@@ -94,7 +94,7 @@ class API {
     if (resp["response"] == "ok") {
       return true;
     } else {
-      throw 'Error! Create wallet request failed - accountAddress: $accountAddress';
+      throw 'Error! Create wallet request failed - accountAddress: $_accountAddress, phoneNumber: $_phoneNumber';
     }
   }
 
