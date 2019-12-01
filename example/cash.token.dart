@@ -69,4 +69,8 @@ void main() async {
   tokenBalance = (tokenBalance / tokenDecimals).toStringAsFixed(2);
   print(
       '$receiverAddress has $tokenBalance $tokenName($tokenSymbol) tokens after transfer');
+
+  // get token transfers
+  Map<String, dynamic> transfers = await graph.getTransfers(walletAddress, tokenAddress);
+  print('Found ${transfers["count"]} transfers for $walletAddress on $tokenSymbol token: ${transfers["data"]}');
 }
