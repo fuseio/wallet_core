@@ -193,6 +193,7 @@ class Graph {
           "type": "SEND"
         });
       }
+      transfers.sort((a,b) => b["blockNumber"].compareTo(a["blockNumber"]));
       return {
         "count": transfers.length,
         "data": transfers
