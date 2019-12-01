@@ -40,11 +40,11 @@ void main() async {
   print('enter sms verification code and press ENTER');
   String verificationCode =
       stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
-  String jwtToken = await api.loginVerify(phoneNumber, verificationCode);
+  String jwtToken = await api.loginVerify(phoneNumber, verificationCode, accountAddress);
   print('jwtToken: $jwtToken');
 
   // create wallet
-  await api.createWallet(accountAddress);
+  await api.createWallet();
 
   // get wallet
   dynamic wallet = await api.getWallet();
