@@ -112,4 +112,19 @@ class API {
       return {};
     }
   }
+
+  Future<dynamic> getWalletByPhoneNumber(String phoneNumber) async {
+    Map<String, dynamic> resp = await _get('v2/wallets/$phoneNumber', private: true);
+    if (resp != null && resp["data"] != null) {
+      return {
+        "phoneNumber": resp["data"]["phoneNumber"],
+        "accountAddress": resp["data"]["accountAddress"],
+        "walletAddress": resp["data"]["walletAddress"],
+        "createdAt": resp["data"]["createdAt"],
+        "updatedAt": resp["data"]["updatedAt"]
+      };
+    } else {
+      return {};
+    }
+  }
 }
