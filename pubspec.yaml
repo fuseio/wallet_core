@@ -13,5 +13,3 @@ dependencies:
   resource: ^2.1.6
   web3dart: ^1.2.1
   graphql: ^2.0.0
-  flutter: 
-    sdk: flutter

@@ -11,9 +11,10 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
+import './utils.dart';
 
 const String RPC_URL = 'https://rpc.fuse.io';
-const num NETWORK_ID = 122;
+const int NETWORK_ID = 122;
 
 const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
     '0xbA01716EAD7989a00cC3b2AE6802b54eaF40fb72';
@@ -54,9 +55,9 @@ class Web3 {
   Web3Client _client;
   Future<bool> _approveCb;
   Credentials _credentials;
-  num _networkId;
+  int _networkId;
 
-  Web3(Future<bool> approveCb(), {String url, num networkId}) {
+  Web3(Future<bool> approveCb(), {String url, int networkId}) {
     _client = new Web3Client(url ?? RPC_URL, new Client());
     _approveCb = approveCb();
     _networkId = networkId ?? NETWORK_ID;
@@ -93,8 +94,8 @@ class Web3 {
     } catch (err) {
       print('could not get $txHash receipt, try again');
     }
-    num delay = 1;
-    num retries = 10;
+    int delay = 1;
+    int retries = 10;
     while (receipt == null) {
       print('waiting for receipt');
       await Future.delayed(new Duration(seconds: delay));
@@ -122,7 +123,7 @@ class Web3 {
     return await _client.getBalance(a);
   }
 
-  Future<String> transfer(String receiverAddress, num amountInWei) async {
+  Future<String> transfer(String receiverAddress, int amountInWei) async {
     print('transfer --> receiver: $receiverAddress, amountInWei: $amountInWei');
 
     bool isApproved = await _approveCb;
@@ -201,7 +202,7 @@ class Web3 {
       String tokenAddress, String receiverAddress, num tokensAmount) async {
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    num tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
     BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
     return await _callContract(
         'BasicToken', tokenAddress, 'transfer', [receiver, amount]);
@@ -233,7 +234,7 @@ class Web3 {
   }
 
   Future<String> cashTransfer(
-      String walletAddress, String receiverAddress, num amountInWei) async {
+      String walletAddress, String receiverAddress, int amountInWei) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(NATIVE_TOKEN_ADDRESS);
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
@@ -251,7 +252,7 @@ class Web3 {
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    num tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
     BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
     return await _callContract(
         'TransferManager',
@@ -266,8 +267,22 @@ class Web3 {
   }
 
 
-  String signOffChain(String signer, String from, String to, num amountInWei, num nonce, num gasPrice, num gasLimit) {
-    List<int> input = null;
-    keccak256(Uint8List.fromList(input));
+  Future<Uint8List> signOffChain(String to, BigInt amountInWei, Uint8List data, BigInt nonce, BigInt gasPrice, BigInt gasLimit) async {
+    String from = (await _credentials.extractAddress()).toString();
+    print(hexlify(nonce));
+    dynamic inputArr = [
+      '0x19',
+      '0x00',
+      from,
+      to,
+      hexZeroPad(hexlify(amountInWei), 32),
+      '0x00',
+      hexlify(nonce),
+      hexZeroPad(hexlify(gasPrice), 32),
+      hexZeroPad(hexlify(gasLimit), 32),
+    ];
+    String input = '0x' + inputArr.map((hexStr) => hexStr.substring(2)).join('');
+    dynamic hash = keccak256(hexToBytes(input));
+    return _credentials.signPersonalMessage(hash, chainId: 122);
   }
 }

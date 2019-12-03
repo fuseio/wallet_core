@@ -2,10 +2,11 @@ library api;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:http/http.dart';
 
-const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api';
+const String API_BASE_URL = 'http://localhost:3000/api';
 
 class API {
   String _base;
@@ -51,9 +52,11 @@ class API {
     Response response;
     if (private != null && private) {
       response = await _client.post('$_base/$endpoint',
-          headers: {"Authorization": "Bearer $_jwtToken"}, body: body);
+          headers: {"Authorization": "Bearer $_jwtToken", "Content-Type": 'application/json'}, body: body);
+          
+          // ..write(jsonEncode(jsonData));
     } else {
-      response = await _client.post('$_base/$endpoint', body: body);
+      response = await _client.post('$_base/$endpoint', body: body, headers: {"Content-Type": 'application/json'});
     }
     return _responseHandler(response);
   }
@@ -126,5 +129,27 @@ class API {
     } else {
       return {};
     }
+  }
+
+  Future<dynamic> relay(Uint8List signature, String walletAddress, Uint8List methodData, BigInt nonce, BigInt gasPrice, BigInt gasLimit) async {
+    // Map<String, dynamic> body = {
+    //   'walletAddress': walletAddress.toString(),
+    //   'methodData': methodData.toString(),
+    //   'nonce': nonce,
+    //   'signature': signature.toString(),
+    //   'gasPrice': gasPrice.toString(),
+    //   'gasLimit': gasLimit.toString()
+    // };
+    dynamic body = json.encode({
+      'walletAddress': walletAddress,
+      'methodData': methodData,
+      'nonce': nonce.toString(),
+      'signature': signature,
+      'gasPrice': gasPrice.toString(),
+      'gasLimit': gasLimit.toString()
+    });
+    print(body);
+     Map<String, dynamic> resp = await _post('v2/relay', body: body);
+     print(resp);
   }
 }
