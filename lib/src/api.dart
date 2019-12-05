@@ -2,9 +2,9 @@ library api;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:http/http.dart';
+import 'package:wallet_core/src/web3.dart';
 
 const String API_BASE_URL = 'http://localhost:3000/api';
 
@@ -53,8 +53,6 @@ class API {
     if (private != null && private) {
       response = await _client.post('$_base/$endpoint',
           headers: {"Authorization": "Bearer $_jwtToken", "Content-Type": 'application/json'}, body: body);
-          
-          // ..write(jsonEncode(jsonData));
     } else {
       response = await _client.post('$_base/$endpoint', body: body, headers: {"Content-Type": 'application/json'});
     }
@@ -131,25 +129,9 @@ class API {
     }
   }
 
-  Future<dynamic> relay(Uint8List signature, String walletAddress, Uint8List methodData, BigInt nonce, BigInt gasPrice, BigInt gasLimit) async {
-    // Map<String, dynamic> body = {
-    //   'walletAddress': walletAddress.toString(),
-    //   'methodData': methodData.toString(),
-    //   'nonce': nonce,
-    //   'signature': signature.toString(),
-    //   'gasPrice': gasPrice.toString(),
-    //   'gasLimit': gasLimit.toString()
-    // };
-    dynamic body = json.encode({
-      'walletAddress': walletAddress,
-      'methodData': methodData,
-      'nonce': nonce.toString(),
-      'signature': signature,
-      'gasPrice': gasPrice.toString(),
-      'gasLimit': gasLimit.toString()
-    });
-    print(body);
-     Map<String, dynamic> resp = await _post('v2/relay', body: body);
-     print(resp);
+  Future<dynamic> joinCommunity(Web3 web3, String walletAddress, String communityAddress) async {
+    Map<String, dynamic> data = await web3.joinCommunityOffChain(walletAddress, communityAddress);
+    Map<String, dynamic> resp = await _post('v2/relay', body: json.encode(data));
+    print(resp);
   }
 }

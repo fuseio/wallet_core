@@ -18,10 +18,8 @@ const int NETWORK_ID = 122;
 
 const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
     '0xbA01716EAD7989a00cC3b2AE6802b54eaF40fb72';
-
 const String NATIVE_TOKEN_ADDRESS =
     '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // For sending native (ETH/FUSE) using TransferManager
-
 const String COMMUNITY_MANAGER_CONTRACT_ADDRESS =
     '0x306BB3f40BEa3710cAc4BD9F1Ef052aD999d7233';
 const String TRANSFER_MANAGER_CONTRACT_ADDRESS =
@@ -212,18 +210,6 @@ class Web3 {
     return DEFAULT_COMMUNITY_CONTRACT_ADDRESS;
   }
 
-  Future<String> joinCommunity(String walletAddress,
-      {String communityAddress}) async {
-    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
-    EthereumAddress community = EthereumAddress.fromHex(
-        communityAddress ?? DEFAULT_COMMUNITY_CONTRACT_ADDRESS);
-    return await _callContract(
-        'CommunityManager',
-        COMMUNITY_MANAGER_CONTRACT_ADDRESS,
-        'joinCommunity',
-        [wallet, community]);
-  }
-
   // "old" join community
   Future<String> join(String communityAddress) async {
     return await _callContract('Community', communityAddress, 'join', []);
@@ -261,28 +247,60 @@ class Web3 {
         [wallet, token, receiver, amount, hexToBytes('0x')]);
   }
 
-  Future<dynamic> cashGetTokenBalance(
-      String walletAddress, String tokenAddress) async {
-    return getTokenBalance(tokenAddress, address: walletAddress);
+  Future<String> getNonceForRelay() async {
+    BigInt block = BigInt.from(await _client.getBlockNumber());
+    // print('block: $block');
+    BigInt timestamp = BigInt.from(new DateTime.now().millisecondsSinceEpoch);
+    // print('timestamp: $timestamp');
+    String blockHex = hexZeroPad(hexlify(block), 16);
+    String timestampHex = hexZeroPad(hexlify(timestamp), 16);
+    return '0x' + blockHex.substring(2, blockHex.length) + timestampHex.substring(2, timestampHex.length);
   }
 
-
-  Future<Uint8List> signOffChain(String to, BigInt amountInWei, Uint8List data, BigInt nonce, BigInt gasPrice, BigInt gasLimit) async {
-    String from = (await _credentials.extractAddress()).toString();
-    print(hexlify(nonce));
+  Future<Uint8List> signOffChain(String from, String to, BigInt value, String data, String nonce, BigInt gasPrice, BigInt gasLimit) async {
     dynamic inputArr = [
       '0x19',
       '0x00',
       from,
       to,
-      hexZeroPad(hexlify(amountInWei), 32),
-      '0x00',
-      hexlify(nonce),
+      hexZeroPad(hexlify(value), 32),
+      data,
+      nonce,
       hexZeroPad(hexlify(gasPrice), 32),
       hexZeroPad(hexlify(gasLimit), 32),
     ];
-    String input = '0x' + inputArr.map((hexStr) => hexStr.substring(2)).join('');
-    dynamic hash = keccak256(hexToBytes(input));
+    String input = '0x' + inputArr.map((hexStr) => hexStr.toString().substring(2)).join('');
+    // print('input: $input');
+    Uint8List hash = keccak256(hexToBytes(input));
     return _credentials.signPersonalMessage(hash, chainId: 122);
+  }
+
+  Future<Map<String, dynamic>> joinCommunityOffChain(String walletAddress, String communityAddress) async {
+    String nonce = await getNonceForRelay();
+    // print('nonce: $nonce');
+
+    DeployedContract contract = await _contract('CommunityManager', COMMUNITY_MANAGER_CONTRACT_ADDRESS);
+    Uint8List data = contract.function('joinCommunity').encodeCall([EthereumAddress.fromHex(walletAddress), EthereumAddress.fromHex(communityAddress)]);
+    String encodedData = HEX.encode(data);
+    // print('encodedData: $encodedData');
+    
+    Uint8List signature = await signOffChain(
+      COMMUNITY_MANAGER_CONTRACT_ADDRESS,
+      walletAddress,
+      BigInt.from(0),
+      encodedData,
+      nonce,
+      BigInt.from(0),
+      BigInt.from(700000)
+    );
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedData,
+      "nonce": nonce,
+      "gasPrice": 0,
+      "gasLimit": 700000,
+      "signature": signature
+    };
   }
 }
