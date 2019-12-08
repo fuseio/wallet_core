@@ -73,7 +73,8 @@ class Graph {
 
   Future<bool> isCommunityMember(String accountAddress, String entitiesListAddress) async {
     String id = '${entitiesListAddress}_$accountAddress';
-
+    
+    _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
       query getCommunityEntities($id: String!) {
@@ -97,6 +98,7 @@ class Graph {
   }
 
   Future<BigInt> getTokenBalance(String accountAddress, String tokenAddress) async {
+    _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
       query getTokenBalance($account: String!, $token: String!) {
@@ -121,6 +123,7 @@ class Graph {
   }
 
   Future<dynamic> getTransfers(String accountAddress, String tokenAddress) async {
+    _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
       query getTransfers($account: String!, $token: String!) {
