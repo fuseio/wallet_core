@@ -131,7 +131,19 @@ class API {
 
   Future<dynamic> joinCommunity(Web3 web3, String walletAddress, String communityAddress) async {
     Map<String, dynamic> data = await web3.joinCommunityOffChain(walletAddress, communityAddress);
-    Map<String, dynamic> resp = await _post('v2/relay', body: json.encode(data));
-    print(resp);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: json.encode(data));
+    return resp;
+  }
+
+  Future<dynamic> transfer(Web3 web3, String walletAddress, String receiverAddress, int amountInWei) async {
+    Map<String, dynamic> data = await web3.transferOffChain(walletAddress, receiverAddress, amountInWei);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: json.encode(data));
+    return resp;
+  }
+
+  Future<dynamic> tokenTransfer(Web3 web3, String walletAddress, String tokenAddress, String receiverAddress, num tokensAmount) async {
+    Map<String, dynamic> data = await web3.transferTokenOffChain(walletAddress, tokenAddress, receiverAddress, tokensAmount);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: json.encode(data));
+    return resp;
   }
 }

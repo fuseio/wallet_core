@@ -11,10 +11,13 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:decimal/decimal.dart';
 import './utils.dart';
 
 const String RPC_URL = 'https://rpc.fuse.io';
 const int NETWORK_ID = 122;
+
+const int DEFAULT_GAS_LIMIT = 700000;
 
 const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
     '0xbA01716EAD7989a00cC3b2AE6802b54eaF40fb72';
@@ -201,7 +204,9 @@ class Web3 {
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
     int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
-    BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
+    Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
+    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+    BigInt amount = BigInt.from((tokensAmountDecimal * decimals).toInt());
     return await _callContract(
         'BasicToken', tokenAddress, 'transfer', [receiver, amount]);
   }
@@ -217,34 +222,6 @@ class Web3 {
 
   Future<EtherAmount> cashGetBalance(String walletAddress) async {
     return await getBalance(address: walletAddress);
-  }
-
-  Future<String> cashTransfer(
-      String walletAddress, String receiverAddress, int amountInWei) async {
-    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
-    EthereumAddress token = EthereumAddress.fromHex(NATIVE_TOKEN_ADDRESS);
-    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
-    BigInt amount = BigInt.from(amountInWei);
-    return await _callContract(
-        'TransferManager',
-        TRANSFER_MANAGER_CONTRACT_ADDRESS,
-        'transferToken',
-        [wallet, token, receiver, amount, hexToBytes('0x')]);
-  }
-
-  Future<String> cashTokenTransfer(String walletAddress, String tokenAddress,
-      String receiverAddress, num tokensAmount) async {
-    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
-    EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
-    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
-    dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
-    BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
-    return await _callContract(
-        'TransferManager',
-        TRANSFER_MANAGER_CONTRACT_ADDRESS,
-        'transferToken',
-        [wallet, token, receiver, amount, hexToBytes('0x')]);
   }
 
   Future<String> getNonceForRelay() async {
@@ -293,7 +270,7 @@ class Web3 {
       encodedData,
       nonce,
       BigInt.from(0),
-      BigInt.from(700000)
+      BigInt.from(DEFAULT_GAS_LIMIT)
     );
 
     return {
@@ -301,9 +278,77 @@ class Web3 {
       "methodData": encodedData,
       "nonce": nonce,
       "gasPrice": 0,
-      "gasLimit": 700000,
+      "gasLimit": DEFAULT_GAS_LIMIT,
       "signature": signature,
       "walletModule": "CommunityManager"
+    };
+  }
+
+  Future<Map<String, dynamic>> transferOffChain(String walletAddress, String receiverAddress, int amountInWei) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress token = EthereumAddress.fromHex(NATIVE_TOKEN_ADDRESS);
+    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
+    BigInt amount = BigInt.from(amountInWei);
+
+    String nonce = await getNonceForRelay();
+    DeployedContract contract = await _contract('TransferManager', TRANSFER_MANAGER_CONTRACT_ADDRESS);
+    Uint8List data = contract.function('transferToken').encodeCall([wallet, token, receiver, amount, hexToBytes('0x')]);
+    String encodedData = '0x' + HEX.encode(data);
+
+    String signature = await signOffChain(
+      TRANSFER_MANAGER_CONTRACT_ADDRESS,
+      walletAddress,
+      BigInt.from(0),
+      encodedData,
+      nonce,
+      BigInt.from(0),
+      BigInt.from(DEFAULT_GAS_LIMIT)
+    );
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedData,
+      "nonce": nonce,
+      "gasPrice": 0,
+      "gasLimit": DEFAULT_GAS_LIMIT,
+      "signature": signature,
+      "walletModule": "TransferManager"
+    };
+  }
+
+  Future<Map<String, dynamic>> transferTokenOffChain(String walletAddress, String tokenAddress, String receiverAddress, num tokensAmount) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
+    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
+    dynamic tokenDetails = await getTokenDetails(tokenAddress);
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
+    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+    BigInt amount = BigInt.from((tokensAmountDecimal * decimals).toInt());
+    
+    String nonce = await getNonceForRelay();
+    DeployedContract contract = await _contract('TransferManager', TRANSFER_MANAGER_CONTRACT_ADDRESS);
+    Uint8List data = contract.function('transferToken').encodeCall([wallet, token, receiver, amount, hexToBytes('0x')]);
+    String encodedData = '0x' + HEX.encode(data);
+
+    String signature = await signOffChain(
+      TRANSFER_MANAGER_CONTRACT_ADDRESS,
+      walletAddress,
+      BigInt.from(0),
+      encodedData,
+      nonce,
+      BigInt.from(0),
+      BigInt.from(DEFAULT_GAS_LIMIT)
+    );
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedData,
+      "nonce": nonce,
+      "gasPrice": 0,
+      "gasLimit": DEFAULT_GAS_LIMIT,
+      "signature": signature,
+      "walletModule": "TransferManager"
     };
   }
 }

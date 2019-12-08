@@ -52,10 +52,11 @@ void main() async {
   print(
       '$receiverAddress has $tokenBalance $tokenName($tokenSymbol) tokens before transfer');
 
+  // init api module
+  API api = new API();
+
   // transfer tokens
-  String txHash = await web3.cashTokenTransfer(
-      walletAddress, tokenAddress, receiverAddress, 2.5);
-  print('transction $txHash successful');
+  await api.tokenTransfer(web3, walletAddress, tokenAddress, receiverAddress, 2.2);
 
   // get own token balance after transfer
   tokenBalance = await graph.getTokenBalance(walletAddress, tokenAddress);
