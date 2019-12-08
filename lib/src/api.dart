@@ -52,9 +52,14 @@ class API {
     Response response;
     if (private != null && private) {
       response = await _client.post('$_base/$endpoint',
-          headers: {"Authorization": "Bearer $_jwtToken", "Content-Type": 'application/json'}, body: body);
+          headers: {
+            "Authorization": "Bearer $_jwtToken",
+            "Content-Type": 'application/json'
+          },
+          body: body);
     } else {
-      response = await _client.post('$_base/$endpoint', body: body, headers: {"Content-Type": 'application/json'});
+      response = await _client.post('$_base/$endpoint',
+          body: body, headers: {"Content-Type": 'application/json'});
     }
     return _responseHandler(response);
   }
@@ -69,10 +74,13 @@ class API {
     }
   }
 
-  Future<String> loginVerify(
-      String phoneNumber, String verificationCode, String accountAddress) async {
-    Map<String, dynamic> resp = await _post('v2/login/verify',
-        body: {"phoneNumber": phoneNumber, "code": verificationCode, "accountAddress" : accountAddress});
+  Future<String> loginVerify(String phoneNumber, String verificationCode,
+      String accountAddress) async {
+    Map<String, dynamic> resp = await _post('v2/login/verify', body: {
+      "phoneNumber": phoneNumber,
+      "code": verificationCode,
+      "accountAddress": accountAddress
+    });
     if (resp["token"] != "") {
       _jwtToken = resp["token"];
       _phoneNumber = phoneNumber;
@@ -90,8 +98,7 @@ class API {
       return true;
     }
 
-    Map<String, dynamic> resp =
-        await _post('v2/wallets', private: true);
+    Map<String, dynamic> resp = await _post('v2/wallets', private: true);
     if (resp["response"] == "ok") {
       return true;
     } else {
@@ -115,7 +122,8 @@ class API {
   }
 
   Future<dynamic> getWalletByPhoneNumber(String phoneNumber) async {
-    Map<String, dynamic> resp = await _get('v2/wallets/$phoneNumber', private: true);
+    Map<String, dynamic> resp =
+        await _get('v2/wallets/$phoneNumber', private: true);
     if (resp != null && resp["data"] != null) {
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
@@ -129,9 +137,30 @@ class API {
     }
   }
 
-  Future<dynamic> joinCommunity(Web3 web3, String walletAddress, String communityAddress) async {
-    Map<String, dynamic> data = await web3.joinCommunityOffChain(walletAddress, communityAddress);
-    Map<String, dynamic> resp = await _post('v2/relay', body: json.encode(data));
-    print(resp);
+  Future<dynamic> joinCommunity(
+      Web3 web3, String walletAddress, String communityAddress) async {
+    Map<String, dynamic> data =
+        await web3.joinCommunityOffChain(walletAddress, communityAddress);
+    Map<String, dynamic> resp =
+        await _post('v2/relay', private: true, body: json.encode(data));
+    return resp;
+  }
+
+  Future<dynamic> transfer(Web3 web3, String walletAddress,
+      String receiverAddress, int amountInWei) async {
+    Map<String, dynamic> data = await web3.transferOffChain(
+        walletAddress, receiverAddress, amountInWei);
+    Map<String, dynamic> resp =
+        await _post('v2/relay', private: true, body: json.encode(data));
+    return resp;
+  }
+
+  Future<dynamic> tokenTransfer(Web3 web3, String walletAddress,
+      String tokenAddress, String receiverAddress, num tokensAmount) async {
+    Map<String, dynamic> data = await web3.transferTokenOffChain(
+        walletAddress, tokenAddress, receiverAddress, tokensAmount);
+    Map<String, dynamic> resp =
+        await _post('v2/relay', private: true, body: json.encode(data));
+    return resp;
   }
 }

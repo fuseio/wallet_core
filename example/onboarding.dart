@@ -40,7 +40,8 @@ void main() async {
   print('enter sms verification code and press ENTER');
   String verificationCode =
       stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
-  String jwtToken = await api.loginVerify(phoneNumber, verificationCode, accountAddress);
+  String jwtToken =
+      await api.loginVerify(phoneNumber, verificationCode, accountAddress);
   print('jwtToken: $jwtToken');
 
   // create wallet
@@ -64,18 +65,20 @@ void main() async {
   print('token: $token');
 
   // check if member of default community
-  bool isMember = await graph.isCommunityMember(walletAddress, community["entitiesList"]["address"]);
+  bool isMember = await graph.isCommunityMember(
+      walletAddress, community["entitiesList"]["address"]);
   print('isMember: $isMember');
 
   if (!isMember) {
     // join default community
     await api.joinCommunity(web3, walletAddress, Web3.getDefaultCommunity());
   }
-  
+
   String communityAddress = '0xc6Dae191309BB5efC1b15B96c68A197A0c600145';
 
   // get community details
-  community = await graph.getCommunityByAddress(communityAddress: communityAddress);
+  community =
+      await graph.getCommunityByAddress(communityAddress: communityAddress);
   print('community: $community');
 
   // get community token
@@ -83,7 +86,8 @@ void main() async {
   print('token: $token');
 
   // check if member of community
-  isMember = await graph.isCommunityMember(walletAddress, community["entitiesList"]["address"]);
+  isMember = await graph.isCommunityMember(
+      walletAddress, community["entitiesList"]["address"]);
   print('isMember: $isMember');
 
   if (!isMember) {

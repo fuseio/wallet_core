@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:wallet_core/wallet_core.dart';
 
@@ -27,12 +28,13 @@ void main() async {
   print(
       'balance before transaction: ${balance.getInWei} wei (${balance.getValueInUnit(EtherUnit.ether)} ether)');
 
+  // init api module
+  API api = new API();
+
   // transfer 0.1 ETH to another address
   String receiverAddress = '0xF3a4C2862188781365966A040B1f47b9614b2DC7';
-  num amount = 1e17;
-  String txHash =
-      await web3.cashTransfer(walletAddress, receiverAddress, amount);
-  print('transction $txHash successful');
+  int amountInWei = pow(10, 17);
+  await api.transfer(web3, walletAddress, receiverAddress, amountInWei);
 
   // get balance after transfer
   balance = await web3.cashGetBalance(walletAddress);

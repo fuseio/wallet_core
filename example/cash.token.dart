@@ -46,16 +46,17 @@ void main() async {
       '$walletAddress has $tokenBalance $tokenName($tokenSymbol) tokens before transfer');
 
   // get receiver token balance before transfer
-  tokenBalance =
-      await graph.getTokenBalance(receiverAddress, tokenAddress);
+  tokenBalance = await graph.getTokenBalance(receiverAddress, tokenAddress);
   tokenBalance = (tokenBalance / tokenDecimals).toStringAsFixed(2);
   print(
       '$receiverAddress has $tokenBalance $tokenName($tokenSymbol) tokens before transfer');
 
+  // init api module
+  API api = new API();
+
   // transfer tokens
-  String txHash = await web3.cashTokenTransfer(
-      walletAddress, tokenAddress, receiverAddress, 2.5);
-  print('transction $txHash successful');
+  await api.tokenTransfer(
+      web3, walletAddress, tokenAddress, receiverAddress, 2.2);
 
   // get own token balance after transfer
   tokenBalance = await graph.getTokenBalance(walletAddress, tokenAddress);
@@ -64,13 +65,14 @@ void main() async {
       '$walletAddress has $tokenBalance $tokenName($tokenSymbol) tokens after transfer');
 
   // get receiver token balance after transfer
-  tokenBalance =
-      await graph.getTokenBalance(receiverAddress, tokenAddress);
+  tokenBalance = await graph.getTokenBalance(receiverAddress, tokenAddress);
   tokenBalance = (tokenBalance / tokenDecimals).toStringAsFixed(2);
   print(
       '$receiverAddress has $tokenBalance $tokenName($tokenSymbol) tokens after transfer');
 
   // get token transfers
-  Map<String, dynamic> transfers = await graph.getTransfers(walletAddress, tokenAddress);
-  print('Found ${transfers["count"]} transfers for $walletAddress on $tokenSymbol token: ${transfers["data"]}');
+  Map<String, dynamic> transfers =
+      await graph.getTransfers(walletAddress, tokenAddress);
+  print(
+      'Found ${transfers["count"]} transfers for $walletAddress on $tokenSymbol token: ${transfers["data"]}');
 }
