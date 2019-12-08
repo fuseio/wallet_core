@@ -257,7 +257,7 @@ class Web3 {
     return '0x' + blockHex.substring(2, blockHex.length) + timestampHex.substring(2, timestampHex.length);
   }
 
-  Future<Uint8List> signOffChain(String from, String to, BigInt value, String data, String nonce, BigInt gasPrice, BigInt gasLimit) async {
+  Future<String> signOffChain(String from, String to, BigInt value, String data, String nonce, BigInt gasPrice, BigInt gasLimit) async {
     dynamic inputArr = [
       '0x19',
       '0x00',
@@ -267,12 +267,14 @@ class Web3 {
       data,
       nonce,
       hexZeroPad(hexlify(gasPrice), 32),
-      hexZeroPad(hexlify(gasLimit), 32),
+      hexZeroPad(hexlify(gasLimit), 32)
     ];
     String input = '0x' + inputArr.map((hexStr) => hexStr.toString().substring(2)).join('');
     // print('input: $input');
     Uint8List hash = keccak256(hexToBytes(input));
-    return _credentials.signPersonalMessage(hash, chainId: 122);
+    // print('hash: ${HEX.encode(hash)}');
+    Uint8List signature = await _credentials.signPersonalMessage(hash);
+    return '0x' + HEX.encode(signature);
   }
 
   Future<Map<String, dynamic>> joinCommunityOffChain(String walletAddress, String communityAddress) async {
@@ -281,10 +283,10 @@ class Web3 {
 
     DeployedContract contract = await _contract('CommunityManager', COMMUNITY_MANAGER_CONTRACT_ADDRESS);
     Uint8List data = contract.function('joinCommunity').encodeCall([EthereumAddress.fromHex(walletAddress), EthereumAddress.fromHex(communityAddress)]);
-    String encodedData = HEX.encode(data);
+    String encodedData = '0x' + HEX.encode(data);
     // print('encodedData: $encodedData');
     
-    Uint8List signature = await signOffChain(
+    String signature = await signOffChain(
       COMMUNITY_MANAGER_CONTRACT_ADDRESS,
       walletAddress,
       BigInt.from(0),
@@ -300,7 +302,8 @@ class Web3 {
       "nonce": nonce,
       "gasPrice": 0,
       "gasLimit": 700000,
-      "signature": signature
+      "signature": signature,
+      "walletModule": "CommunityManager"
     };
   }
 }
