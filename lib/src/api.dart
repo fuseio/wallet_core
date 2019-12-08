@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:wallet_core/src/web3.dart';
 
-const String API_BASE_URL = 'http://localhost:3000/api';
+const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api';
 
 class API {
   String _base;
