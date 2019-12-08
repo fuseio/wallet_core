@@ -3,6 +3,7 @@ library web3;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:http/http.dart';
 import 'package:bip32/bip32.dart' as bip32;
@@ -10,16 +11,15 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
+import './utils.dart';
 
 const String RPC_URL = 'https://rpc.fuse.io';
-const num NETWORK_ID = 122;
+const int NETWORK_ID = 122;
 
 const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
     '0xbA01716EAD7989a00cC3b2AE6802b54eaF40fb72';
-
 const String NATIVE_TOKEN_ADDRESS =
     '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // For sending native (ETH/FUSE) using TransferManager
-
 const String COMMUNITY_MANAGER_CONTRACT_ADDRESS =
     '0x306BB3f40BEa3710cAc4BD9F1Ef052aD999d7233';
 const String TRANSFER_MANAGER_CONTRACT_ADDRESS =
@@ -53,9 +53,9 @@ class Web3 {
   Web3Client _client;
   Future<bool> _approveCb;
   Credentials _credentials;
-  num _networkId;
+  int _networkId;
 
-  Web3(Future<bool> approveCb(), {String url, num networkId}) {
+  Web3(Future<bool> approveCb(), {String url, int networkId}) {
     _client = new Web3Client(url ?? RPC_URL, new Client());
     _approveCb = approveCb();
     _networkId = networkId ?? NETWORK_ID;
@@ -92,8 +92,8 @@ class Web3 {
     } catch (err) {
       print('could not get $txHash receipt, try again');
     }
-    num delay = 1;
-    num retries = 10;
+    int delay = 1;
+    int retries = 10;
     while (receipt == null) {
       print('waiting for receipt');
       await Future.delayed(new Duration(seconds: delay));
@@ -121,7 +121,7 @@ class Web3 {
     return await _client.getBalance(a);
   }
 
-  Future<String> transfer(String receiverAddress, num amountInWei) async {
+  Future<String> transfer(String receiverAddress, int amountInWei) async {
     print('transfer --> receiver: $receiverAddress, amountInWei: $amountInWei');
 
     bool isApproved = await _approveCb;
@@ -200,7 +200,7 @@ class Web3 {
       String tokenAddress, String receiverAddress, num tokensAmount) async {
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    num tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
     BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
     return await _callContract(
         'BasicToken', tokenAddress, 'transfer', [receiver, amount]);
@@ -208,18 +208,6 @@ class Web3 {
 
   static String getDefaultCommunity() {
     return DEFAULT_COMMUNITY_CONTRACT_ADDRESS;
-  }
-
-  Future<String> joinCommunity(String walletAddress,
-      {String communityAddress}) async {
-    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
-    EthereumAddress community = EthereumAddress.fromHex(
-        communityAddress ?? DEFAULT_COMMUNITY_CONTRACT_ADDRESS);
-    return await _callContract(
-        'CommunityManager',
-        COMMUNITY_MANAGER_CONTRACT_ADDRESS,
-        'joinCommunity',
-        [wallet, community]);
   }
 
   // "old" join community
@@ -232,7 +220,7 @@ class Web3 {
   }
 
   Future<String> cashTransfer(
-      String walletAddress, String receiverAddress, num amountInWei) async {
+      String walletAddress, String receiverAddress, int amountInWei) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(NATIVE_TOKEN_ADDRESS);
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
@@ -250,12 +238,72 @@ class Web3 {
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    num tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
     BigInt amount = BigInt.from(tokensAmount * pow(10, tokenDecimals));
     return await _callContract(
         'TransferManager',
         TRANSFER_MANAGER_CONTRACT_ADDRESS,
         'transferToken',
         [wallet, token, receiver, amount, hexToBytes('0x')]);
+  }
+
+  Future<String> getNonceForRelay() async {
+    BigInt block = BigInt.from(await _client.getBlockNumber());
+    // print('block: $block');
+    BigInt timestamp = BigInt.from(new DateTime.now().millisecondsSinceEpoch);
+    // print('timestamp: $timestamp');
+    String blockHex = hexZeroPad(hexlify(block), 16);
+    String timestampHex = hexZeroPad(hexlify(timestamp), 16);
+    return '0x' + blockHex.substring(2, blockHex.length) + timestampHex.substring(2, timestampHex.length);
+  }
+
+  Future<String> signOffChain(String from, String to, BigInt value, String data, String nonce, BigInt gasPrice, BigInt gasLimit) async {
+    dynamic inputArr = [
+      '0x19',
+      '0x00',
+      from,
+      to,
+      hexZeroPad(hexlify(value), 32),
+      data,
+      nonce,
+      hexZeroPad(hexlify(gasPrice), 32),
+      hexZeroPad(hexlify(gasLimit), 32)
+    ];
+    String input = '0x' + inputArr.map((hexStr) => hexStr.toString().substring(2)).join('');
+    // print('input: $input');
+    Uint8List hash = keccak256(hexToBytes(input));
+    // print('hash: ${HEX.encode(hash)}');
+    Uint8List signature = await _credentials.signPersonalMessage(hash);
+    return '0x' + HEX.encode(signature);
+  }
+
+  Future<Map<String, dynamic>> joinCommunityOffChain(String walletAddress, String communityAddress) async {
+    String nonce = await getNonceForRelay();
+    // print('nonce: $nonce');
+
+    DeployedContract contract = await _contract('CommunityManager', COMMUNITY_MANAGER_CONTRACT_ADDRESS);
+    Uint8List data = contract.function('joinCommunity').encodeCall([EthereumAddress.fromHex(walletAddress), EthereumAddress.fromHex(communityAddress)]);
+    String encodedData = '0x' + HEX.encode(data);
+    // print('encodedData: $encodedData');
+    
+    String signature = await signOffChain(
+      COMMUNITY_MANAGER_CONTRACT_ADDRESS,
+      walletAddress,
+      BigInt.from(0),
+      encodedData,
+      nonce,
+      BigInt.from(0),
+      BigInt.from(700000)
+    );
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedData,
+      "nonce": nonce,
+      "gasPrice": 0,
+      "gasLimit": 700000,
+      "signature": signature,
+      "walletModule": "CommunityManager"
+    };
   }
 }

@@ -4,8 +4,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:wallet_core/src/web3.dart';
 
-const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api';
+const String API_BASE_URL = 'http://localhost:3000/api';
 
 class API {
   String _base;
@@ -51,9 +52,9 @@ class API {
     Response response;
     if (private != null && private) {
       response = await _client.post('$_base/$endpoint',
-          headers: {"Authorization": "Bearer $_jwtToken"}, body: body);
+          headers: {"Authorization": "Bearer $_jwtToken", "Content-Type": 'application/json'}, body: body);
     } else {
-      response = await _client.post('$_base/$endpoint', body: body);
+      response = await _client.post('$_base/$endpoint', body: body, headers: {"Content-Type": 'application/json'});
     }
     return _responseHandler(response);
   }
@@ -126,5 +127,11 @@ class API {
     } else {
       return {};
     }
+  }
+
+  Future<dynamic> joinCommunity(Web3 web3, String walletAddress, String communityAddress) async {
+    Map<String, dynamic> data = await web3.joinCommunityOffChain(walletAddress, communityAddress);
+    Map<String, dynamic> resp = await _post('v2/relay', body: json.encode(data));
+    print(resp);
   }
 }

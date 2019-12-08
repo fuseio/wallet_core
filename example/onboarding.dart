@@ -69,7 +69,7 @@ void main() async {
 
   if (!isMember) {
     // join default community
-    await web3.joinCommunity(walletAddress);
+    await api.joinCommunity(web3, walletAddress, Web3.getDefaultCommunity());
   }
   
   String communityAddress = '0xc6Dae191309BB5efC1b15B96c68A197A0c600145';
@@ -88,6 +88,6 @@ void main() async {
 
   if (!isMember) {
     // join community
-    await web3.joinCommunity(walletAddress, communityAddress: communityAddress);
+    await api.joinCommunity(web3, walletAddress, communityAddress);
   }
 }
