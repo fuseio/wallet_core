@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:core' as prefix0;
-import 'dart:core';
 import 'dart:io';
 
 import 'package:wallet_core/wallet_core.dart';
