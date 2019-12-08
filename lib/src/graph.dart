@@ -13,9 +13,15 @@ class Graph {
   GraphQLClient _clientMainnet;
 
   Graph({String url}) {
-    _clientFuse = GraphQLClient(link: HttpLink(uri: '${url ?? BASE_URL}/fuse-qa'), cache: InMemoryCache());
-    _clientRopsten = GraphQLClient(link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ropsten'), cache: InMemoryCache());
-    _clientMainnet = GraphQLClient(link: HttpLink(uri: '${url ?? BASE_URL}/fuse-mainnet'), cache: InMemoryCache());
+    _clientFuse = GraphQLClient(
+        link: HttpLink(uri: '${url ?? BASE_URL}/fuse-qa'),
+        cache: InMemoryCache());
+    _clientRopsten = GraphQLClient(
+        link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ropsten'),
+        cache: InMemoryCache());
+    _clientMainnet = GraphQLClient(
+        link: HttpLink(uri: '${url ?? BASE_URL}/fuse-mainnet'),
+        cache: InMemoryCache());
   }
 
   Future<dynamic> getCommunityByAddress({String communityAddress}) async {
@@ -71,9 +77,10 @@ class Graph {
     }
   }
 
-  Future<bool> isCommunityMember(String accountAddress, String entitiesListAddress) async {
+  Future<bool> isCommunityMember(
+      String accountAddress, String entitiesListAddress) async {
     String id = '${entitiesListAddress}_$accountAddress';
-    
+
     _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
@@ -86,9 +93,7 @@ class Graph {
           }
       }
       ''',
-      variables: <String, dynamic>{
-        'id': id
-      },
+      variables: <String, dynamic>{'id': id},
     ));
     if (result.hasErrors) {
       throw 'Error! Is community member request failed - accountAddress: $accountAddress, entitiesListAddress: $entitiesListAddress';
@@ -97,7 +102,8 @@ class Graph {
     }
   }
 
-  Future<BigInt> getTokenBalance(String accountAddress, String tokenAddress) async {
+  Future<BigInt> getTokenBalance(
+      String accountAddress, String tokenAddress) async {
     _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
@@ -118,11 +124,13 @@ class Graph {
     if (result.hasErrors) {
       throw 'Error! Get token balance request failed - accountAddress: $accountAddress, tokenAddress: $tokenAddress';
     } else {
-      return BigInt.from(num.parse(result.data["accounts"][0]["tokens"][0]["balance"]));
+      return BigInt.from(
+          num.parse(result.data["accounts"][0]["tokens"][0]["balance"]));
     }
   }
 
-  Future<dynamic> getTransfers(String accountAddress, String tokenAddress) async {
+  Future<dynamic> getTransfers(
+      String accountAddress, String tokenAddress) async {
     _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
@@ -167,7 +175,7 @@ class Graph {
     } else {
       List transfers = [];
 
-      for (num i=0; i < result.data["transfersIn"].length; i++) {
+      for (num i = 0; i < result.data["transfersIn"].length; i++) {
         dynamic t = result.data["transfersIn"][i];
         transfers.add({
           "blockNumber": num.parse(t["blockNumber"]),
@@ -182,7 +190,7 @@ class Graph {
         });
       }
 
-      for (num i=0; i < result.data["transfersOut"].length; i++) {
+      for (num i = 0; i < result.data["transfersOut"].length; i++) {
         dynamic t = result.data["transfersOut"][i];
         transfers.add({
           "blockNumber": num.parse(t["blockNumber"]),
@@ -196,11 +204,8 @@ class Graph {
           "type": "SEND"
         });
       }
-      transfers.sort((a,b) => b["blockNumber"].compareTo(a["blockNumber"]));
-      return {
-        "count": transfers.length,
-        "data": transfers
-      };
+      transfers.sort((a, b) => b["blockNumber"].compareTo(a["blockNumber"]));
+      return {"count": transfers.length, "data": transfers};
     }
   }
 }
