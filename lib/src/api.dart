@@ -50,8 +50,9 @@ class API {
       {dynamic body, bool private}) async {
     print('POST $endpoint $body');
     Response response;
+    body = body == null ? body : json.encode(body);
     if (private != null && private) {
-      response = await _client.post('$_base/$endpoint',
+          response = await _client.post('$_base/$endpoint',
           headers: {
             "Authorization": "Bearer $_jwtToken",
             "Content-Type": 'application/json'
@@ -142,7 +143,7 @@ class API {
     Map<String, dynamic> data =
         await web3.joinCommunityOffChain(walletAddress, communityAddress);
     Map<String, dynamic> resp =
-        await _post('v2/relay', private: true, body: json.encode(data));
+        await _post('v2/relay', private: true, body: data);
     return resp;
   }
 
@@ -151,7 +152,7 @@ class API {
     Map<String, dynamic> data = await web3.transferOffChain(
         walletAddress, receiverAddress, amountInWei);
     Map<String, dynamic> resp =
-        await _post('v2/relay', private: true, body: json.encode(data));
+        await _post('v2/relay', private: true, body: data);
     return resp;
   }
 
@@ -160,7 +161,7 @@ class API {
     Map<String, dynamic> data = await web3.transferTokenOffChain(
         walletAddress, tokenAddress, receiverAddress, tokensAmount);
     Map<String, dynamic> resp =
-        await _post('v2/relay', private: true, body: json.encode(data));
+        await _post('v2/relay', private: true, body: data);
     return resp;
   }
 }
