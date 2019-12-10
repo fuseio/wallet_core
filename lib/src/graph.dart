@@ -124,8 +124,12 @@ class Graph {
     if (result.hasErrors) {
       throw 'Error! Get token balance request failed - accountAddress: $accountAddress, tokenAddress: $tokenAddress';
     } else {
-      return BigInt.from(
+      try {
+        return BigInt.from(
           num.parse(result.data["accounts"][0]["tokens"][0]["balance"]));
+      } catch (RangeError) {
+        return BigInt.from(0);
+      }
     }
   }
 
