@@ -15,9 +15,14 @@ class API {
   String _phoneNumber;
   String _accountAddress;
 
-  API({String base}) {
+  API({String base, String jwtToken}) {
     _base = base ?? API_BASE_URL;
+    _jwtToken = jwtToken ?? null;
     _client = new Client();
+  }
+
+  void setJwtToken(String jwtToken) {
+    _jwtToken = jwtToken;
   }
 
   Map<String, dynamic> _responseHandler(Response response) {
