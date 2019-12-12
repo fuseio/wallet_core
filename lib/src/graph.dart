@@ -189,7 +189,7 @@ class Graph {
           "to": t["to"],
           "tokenAddress": t["tokenAddress"],
           "txHash": t["txHash"],
-          "value": BigInt.from(num.parse(t["value"])),
+          "value": t["value"],
           "type": "RECEIVE"
         });
       }
@@ -204,7 +204,7 @@ class Graph {
           "to": t["to"],
           "tokenAddress": t["tokenAddress"],
           "txHash": t["txHash"],
-          "value": BigInt.from(num.parse(t["value"])),
+          "value": t["value"],
           "type": "SEND"
         });
       }
