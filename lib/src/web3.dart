@@ -202,9 +202,9 @@ class Web3 {
 
   Future<String> getNonceForRelay() async {
     BigInt block = BigInt.from(await _client.getBlockNumber());
-    // print('block: $block');
+    print('block: $block');
     BigInt timestamp = BigInt.from(new DateTime.now().millisecondsSinceEpoch);
-    // print('timestamp: $timestamp');
+    print('timestamp: $timestamp');
     String blockHex = hexZeroPad(hexlify(block), 16);
     String timestampHex = hexZeroPad(hexlify(timestamp), 16);
     return '0x' +
@@ -227,9 +227,10 @@ class Web3 {
     ];
     String input = '0x' +
         inputArr.map((hexStr) => hexStr.toString().substring(2)).join('');
-    // print('input: $input');
+    print('input: $input');
     Uint8List hash = keccak256(hexToBytes(input));
-    // print('hash: ${HEX.encode(hash)}');
+    print('hash: ${HEX.encode(hash)}');
+    print('signing on message with accountAddress: ${await _credentials.extractAddress()}');
     Uint8List signature = await _credentials.signPersonalMessage(hash);
     return '0x' + HEX.encode(signature);
   }
@@ -237,7 +238,7 @@ class Web3 {
   Future<Map<String, dynamic>> joinCommunityOffChain(
       String walletAddress, String communityAddress) async {
     String nonce = await getNonceForRelay();
-    // print('nonce: $nonce');
+    print('nonce: $nonce');
 
     DeployedContract contract =
         await _contract('CommunityManager', COMMUNITY_MANAGER_CONTRACT_ADDRESS);
@@ -246,7 +247,7 @@ class Web3 {
       EthereumAddress.fromHex(communityAddress)
     ]);
     String encodedData = '0x' + HEX.encode(data);
-    // print('encodedData: $encodedData');
+    print('encodedData: $encodedData');
 
     String signature = await signOffChain(
         COMMUNITY_MANAGER_CONTRACT_ADDRESS,
