@@ -184,4 +184,14 @@ class API {
         'v1/entities/$communityAddress?type=business&withMetadata=true');
     return resp;
   }
+
+  Future<dynamic> syncContacts(List<String> phoneNumbers) async {
+    Map<String, dynamic> resp = await _post('v2/contacts', body: {"contacts": phoneNumbers}, private: true);
+    return resp;
+  }
+
+  Future<dynamic> ackSync(int nonce) async {
+    Map<String, dynamic> resp = await _post('v2/contacts/$nonce', private: true);
+    return resp;
+  }
 }
