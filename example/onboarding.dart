@@ -74,6 +74,10 @@ void main() async {
     await api.joinCommunity(web3, walletAddress, Web3.getDefaultCommunity());
   }
 
+  // get default community businesses
+  dynamic businesses = await api.getBusinessList(Web3.getDefaultCommunity());
+  print('businesses: $businesses');
+
   String communityAddress = '0xc6Dae191309BB5efC1b15B96c68A197A0c600145';
 
   // get community details
@@ -94,4 +98,8 @@ void main() async {
     // join community
     await api.joinCommunity(web3, walletAddress, communityAddress);
   }
+
+  // get community businesses
+  businesses = await api.getBusinessList(communityAddress);
+  print('businesses: $businesses');
 }

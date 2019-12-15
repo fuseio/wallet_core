@@ -126,7 +126,7 @@ class Graph {
     } else {
       try {
         return BigInt.from(
-          num.parse(result.data["accounts"][0]["tokens"][0]["balance"]));
+            num.parse(result.data["accounts"][0]["tokens"][0]["balance"]));
       } catch (RangeError) {
         return BigInt.from(0);
       }
