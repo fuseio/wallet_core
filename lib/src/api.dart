@@ -57,7 +57,7 @@ class API {
     Response response;
     body = body == null ? body : json.encode(body);
     if (private != null && private) {
-          response = await _client.post('$_base/$endpoint',
+      response = await _client.post('$_base/$endpoint',
           headers: {
             "Authorization": "Bearer $_jwtToken",
             "Content-Type": 'application/json'
@@ -167,6 +167,12 @@ class API {
         walletAddress, tokenAddress, receiverAddress, tokensAmount);
     Map<String, dynamic> resp =
         await _post('v2/relay', private: true, body: data);
+    return resp;
+  }
+
+  Future<dynamic> getBusinessList(String communityAddress) async {
+    Map<String, dynamic> resp = await _get(
+        'v1/entities/$communityAddress?type=business&withMetadata=true');
     return resp;
   }
 }

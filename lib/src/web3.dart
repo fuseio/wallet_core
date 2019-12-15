@@ -230,7 +230,8 @@ class Web3 {
     print('input: $input');
     Uint8List hash = keccak256(hexToBytes(input));
     print('hash: ${HEX.encode(hash)}');
-    print('signing on message with accountAddress: ${await _credentials.extractAddress()}');
+    print(
+        'signing on message with accountAddress: ${await _credentials.extractAddress()}');
     Uint8List signature = await _credentials.signPersonalMessage(hash);
     return '0x' + HEX.encode(signature);
   }
