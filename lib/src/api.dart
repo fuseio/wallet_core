@@ -105,7 +105,7 @@ class API {
     }
 
     Map<String, dynamic> resp = await _post('v2/wallets', private: true);
-    if (resp["response"] == "ok") {
+    if (resp["job"] != null) {
       return true;
     } else {
       throw 'Error! Create wallet request failed - accountAddress: $_accountAddress, phoneNumber: $_phoneNumber';
@@ -124,6 +124,15 @@ class API {
       };
     } else {
       return {};
+    }
+  }
+
+  Future<dynamic> getJob(String id) async {
+    Map<String, dynamic> resp = await _get('v2/jobs/$id', private: true);
+    if (resp != null && resp["data"] != null) {
+      return resp["data"];
+    } else {
+      return null;
     }
   }
 
