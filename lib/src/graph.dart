@@ -79,13 +79,11 @@ class Graph {
 
   Future<bool> isCommunityMember(
       String accountAddress, String entitiesListAddress) async {
-    String id = '${entitiesListAddress}_$accountAddress';
-
     _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
-      query getCommunityEntities($id: String!) {
-          communityEntities(where:{id: $id}) {
+      query getCommunityEntities($address: String!, $entitiesList: String!) {
+          communityEntities(where:{address: $address, entitiesList: $entitiesList}) {
             id
             address
             isAdmin
@@ -93,7 +91,7 @@ class Graph {
           }
       }
       ''',
-      variables: <String, dynamic>{'id': id},
+      variables: <String, dynamic>{'address': accountAddress, 'entitiesList': entitiesListAddress},
     ));
     if (result.hasErrors) {
       throw 'Error! Is community member request failed - accountAddress: $accountAddress, entitiesListAddress: $entitiesListAddress';
