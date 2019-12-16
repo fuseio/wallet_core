@@ -19,10 +19,10 @@ const int NETWORK_ID = 122;
 
 const int DEFAULT_GAS_LIMIT = 700000;
 
-const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
-    '0xbA01716EAD7989a00cC3b2AE6802b54eaF40fb72';
 const String NATIVE_TOKEN_ADDRESS =
     '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // For sending native (ETH/FUSE) using TransferManager
+const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
+    '0xbA01716EAD7989a00cC3b2AE6802b54eaF40fb72';
 const String COMMUNITY_MANAGER_CONTRACT_ADDRESS =
     '0x306BB3f40BEa3710cAc4BD9F1Ef052aD999d7233';
 const String TRANSFER_MANAGER_CONTRACT_ADDRESS =
@@ -33,11 +33,26 @@ class Web3 {
   Future<bool> _approveCb;
   Credentials _credentials;
   int _networkId;
+  String _defaultCommunityContractAddress;
+  String _communityManagerContractAddress;
+  String _transferManagerContractAddress;
+  int _defaultGasLimit;
 
-  Web3(Future<bool> approveCb(), {String url, int networkId}) {
+  Web3(Future<bool> approveCb(), {
+    String url,
+    int networkId,
+    String defaultCommunityAddress,
+    String communityManagerAddress,
+    String transferManagerAddress,
+    int defaultGasLimit
+  }) {
     _client = new Web3Client(url ?? RPC_URL, new Client());
     _approveCb = approveCb();
     _networkId = networkId ?? NETWORK_ID;
+    _defaultCommunityContractAddress = defaultCommunityAddress ?? DEFAULT_COMMUNITY_CONTRACT_ADDRESS;
+    _communityManagerContractAddress = communityManagerAddress ?? COMMUNITY_MANAGER_CONTRACT_ADDRESS;
+    _transferManagerContractAddress = transferManagerAddress ?? TRANSFER_MANAGER_CONTRACT_ADDRESS;
+    _defaultGasLimit = defaultGasLimit ?? DEFAULT_GAS_LIMIT;
   }
 
   static String generateMnemonic() {
@@ -187,8 +202,8 @@ class Web3 {
         'BasicToken', tokenAddress, 'transfer', [receiver, amount]);
   }
 
-  static String getDefaultCommunity() {
-    return DEFAULT_COMMUNITY_CONTRACT_ADDRESS;
+  String getDefaultCommunity() {
+    return _defaultCommunityContractAddress;
   }
 
   // "old" join community
@@ -242,7 +257,7 @@ class Web3 {
     print('nonce: $nonce');
 
     DeployedContract contract =
-        await _contract('CommunityManager', COMMUNITY_MANAGER_CONTRACT_ADDRESS);
+        await _contract('CommunityManager', _communityManagerContractAddress);
     Uint8List data = contract.function('joinCommunity').encodeCall([
       EthereumAddress.fromHex(walletAddress),
       EthereumAddress.fromHex(communityAddress)
@@ -251,20 +266,20 @@ class Web3 {
     print('encodedData: $encodedData');
 
     String signature = await signOffChain(
-        COMMUNITY_MANAGER_CONTRACT_ADDRESS,
+        _communityManagerContractAddress,
         walletAddress,
         BigInt.from(0),
         encodedData,
         nonce,
         BigInt.from(0),
-        BigInt.from(DEFAULT_GAS_LIMIT));
+        BigInt.from(_defaultGasLimit));
 
     return {
       "walletAddress": walletAddress,
       "methodData": encodedData,
       "nonce": nonce,
       "gasPrice": 0,
-      "gasLimit": DEFAULT_GAS_LIMIT,
+      "gasLimit": _defaultGasLimit,
       "signature": signature,
       "walletModule": "CommunityManager"
     };
@@ -279,27 +294,27 @@ class Web3 {
 
     String nonce = await getNonceForRelay();
     DeployedContract contract =
-        await _contract('TransferManager', TRANSFER_MANAGER_CONTRACT_ADDRESS);
+        await _contract('TransferManager', _transferManagerContractAddress);
     Uint8List data = contract
         .function('transferToken')
         .encodeCall([wallet, token, receiver, amount, hexToBytes('0x')]);
     String encodedData = '0x' + HEX.encode(data);
 
     String signature = await signOffChain(
-        TRANSFER_MANAGER_CONTRACT_ADDRESS,
+        _transferManagerContractAddress,
         walletAddress,
         BigInt.from(0),
         encodedData,
         nonce,
         BigInt.from(0),
-        BigInt.from(DEFAULT_GAS_LIMIT));
+        BigInt.from(_defaultGasLimit));
 
     return {
       "walletAddress": walletAddress,
       "methodData": encodedData,
       "nonce": nonce,
       "gasPrice": 0,
-      "gasLimit": DEFAULT_GAS_LIMIT,
+      "gasLimit": _defaultGasLimit,
       "signature": signature,
       "walletModule": "TransferManager"
     };
@@ -318,27 +333,27 @@ class Web3 {
 
     String nonce = await getNonceForRelay();
     DeployedContract contract =
-        await _contract('TransferManager', TRANSFER_MANAGER_CONTRACT_ADDRESS);
+        await _contract('TransferManager', _transferManagerContractAddress);
     Uint8List data = contract
         .function('transferToken')
         .encodeCall([wallet, token, receiver, amount, hexToBytes('0x')]);
     String encodedData = '0x' + HEX.encode(data);
 
     String signature = await signOffChain(
-        TRANSFER_MANAGER_CONTRACT_ADDRESS,
+        _transferManagerContractAddress,
         walletAddress,
         BigInt.from(0),
         encodedData,
         nonce,
         BigInt.from(0),
-        BigInt.from(DEFAULT_GAS_LIMIT));
+        BigInt.from(_defaultGasLimit));
 
     return {
       "walletAddress": walletAddress,
       "methodData": encodedData,
       "nonce": nonce,
       "gasPrice": 0,
-      "gasLimit": DEFAULT_GAS_LIMIT,
+      "gasLimit": _defaultGasLimit,
       "signature": signature,
       "walletModule": "TransferManager"
     };

@@ -56,7 +56,7 @@ void main() async {
   // init graph module
   Graph graph = new Graph();
 
-  dynamic defaultCommunity = Web3.getDefaultCommunity();
+  dynamic defaultCommunity = web3.getDefaultCommunity();
   // get default community details
   dynamic community = await graph.getCommunityByAddress(defaultCommunity);
   print('community: $community');
@@ -76,7 +76,7 @@ void main() async {
   }
 
   // get default community businesses
-  dynamic businesses = await api.getBusinessList(Web3.getDefaultCommunity());
+  dynamic businesses = await api.getBusinessList(web3.getDefaultCommunity());
   print('businesses: $businesses');
 
   String communityAddress = '0xc6Dae191309BB5efC1b15B96c68A197A0c600145';
