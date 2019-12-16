@@ -56,12 +56,13 @@ void main() async {
   // init graph module
   Graph graph = new Graph();
 
+  dynamic defaultCommunity = Web3.getDefaultCommunity();
   // get default community details
-  dynamic community = await graph.getCommunityByAddress();
+  dynamic community = await graph.getCommunityByAddress(defaultCommunity);
   print('community: $community');
 
   // get default community token
-  dynamic token = await graph.getTokenOfCommunity();
+  dynamic token = await graph.getTokenOfCommunity(defaultCommunity);
   print('token: $token');
 
   // check if member of default community
@@ -71,7 +72,7 @@ void main() async {
 
   if (!isMember) {
     // join default community
-    await api.joinCommunity(web3, walletAddress, Web3.getDefaultCommunity());
+    await api.joinCommunity(web3, walletAddress, defaultCommunity);
   }
 
   // get default community businesses
@@ -82,11 +83,11 @@ void main() async {
 
   // get community details
   community =
-      await graph.getCommunityByAddress(communityAddress: communityAddress);
+      await graph.getCommunityByAddress(communityAddress);
   print('community: $community');
 
   // get community token
-  token = await graph.getTokenOfCommunity(communityAddress: communityAddress);
+  token = await graph.getTokenOfCommunity(communityAddress);
   print('token: $token');
 
   // check if member of community

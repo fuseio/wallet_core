@@ -24,8 +24,7 @@ class Graph {
         cache: InMemoryCache());
   }
 
-  Future<dynamic> getCommunityByAddress({String communityAddress}) async {
-    String community = communityAddress ?? Web3.getDefaultCommunity();
+  Future<dynamic> getCommunityByAddress(String communityAddress) async {
 
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
@@ -41,18 +40,17 @@ class Graph {
       }
       ''',
       variables: <String, dynamic>{
-        'address': community,
+        'address': communityAddress,
       },
     ));
     if (result.hasErrors) {
-      throw 'Error! Get community request failed - communityAddress: $community';
+      throw 'Error! Get community request failed - communityAddress: $communityAddress';
     } else {
       return result.data["communities"][0];
     }
   }
 
-  Future<dynamic> getTokenOfCommunity({String communityAddress}) async {
-    String community = communityAddress ?? Web3.getDefaultCommunity();
+  Future<dynamic> getTokenOfCommunity(String communityAddress) async {
 
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
@@ -67,11 +65,11 @@ class Graph {
       }
       ''',
       variables: <String, dynamic>{
-        'address': community,
+        'address': communityAddress,
       },
     ));
     if (result.hasErrors) {
-      throw 'Error! Get token of community request failed - communityAddress: $community';
+      throw 'Error! Get token of community request failed - communityAddress: $communityAddress';
     } else {
       return result.data["tokens"][0];
     }
