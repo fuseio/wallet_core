@@ -187,7 +187,7 @@ class API {
 
   Future<dynamic> syncContacts(List<String> phoneNumbers) async {
     Map<String, dynamic> resp = await _post('v2/contacts', body: {"contacts": phoneNumbers}, private: true);
-    return resp;
+    return resp["data"];
   }
 
   Future<dynamic> ackSync(int nonce) async {
