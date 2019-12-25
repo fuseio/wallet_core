@@ -130,14 +130,15 @@ class Graph {
   }
 
   Future<dynamic> getTransfers(
-      String accountAddress, String tokenAddress) async {
+      String accountAddress, String tokenAddress, {fromBlockNumber: -1}) async {
     _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
-      query getTransfers($account: String!, $token: String!) {
+      query getTransfers($account: String!, $token: String!, $fromBlockNumber: Int!) {
           transfersIn: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
             tokenAddress: $token,
-            to: $account
+            to: $account,
+            blockNumber_gt: $fromBlockNumber,
           }) {
             id,
             blockNumber,
@@ -151,7 +152,8 @@ class Graph {
 
           transfersOut: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
             tokenAddress: $token,
-            from: $account
+            from: $account,
+            blockNumber_gt: $fromBlockNumber,
           }) {
             id,
             blockNumber,
@@ -167,7 +169,8 @@ class Graph {
       variables: <String, dynamic>{
         'account': accountAddress,
         'token': tokenAddress,
-        'n': 20
+        'n': 20,
+        'fromBlockNumber': fromBlockNumber
       },
     ));
     if (result.hasErrors) {
@@ -186,7 +189,8 @@ class Graph {
           "tokenAddress": t["tokenAddress"],
           "txHash": t["txHash"],
           "value": t["value"],
-          "type": "RECEIVE"
+          "type": "RECEIVE",
+          "status": "CONFIRMED"
         });
       }
 
@@ -201,7 +205,8 @@ class Graph {
           "tokenAddress": t["tokenAddress"],
           "txHash": t["txHash"],
           "value": t["value"],
-          "type": "SEND"
+          "type": "SEND",
+          "status": "CONFIRMED"
         });
       }
       transfers.sort((a, b) => b["blockNumber"].compareTo(a["blockNumber"]));
