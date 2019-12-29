@@ -8,19 +8,19 @@ const String BASE_URL = 'https://graph.fuse.io/subgraphs/name/fuseio';
 
 class Graph {
   GraphQLClient _clientFuse;
-  // GraphQLClient _clientRopsten;
-  // GraphQLClient _clientMainnet;
+  GraphQLClient _clientRopsten;
+  GraphQLClient _clientMainnet;
 
   Graph({String url}) {
     _clientFuse = GraphQLClient(
         link: HttpLink(uri: '${url ?? BASE_URL}/fuse-qa'),
         cache: InMemoryCache());
-    // _clientRopsten = GraphQLClient(
-    //     link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ropsten'),
-    //     cache: InMemoryCache());
-    // _clientMainnet = GraphQLClient(
-    //     link: HttpLink(uri: '${url ?? BASE_URL}/fuse-mainnet'),
-    //     cache: InMemoryCache());
+    _clientRopsten = GraphQLClient(
+        link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ropsten'),
+        cache: InMemoryCache());
+    _clientMainnet = GraphQLClient(
+        link: HttpLink(uri: '${url ?? BASE_URL}/fuse-mainnet'),
+        cache: InMemoryCache());
   }
 
   Future<dynamic> getCommunityByAddress(String communityAddress) async {
