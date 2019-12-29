@@ -75,6 +75,10 @@ class Web3 {
     return (await _credentials.extractAddress()).toString();
   }
 
+  Future<int> getBlockNumber() async {
+    return _client.getBlockNumber();
+  }
+
   Future<String> _sendTransactionAndWaitForReceipt(
       Transaction transaction) async {
     print('sendTransactionAndWaitForReceipt');

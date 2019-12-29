@@ -3,7 +3,6 @@ library graph;
 import 'dart:async';
 
 import 'package:graphql/client.dart';
-import 'package:wallet_core/src/web3.dart';
 
 const String BASE_URL = 'https://graph.fuse.io/subgraphs/name/fuseio';
 
@@ -129,16 +128,92 @@ class Graph {
     }
   }
 
-  Future<dynamic> getTransfers(
-      String accountAddress, String tokenAddress, {fromBlockNumber: -1}) async {
+  Future<dynamic> getReceivedTransfers(
+      String accountAddress, String tokenAddress, {int fromBlockNumber, int toBlockNumber}) async {
     _clientFuse.cache.reset();
+
+    Map<String, dynamic> variables = <String, dynamic>{
+        'account': accountAddress,
+        'token': tokenAddress,
+        'n': 20,
+    };
+
+    if (fromBlockNumber != null) {
+      variables['fromBlockNumber'] = fromBlockNumber;
+    }
+    if (toBlockNumber != null) {
+      variables['toBlockNumber'] = toBlockNumber;
+    }
     QueryResult result = await _clientFuse.query(QueryOptions(
       document: r'''
-      query getTransfers($account: String!, $token: String!, $fromBlockNumber: Int!) {
+      query getTransfers($account: String!, $token: String!, $fromBlockNumber: Int, $toBlockNumber: Int) {
           transfersIn: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
             tokenAddress: $token,
             to: $account,
             blockNumber_gt: $fromBlockNumber,
+            blockNumber_lt: $toBlockNumber
+          }) {
+            id,
+            blockNumber,
+            txHash,
+            tokenAddress,
+            from,
+            to,
+            value,
+            data
+          }
+      }
+      ''',
+      variables: variables,
+    ));
+    if (result.hasErrors) {
+      throw 'Error! Get transfers request failed - accountAddress: $accountAddress, tokenAddress: $tokenAddress';
+    } else {
+      List transfers = [];
+
+      for (dynamic t in result.data['transfersIn']) {
+        transfers.add({
+          "blockNumber": num.parse(t["blockNumber"]),
+          "data": t["data"] ?? null,
+          "from": t["from"],
+          "id": t["id"],
+          "to": t["to"],
+          "tokenAddress": t["tokenAddress"],
+          "txHash": t["txHash"],
+          "value": t["value"],
+          "type": "RECEIVE",
+          "status": "CONFIRMED"
+        });
+      }
+
+      transfers.sort((a, b) => b["blockNumber"].compareTo(a["blockNumber"]));
+      return {"count": transfers.length, "data": transfers};
+    }
+  }
+  Future<dynamic> getTransfers(
+      String accountAddress, String tokenAddress, {int fromBlockNumber, int toBlockNumber}) async {
+    _clientFuse.cache.reset();
+
+    Map<String, dynamic> variables = <String, dynamic>{
+        'account': accountAddress,
+        'token': tokenAddress,
+        'n': 20,
+    };
+
+    if (fromBlockNumber != null) {
+      variables['fromBlockNumber'] = fromBlockNumber;
+    }
+    if (toBlockNumber != null) {
+      variables['toBlockNumber'] = toBlockNumber;
+    }
+    QueryResult result = await _clientFuse.query(QueryOptions(
+      document: r'''
+      query getTransfers($account: String!, $token: String!, $fromBlockNumber: Int, $toBlockNumber: Int) {
+          transfersIn: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
+            tokenAddress: $token,
+            to: $account,
+            blockNumber_gt: $fromBlockNumber,
+            blockNumber_lt: $toBlockNumber
           }) {
             id,
             blockNumber,
@@ -154,6 +229,7 @@ class Graph {
             tokenAddress: $token,
             from: $account,
             blockNumber_gt: $fromBlockNumber,
+            blockNumber_lt: $toBlockNumber
           }) {
             id,
             blockNumber,
@@ -166,12 +242,7 @@ class Graph {
           }
       }
       ''',
-      variables: <String, dynamic>{
-        'account': accountAddress,
-        'token': tokenAddress,
-        'n': 20,
-        'fromBlockNumber': fromBlockNumber
-      },
+      variables: variables,
     ));
     if (result.hasErrors) {
       throw 'Error! Get transfers request failed - accountAddress: $accountAddress, tokenAddress: $tokenAddress';
