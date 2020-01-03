@@ -185,6 +185,12 @@ class API {
     return resp;
   }
 
+  Future<dynamic> getEntityMetadata(String communityAddress, String account) async {
+    Map<String, dynamic> resp = await _get(
+        'v1/entities/metadata/$communityAddress/$account');
+    return resp['data'];
+  }
+
   Future<dynamic> syncContacts(List<String> phoneNumbers) async {
     Map<String, dynamic> resp = await _post('v2/contacts', body: {"contacts": phoneNumbers}, private: true);
     return resp["data"];

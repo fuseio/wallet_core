@@ -33,7 +33,13 @@ class Graph {
             address
             name
             entitiesList {
-              address
+              communityEntities {
+                address
+                isAdmin
+                isApproved
+                isUser
+                isBusiness
+              }
             }
           }
       }
