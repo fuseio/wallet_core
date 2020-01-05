@@ -70,6 +70,25 @@ class API {
     return _responseHandler(response);
   }
 
+  Future<Map<String, dynamic>> _put(String endpoint,
+      {dynamic body, bool private}) async {
+    print('PUT $endpoint $body');
+    Response response;
+    body = body == null ? body : json.encode(body);
+    if (private != null && private) {
+      response = await _client.put('$_base/$endpoint',
+          headers: {
+            "Authorization": "Bearer $_jwtToken",
+            "Content-Type": 'application/json'
+          },
+          body: body);
+    } else {
+      response = await _client.post('$_base/$endpoint',
+          body: body, headers: {"Content-Type": 'application/json'});
+    }
+    return _responseHandler(response);
+  }
+
   Future<bool> loginRequest(String phoneNumber) async {
     Map<String, dynamic> resp =
         await _post('v2/login/request', body: {"phoneNumber": phoneNumber});
@@ -203,6 +222,16 @@ class API {
 
   Future<dynamic> invite(String phoneNumber, String communityAddress) async {
     Map<String, dynamic> resp = await _post('v2/wallets/invite/$phoneNumber', body: {"communityAddress": communityAddress}, private: true);
+    return resp;
+  }
+
+  Future<dynamic> saveUserToDb(Map body) async {
+    Map<String, dynamic> resp = await _post('v2/users', body: body, private: false);
+    return resp;
+  }
+
+  Future<dynamic> createProfile(Map publicData) async {
+    Map<String, dynamic> resp = await _put('v1/profiles/${publicData['account']}', body: {"publicData": publicData}, private: false);
     return resp;
   }
 }
