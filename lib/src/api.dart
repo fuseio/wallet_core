@@ -83,7 +83,7 @@ class API {
           },
           body: body);
     } else {
-      response = await _client.post('$_base/$endpoint',
+      response = await _client.put('$_base/$endpoint',
           body: body, headers: {"Content-Type": 'application/json'});
     }
     return _responseHandler(response);
@@ -230,8 +230,8 @@ class API {
     return resp;
   }
 
-  Future<dynamic> createProfile(Map publicData) async {
-    Map<String, dynamic> resp = await _put('v1/profiles/${publicData['account']}', body: {"publicData": publicData}, private: false);
+  Future<dynamic> createProfile(String communityAddress, Map publicData) async {
+    Map<String, dynamic> resp = await _put('v1/profiles/$communityAddress', body: {"publicData": publicData}, private: false);
     return resp;
   }
 }
