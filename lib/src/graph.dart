@@ -5,15 +5,16 @@ import 'dart:async';
 import 'package:graphql/client.dart';
 
 const String BASE_URL = 'https://graph.fuse.io/subgraphs/name/fuseio';
+const String SUB_GRAPH = 'fuse-qa';
 
 class Graph {
   GraphQLClient _clientFuse;
   GraphQLClient _clientRopsten;
   GraphQLClient _clientMainnet;
 
-  Graph({String url}) {
+  Graph({String url, String subGraph}) {
     _clientFuse = GraphQLClient(
-        link: HttpLink(uri: '${url ?? BASE_URL}/fuse-qa'),
+        link: HttpLink(uri: '${url ?? BASE_URL}/${subGraph ?? SUB_GRAPH}'),
         cache: InMemoryCache());
     _clientRopsten = GraphQLClient(
         link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ropsten'),
