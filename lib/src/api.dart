@@ -198,6 +198,12 @@ class API {
     return resp;
   }
 
+  Future<dynamic> getCommunityData(String communityAddress) async {
+    Map<String, dynamic> resp = await _get(
+        'v1/communities/$communityAddress', private: false);
+    return resp['data'];
+  }
+
   Future<dynamic> getBusinessList(String communityAddress) async {
     Map<String, dynamic> resp = await _get(
         'v1/entities/$communityAddress?type=business&withMetadata=true');
