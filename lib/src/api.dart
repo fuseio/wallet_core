@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:wallet_core/src/utils.dart';
 import 'package:wallet_core/src/web3.dart';
 
 const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api';
@@ -39,32 +40,34 @@ class API {
     }
   }
 
-  Future<Map<String, dynamic>> _get(String endpoint, {bool private}) async {
+  Future<Map<String, dynamic>> _get(String endpoint, {bool private, bool isRopsten = false}) async {
     print('GET $endpoint');
     Response response;
+    String uri = isRopsten ? toRopsten(_base) : _base;
     if (private != null && private) {
-      response = await _client.get('$_base/$endpoint',
+      response = await _client.get('$uri/$endpoint',
           headers: {"Authorization": "Bearer $_jwtToken"});
     } else {
-      response = await _client.get('$_base/$endpoint');
+      response = await _client.get('$uri/$endpoint');
     }
     return _responseHandler(response);
   }
 
   Future<Map<String, dynamic>> _post(String endpoint,
-      {dynamic body, bool private}) async {
+      {dynamic body, bool private, bool isRopsten = false}) async {
     print('POST $endpoint $body');
     Response response;
     body = body == null ? body : json.encode(body);
+    String uri = isRopsten ? toRopsten(_base) : _base;
     if (private != null && private) {
-      response = await _client.post('$_base/$endpoint',
+      response = await _client.post('$uri/$endpoint',
           headers: {
             "Authorization": "Bearer $_jwtToken",
             "Content-Type": 'application/json'
           },
           body: body);
     } else {
-      response = await _client.post('$_base/$endpoint',
+      response = await _client.post('$uri/$endpoint',
           body: body, headers: {"Content-Type": 'application/json'});
     }
     return _responseHandler(response);
@@ -210,9 +213,9 @@ class API {
     return resp;
   }
 
-  Future<dynamic> getEntityMetadata(String communityAddress, String account) async {
+  Future<dynamic> getEntityMetadata(String communityAddress, String account, {bool isRopsten = false}) async {
     Map<String, dynamic> resp = await _get(
-        'v1/entities/metadata/$communityAddress/$account');
+        'v1/entities/metadata/$communityAddress/$account', isRopsten: isRopsten);
     return resp['data'];
   }
 

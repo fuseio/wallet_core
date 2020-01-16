@@ -8,3 +8,11 @@ String hexZeroPad(String value, num length) {
 String hexlify(BigInt dec) {
   return '0x0' + dec.toRadixString(16);
 }
+
+String toRopsten(String baseURI) {
+  if (baseURI.contains('qa')) {
+    return baseURI;
+  } else {
+    return baseURI.replaceAll('studio', 'studio-ropsten');
+  }
+}
