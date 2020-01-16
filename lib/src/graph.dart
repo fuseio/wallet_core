@@ -67,7 +67,8 @@ class Graph {
             symbol,
             name,
             address,
-            decimals
+            decimals,
+            originNetwork
           }
       }
       ''',
