@@ -333,7 +333,7 @@ class Web3 {
     int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
     Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
-    BigInt amount = BigInt.from((tokensAmountDecimal * decimals).toInt());
+    BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
 
     String nonce = await getNonceForRelay();
     DeployedContract contract =
