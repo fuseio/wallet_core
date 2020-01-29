@@ -119,16 +119,16 @@ class API {
     }
   }
 
-  Future<bool> createWallet() async {
+  Future<dynamic> createWallet() async {
     dynamic wallet = await getWallet();
     if (wallet != null && wallet["walletAddress"] != null) {
       print('Wallet already exists - wallet: $wallet');
-      return true;
+      return wallet;
     }
 
     Map<String, dynamic> resp = await _post('v2/wallets', private: true);
     if (resp["job"] != null) {
-      return true;
+      return resp;
     } else {
       throw 'Error! Create wallet request failed - accountAddress: $_accountAddress, phoneNumber: $_phoneNumber';
     }
