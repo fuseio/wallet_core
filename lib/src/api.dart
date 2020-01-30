@@ -201,9 +201,9 @@ class API {
     return resp;
   }
 
-  Future<dynamic> getCommunityData(String communityAddress) async {
+  Future<dynamic> getCommunityData(String communityAddress, {bool isRopsten = false}) async {
     Map<String, dynamic> resp = await _get(
-        'v1/communities/$communityAddress', private: false);
+        'v1/communities/$communityAddress', private: false, isRopsten: isRopsten);
     return resp['data'];
   }
 
@@ -242,5 +242,10 @@ class API {
   Future<dynamic> createProfile(String communityAddress, Map publicData) async {
     Map<String, dynamic> resp = await _put('v1/profiles/$communityAddress', body: {"publicData": publicData}, private: false);
     return resp;
+  }
+
+  Future<dynamic> fetchMetadata(String uri) async {
+    Map<String, dynamic> resp = await _get('v1/metadata/$uri', private: false);
+    return resp['data'];
   }
 }
