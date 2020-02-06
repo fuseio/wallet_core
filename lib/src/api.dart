@@ -230,8 +230,8 @@ class API {
     return resp;
   }
 
-  Future<dynamic> invite(String phoneNumber, String communityAddress) async {
-    Map<String, dynamic> resp = await _post('v2/wallets/invite/$phoneNumber', body: {"communityAddress": communityAddress}, private: true);
+  Future<dynamic> invite(String phoneNumber, String communityAddress, {String name = ''}) async {
+    Map<String, dynamic> resp = await _post('v2/wallets/invite/$phoneNumber', body: {"communityAddress": communityAddress, "name": name}, private: true);
     return resp;
   }
 
