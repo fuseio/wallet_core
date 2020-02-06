@@ -201,9 +201,10 @@ class API {
     return resp;
   }
 
-  Future<dynamic> getCommunityData(String communityAddress, {bool isRopsten = false}) async {
+  Future<dynamic> getCommunityData(String communityAddress, {bool isRopsten = false, String walletAddress}) async {
+    String url = walletAddress != null ? 'v1/communities/$communityAddress/$walletAddress' : 'v1/communities/$communityAddress';
     Map<String, dynamic> resp = await _get(
-        'v1/communities/$communityAddress', private: false, isRopsten: isRopsten);
+        url, private: false, isRopsten: isRopsten);
     return resp['data'];
   }
 
