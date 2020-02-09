@@ -169,7 +169,8 @@ class Graph {
             from,
             to,
             value,
-            data
+            data,
+            timestamp
           }
       }
       ''',
@@ -191,7 +192,8 @@ class Graph {
           "txHash": t["txHash"],
           "value": t["value"],
           "type": "RECEIVE",
-          "status": "CONFIRMED"
+          "status": "CONFIRMED",
+          "timestamp": t['timestamp']
         });
       }
 
@@ -231,7 +233,8 @@ class Graph {
             from,
             to,
             value,
-            data
+            data,
+            timestamp
           }
 
           transfersOut: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
@@ -247,7 +250,8 @@ class Graph {
             from,
             to,
             value,
-            data
+            data,
+            timestamp
           }
       }
       ''',
@@ -270,7 +274,8 @@ class Graph {
           "txHash": t["txHash"],
           "value": t["value"],
           "type": "RECEIVE",
-          "status": "CONFIRMED"
+          "status": "CONFIRMED",
+          "timestamp": t['timestamp']
         });
       }
 
@@ -286,7 +291,8 @@ class Graph {
           "txHash": t["txHash"],
           "value": t["value"],
           "type": "SEND",
-          "status": "CONFIRMED"
+          "status": "CONFIRMED",
+          "timestamp": t['timestamp']
         });
       }
       transfers.sort((a, b) => b["blockNumber"].compareTo(a["blockNumber"]));
