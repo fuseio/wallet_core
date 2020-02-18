@@ -180,6 +180,12 @@ class API {
     return resp;
   }
 
+  Future<dynamic> backupWallet(String communityAddress) async {
+    Map<String, dynamic> resp = await _post('v2/wallets/backup',
+      body: {"communityAddress": communityAddress}, private: true);
+    return resp;
+  }
+
   Future<dynamic> joinCommunity(
       Web3 web3, String walletAddress, String communityAddress) async {
     Map<String, dynamic> data =
