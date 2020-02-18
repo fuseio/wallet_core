@@ -174,6 +174,12 @@ class API {
     }
   }
 
+  Future<dynamic> updateFirebaseToken(String walletAddress, String firebaseToken) async {
+    Map<String, dynamic> resp = await _put('v2/wallets/token/$walletAddress',
+      body: {"firebaseToken": firebaseToken}, private: true);
+    return resp;
+  }
+
   Future<dynamic> joinCommunity(
       Web3 web3, String walletAddress, String communityAddress) async {
     Map<String, dynamic> data =
