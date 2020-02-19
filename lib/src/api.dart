@@ -8,7 +8,7 @@ import 'package:wallet_core/src/utils.dart';
 import 'package:wallet_core/src/web3.dart';
 
 const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api';
-const String FUNDEE_BASE_URL = 'https://funder.fuse.io/api';
+const String FUNDER_BASE_URL = 'https://funder-qa.fuse.io/api';
 
 class API {
   String _base;
@@ -16,11 +16,13 @@ class API {
   String _jwtToken;
   String _phoneNumber;
   String _accountAddress;
+  String _funderBase;
 
-  API({String base, String jwtToken}) {
+  API({String base, String jwtToken, String funderBase}) {
     _base = base ?? API_BASE_URL;
     _jwtToken = jwtToken ?? null;
     _client = new Client();
+    _funderBase = funderBase ?? FUNDER_BASE_URL;
   }
 
   void setJwtToken(String jwtToken) {
@@ -265,7 +267,7 @@ class API {
 
   Future<dynamic> getFunderJob(String id) async {
     Client funderClient = new Client();
-    Response response = await funderClient.get('$FUNDEE_BASE_URL/job/$id');
+    Response response = await funderClient.get('$_funderBase/job/$id');
     Map<String, dynamic> data = _responseHandler(response);
     return data['data'];
   }
