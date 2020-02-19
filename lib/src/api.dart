@@ -8,6 +8,7 @@ import 'package:wallet_core/src/utils.dart';
 import 'package:wallet_core/src/web3.dart';
 
 const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api';
+const String FUNDEE_BASE_URL = 'https://funder.fuse.io/api';
 
 class API {
   String _base;
@@ -260,5 +261,12 @@ class API {
   Future<dynamic> fetchMetadata(String uri) async {
     Map<String, dynamic> resp = await _get('v1/metadata/$uri', private: false);
     return resp['data'];
+  }
+
+  Future<dynamic> getFunderJob(String id) async {
+    Client funderClient = new Client();
+    Response response = await funderClient.get('$FUNDEE_BASE_URL/job/$id');
+    Map<String, dynamic> data = _responseHandler(response);
+    return data['data'];
   }
 }
