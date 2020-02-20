@@ -57,6 +57,34 @@ class Graph {
     }
   }
 
+  Future<dynamic> getCommunityBusinesses(String communityAddress) async {
+
+    QueryResult result = await _clientFuse.query(QueryOptions(
+      document: r'''
+      query getCommunityBusinesses($address: String!) {
+          communities(where:{address: $address}) {
+            entitiesList {
+              communityEntities(where:{isBusiness: true}) {
+                address
+                isAdmin
+                isApproved
+                isBusiness
+              }
+            }
+          }
+      }
+      ''',
+      variables: <String, dynamic>{
+        'address': communityAddress,
+      },
+    ));
+    if (result.hasErrors) {
+      throw 'Error! Get community businesses request failed - communityAddress: $communityAddress';
+    } else {
+      return result.data["communities"][0]['entitiesList']['communityEntities'];
+    }
+  }
+
   Future<dynamic> getTokenOfCommunity(String communityAddress) async {
 
     QueryResult result = await _clientFuse.query(QueryOptions(
