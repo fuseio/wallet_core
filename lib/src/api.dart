@@ -16,6 +16,7 @@ class API {
   String _jwtToken;
   String _phoneNumber;
   String _accountAddress;
+  String _firebaseIdToken;
   String _funderBase;
 
   API({String base, String jwtToken, String funderBase}) {
@@ -93,6 +94,21 @@ class API {
           body: body, headers: {"Content-Type": 'application/json'});
     }
     return _responseHandler(response);
+  }
+
+  Future<String> login(String token, String accountAddress) async {
+    Map<String, dynamic> resp = await _post('v2/login', body: {
+      "token": token,
+      "accountAddress": accountAddress
+    });
+    if (resp["token"] != "") {
+      _jwtToken = resp["token"];
+      _firebaseIdToken = token;
+      _accountAddress = accountAddress;
+      return _jwtToken;
+    } else {
+      throw 'Error! Login verify failed - accountAddress: $accountAddress, token: $token';
+    }
   }
 
   Future<bool> loginRequest(String phoneNumber) async {
