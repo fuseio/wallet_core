@@ -96,10 +96,11 @@ class API {
     return _responseHandler(response);
   }
 
-  Future<String> login(String token, String accountAddress) async {
+  Future<String> login(String token, String accountAddress, {String appName}) async {
     Map<String, dynamic> resp = await _post('v2/login', body: {
       "token": token,
-      "accountAddress": accountAddress
+      "accountAddress": accountAddress,
+      "appName": appName
     });
     if (resp["token"] != "") {
       _jwtToken = resp["token"];
