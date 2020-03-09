@@ -3,6 +3,7 @@ library graph;
 import 'dart:async';
 
 import 'package:graphql/client.dart';
+import 'package:wallet_core/src/queries.dart';
 
 const String BASE_URL = 'https://graph.fuse.io/subgraphs/name/fuseio';
 const String SUB_GRAPH = 'fuse-qa';
@@ -27,30 +28,12 @@ class Graph {
   Future<dynamic> getCommunityByAddress(String communityAddress) async {
 
     QueryResult result = await _clientFuse.query(QueryOptions(
-      document: r'''
-      query getCommunityByAddress($address: String!) {
-          communities(where:{address: $address}) {
-            id
-            address
-            name
-            entitiesList {
-              address
-              communityEntities {
-                address
-                isAdmin
-                isApproved
-                isUser
-                isBusiness
-              }
-            }
-          }
-      }
-      ''',
+      documentNode: gql(getCommunityByAddressQuery),
       variables: <String, dynamic>{
         'address': communityAddress,
       },
     ));
-    if (result.hasErrors) {
+    if (result.hasException) {
       throw 'Error! Get community request failed - communityAddress: $communityAddress';
     } else {
       return result.data["communities"][0];
@@ -60,25 +43,12 @@ class Graph {
   Future<dynamic> getCommunityBusinesses(String communityAddress) async {
 
     QueryResult result = await _clientFuse.query(QueryOptions(
-      document: r'''
-      query getCommunityBusinesses($address: String!) {
-          communities(where:{address: $address}) {
-            entitiesList {
-              communityEntities(where:{isBusiness: true}) {
-                address
-                isAdmin
-                isApproved
-                isBusiness
-              }
-            }
-          }
-      }
-      ''',
+      documentNode: gql(getCommunityBusinessesQuery),
       variables: <String, dynamic>{
         'address': communityAddress,
       },
     ));
-    if (result.hasErrors) {
+    if (result.hasException) {
       throw 'Error! Get community businesses request failed - communityAddress: $communityAddress';
     } else {
       return result.data["communities"][0]['entitiesList']['communityEntities'];
@@ -88,23 +58,12 @@ class Graph {
   Future<dynamic> getTokenOfCommunity(String communityAddress) async {
 
     QueryResult result = await _clientFuse.query(QueryOptions(
-      document: r'''
-      query getTokenOfCommunity($address: String!) {
-          tokens(where:{communityAddress: $address}) {
-            id,
-            symbol,
-            name,
-            address,
-            decimals,
-            originNetwork
-          }
-      }
-      ''',
+      documentNode: gql(getTokenOfCommunityQuery),
       variables: <String, dynamic>{
         'address': communityAddress,
       },
     ));
-    if (result.hasErrors) {
+    if (result.hasException) {
       throw 'Error! Get token of community request failed - communityAddress: $communityAddress';
     } else {
       return result.data["tokens"][0];
@@ -115,19 +74,10 @@ class Graph {
       String accountAddress, String entitiesListAddress) async {
     _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
-      document: r'''
-      query getCommunityEntities($address: String!, $entitiesList: String!) {
-          communityEntities(where:{address: $address, entitiesList: $entitiesList}) {
-            id
-            address
-            isAdmin
-            isApproved
-          }
-      }
-      ''',
+      documentNode: gql(isCommunityMemberQuery),
       variables: <String, dynamic>{'address': accountAddress, 'entitiesList': entitiesListAddress},
     ));
-    if (result.hasErrors) {
+    if (result.hasException) {
       throw 'Error! Is community member request failed - accountAddress: $accountAddress, entitiesListAddress: $entitiesListAddress';
     } else {
       return result.data["communityEntities"].length > 0;
@@ -138,22 +88,13 @@ class Graph {
       String accountAddress, String tokenAddress) async {
     _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
-      document: r'''
-      query getTokenBalance($account: String!, $token: String!) {
-          accounts(where:{address: $account}) {
-            id
-            tokens(where:{tokenAddress: $token}){
-              balance
-            }
-          }
-      }
-      ''',
+      documentNode: gql(getTokenBalanceQuery),
       variables: <String, dynamic>{
         'account': accountAddress,
         'token': tokenAddress
       },
     ));
-    if (result.hasErrors) {
+    if (result.hasException) {
       throw 'Error! Get token balance request failed - accountAddress: $accountAddress, tokenAddress: $tokenAddress';
     } else {
       try {
@@ -182,29 +123,10 @@ class Graph {
       variables['toBlockNumber'] = toBlockNumber;
     }
     QueryResult result = await _clientFuse.query(QueryOptions(
-      document: r'''
-      query getTransfers($account: String!, $token: String!, $fromBlockNumber: Int, $toBlockNumber: Int) {
-          transfersIn: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
-            tokenAddress: $token,
-            to: $account,
-            blockNumber_gt: $fromBlockNumber,
-            blockNumber_lt: $toBlockNumber
-          }) {
-            id,
-            blockNumber,
-            txHash,
-            tokenAddress,
-            from,
-            to,
-            value,
-            data,
-            timestamp
-          }
-      }
-      ''',
+      documentNode: gql(getReceivedTransfersQuery),
       variables: variables,
     ));
-    if (result.hasErrors) {
+    if (result.hasException) {
       throw 'Error! Get transfers request failed - accountAddress: $accountAddress, tokenAddress: $tokenAddress';
     } else {
       List transfers = [];
@@ -246,46 +168,10 @@ class Graph {
       variables['toBlockNumber'] = toBlockNumber;
     }
     QueryResult result = await _clientFuse.query(QueryOptions(
-      document: r'''
-      query getTransfers($account: String!, $token: String!, $fromBlockNumber: Int, $toBlockNumber: Int) {
-          transfersIn: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
-            tokenAddress: $token,
-            to: $account,
-            blockNumber_gt: $fromBlockNumber,
-            blockNumber_lt: $toBlockNumber
-          }) {
-            id,
-            blockNumber,
-            txHash,
-            tokenAddress,
-            from,
-            to,
-            value,
-            data,
-            timestamp
-          }
-
-          transfersOut: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
-            tokenAddress: $token,
-            from: $account,
-            blockNumber_gt: $fromBlockNumber,
-            blockNumber_lt: $toBlockNumber
-          }) {
-            id,
-            blockNumber,
-            txHash,
-            tokenAddress,
-            from,
-            to,
-            value,
-            data,
-            timestamp
-          }
-      }
-      ''',
+      documentNode: gql(getTransfersQuery),
       variables: variables,
     ));
-    if (result.hasErrors) {
+    if (result.hasException) {
       throw 'Error! Get transfers request failed - accountAddress: $accountAddress, tokenAddress: $tokenAddress';
     } else {
       List transfers = [];
