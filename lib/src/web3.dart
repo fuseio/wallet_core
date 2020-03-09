@@ -19,14 +19,7 @@ const int NETWORK_ID = 122;
 
 const int DEFAULT_GAS_LIMIT = 700000;
 
-const String NATIVE_TOKEN_ADDRESS =
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // For sending native (ETH/FUSE) using TransferManager
-const String DEFAULT_COMMUNITY_CONTRACT_ADDRESS =
-    '0x51fB8Ee1D805f8c6D42081d0005cd61eF87DdF4F';
-const String COMMUNITY_MANAGER_CONTRACT_ADDRESS =
-    '0xE47204f722F1B0a1113C1fBAd772626A9621E61E';
-const String TRANSFER_MANAGER_CONTRACT_ADDRESS =
-    '0x5472F98b5A043F115eD5079810c0e8dc54304736';
+const String NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // For sending native (ETH/FUSE) using TransferManager
 
 class Web3 {
   Web3Client _client;
@@ -49,9 +42,9 @@ class Web3 {
     _client = new Web3Client(url ?? RPC_URL, new Client());
     _approveCb = approveCb();
     _networkId = networkId ?? NETWORK_ID;
-    _defaultCommunityContractAddress = defaultCommunityAddress ?? DEFAULT_COMMUNITY_CONTRACT_ADDRESS;
-    _communityManagerContractAddress = communityManagerAddress ?? COMMUNITY_MANAGER_CONTRACT_ADDRESS;
-    _transferManagerContractAddress = transferManagerAddress ?? TRANSFER_MANAGER_CONTRACT_ADDRESS;
+    _defaultCommunityContractAddress = defaultCommunityAddress;
+    _communityManagerContractAddress = communityManagerAddress;
+    _transferManagerContractAddress = transferManagerAddress;
     _defaultGasLimit = defaultGasLimit ?? DEFAULT_GAS_LIMIT;
   }
 
