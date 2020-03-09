@@ -162,7 +162,9 @@ class API {
         "accountAddress": resp["data"]["accountAddress"],
         "walletAddress": resp["data"]["walletAddress"],
         "createdAt": resp["data"]["createdAt"],
-        "updatedAt": resp["data"]["updatedAt"]
+        "updatedAt": resp["data"]["updatedAt"],
+        "communityManager": resp['data']['walletModules']['CommunityManager'],
+        "transferManager": resp['data']['walletModules']['TransferManager'],
       };
     } else {
       return {};
