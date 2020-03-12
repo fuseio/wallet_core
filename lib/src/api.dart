@@ -166,6 +166,7 @@ class API {
         "updatedAt": resp["data"]["updatedAt"],
         "communityManager": resp['data']['walletModules']['CommunityManager'],
         "transferManager": resp['data']['walletModules']['TransferManager'],
+        "networks": resp['data']['networks'],
       };
     } else {
       return {};
