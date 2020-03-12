@@ -214,10 +214,20 @@ class Graph {
     }
   }
 
-  Future<dynamic> getTransfersEventsOnForeign(String foreign, String accountAddress, String tokenAddress, {int fromBlockNumber, int toBlockNumber}) async {
+  Future<dynamic> getTransfersEventsOnForeign({
+    String foreignNetwork,
+    String to,
+    String from,
+    String tokenAddress,
+    int fromBlockNumber,
+    int toBlockNumber
+  }) async {
     Map<String, dynamic> variables = <String, dynamic>{
-        'accountAddress': accountAddress,
-        'tokenAddress': tokenAddress
+        'to': to,
+        'from': from,
+        'tokenAddress': tokenAddress,
+        'skip': 0,
+        'first': 20,
     };
 
     if (fromBlockNumber != null) {
@@ -227,14 +237,14 @@ class Graph {
       variables['toBlockNumber'] = toBlockNumber;
     }
 
-    GraphQLClient foreignClient = foreign == 'mainnet' ? _clientMainnet : _clientRopsten;
+    GraphQLClient foreignClient = foreignNetwork == 'mainnet' ? _clientMainnet : _clientRopsten;
 
     QueryResult result = await foreignClient.query(QueryOptions(
       documentNode: gql(getTransfersEventsOnForeignQuery),
       variables: variables,
     ));
     if (result.hasException) {
-      throw 'Error! Get Transfers events failed - accountAddress: $accountAddress';
+      throw 'Error! Get Transfers events failed - accountAddress: $to';
     } else {
       return result.data["transferEvents"];
     }

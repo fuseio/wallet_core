@@ -126,17 +126,21 @@ const String getTransfersQuery = r'''
 
 const String getTransfersEventsOnForeignQuery = r'''
   query getTransfersEventsOnForeign(
-    $accountAddress: String!,
+    $to: String!,
+    $from: String,
     $tokenAddress: String!,
     $fromBlockNumber: Int,
-    $toBlockNumber: Int
+    $toBlockNumber: Int,
+    $skip: Int,
+    $first: Int,
   ) {
     transferEvents(where: {
+        to: $to,
+        from: $from,
         tokenAddress: $tokenAddress,
-        to: $accountAddress,
         blockNumber_gt: $fromBlockNumber,
         blockNumber_lt: $toBlockNumber
-    }) {
+    }, skip: $skip, first: $first) {
       id
       from
       to
