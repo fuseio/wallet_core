@@ -126,7 +126,7 @@ const String getTransfersQuery = r'''
 
 const String getTransfersEventsOnForeignQuery = r'''
   query getTransfersEventsOnForeign(
-    $to: String!,
+    $to: String,
     $from: String,
     $tokenAddress: String!,
     $fromBlockNumber: Int,
