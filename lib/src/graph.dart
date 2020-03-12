@@ -213,4 +213,30 @@ class Graph {
       return {"count": transfers.length, "data": transfers};
     }
   }
+
+  Future<dynamic> getTransfersEventsOnForeign(String foreign, String accountAddress, String tokenAddress, {int fromBlockNumber, int toBlockNumber}) async {
+    Map<String, dynamic> variables = <String, dynamic>{
+        'accountAddress': accountAddress,
+        'tokenAddress': tokenAddress
+    };
+
+    if (fromBlockNumber != null) {
+      variables['fromBlockNumber'] = fromBlockNumber;
+    }
+    if (toBlockNumber != null) {
+      variables['toBlockNumber'] = toBlockNumber;
+    }
+
+    GraphQLClient foreignClient = foreign == 'mainnet' ? _clientMainnet : _clientRopsten;
+
+    QueryResult result = await foreignClient.query(QueryOptions(
+      documentNode: gql(getTransfersEventsOnForeignQuery),
+      variables: variables,
+    ));
+    if (result.hasException) {
+      throw 'Error! Get Transfers events failed - accountAddress: $accountAddress';
+    } else {
+      return result.data["transferEvents"];
+    }
+  }
 }

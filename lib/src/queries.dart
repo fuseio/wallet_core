@@ -123,3 +123,26 @@ const String getTransfersQuery = r'''
       }
   }
 ''';
+
+const String getTransfersEventsOnForeignQuery = r'''
+  query getTransfersEventsOnForeign(
+    $accountAddress: String!,
+    $tokenAddress: String!,
+    $fromBlockNumber: Int,
+    $toBlockNumber: Int
+  ) {
+    transferEvents(where: {
+        tokenAddress: $tokenAddress,
+        to: $accountAddress,
+        blockNumber_gt: $fromBlockNumber,
+        blockNumber_lt: $toBlockNumber
+    }) {
+      id
+      from
+      to
+      value
+      blockNumber
+      txHash
+    }
+  }
+''';
