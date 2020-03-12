@@ -140,6 +140,15 @@ class API {
     }
   }
 
+  Future<dynamic> createWalletOnForeign() async {
+    Map<String, dynamic> resp = await _post('v2/wallets/foreign', private: true);
+    if (resp["job"] != null) {
+      return resp;
+    } else {
+      throw 'Error! Create foreign wallet request failed - accountAddress: $_accountAddress, phoneNumber: $_phoneNumber';
+    }
+  }
+
   Future<dynamic> createWallet() async {
     dynamic wallet = await getWallet();
     if (wallet != null && wallet["walletAddress"] != null) {
