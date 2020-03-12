@@ -96,10 +96,11 @@ class API {
     return _responseHandler(response);
   }
 
-  Future<String> login(String token, String accountAddress, {String appName}) async {
+  Future<String> login(String token, String accountAddress, String identifier, {String appName}) async {
     Map<String, dynamic> resp = await _post('v2/login', body: {
       "token": token,
       "accountAddress": accountAddress,
+      "identifier": identifier,
       "appName": appName
     });
     if (resp["token"] != "") {
@@ -108,7 +109,7 @@ class API {
       _accountAddress = accountAddress;
       return _jwtToken;
     } else {
-      throw 'Error! Login verify failed - accountAddress: $accountAddress, token: $token';
+      throw 'Error! Login verify failed - accountAddress: $accountAddress, token: $token, identifier: $identifier';
     }
   }
 
