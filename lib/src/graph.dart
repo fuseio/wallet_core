@@ -6,14 +6,16 @@ import 'package:graphql/client.dart';
 import 'package:wallet_core/src/queries.dart';
 
 const String BASE_URL = 'https://graph.fuse.io/subgraphs/name/fuseio';
+const String TOKEN_REGISTRY_URI = 'https://api.thegraph.com/subgraphs/name/protofire/token-registry';
 const String SUB_GRAPH = 'fuse-qa';
 
 class Graph {
   GraphQLClient _clientFuse;
   GraphQLClient _clientRopsten;
   GraphQLClient _clientMainnet;
+  GraphQLClient _clientTokenRegistry;
 
-  Graph({String url, String subGraph}) {
+  Graph({String url, String subGraph, String tokenRegistryUri = TOKEN_REGISTRY_URI}) {
     _clientFuse = GraphQLClient(
         link: HttpLink(uri: '${url ?? BASE_URL}/${subGraph ?? SUB_GRAPH}'),
         cache: InMemoryCache());
@@ -22,6 +24,9 @@ class Graph {
         cache: InMemoryCache());
     _clientMainnet = GraphQLClient(
         link: HttpLink(uri: '${url ?? BASE_URL}/fuse-mainnet'),
+        cache: InMemoryCache());
+    _clientTokenRegistry = GraphQLClient(
+        link: HttpLink(uri: '${tokenRegistryUri}'),
         cache: InMemoryCache());
   }
 
@@ -214,7 +219,7 @@ class Graph {
     }
   }
 
-  Future<dynamic> getTransfersEventsOnForeign({
+  Future<dynamic> getTransferEvents({
     String foreignNetwork,
     String to,
     String from,
@@ -236,17 +241,32 @@ class Graph {
     if (toBlockNumber != null) {
       variables['toBlockNumber'] = toBlockNumber;
     }
-
     GraphQLClient foreignClient = foreignNetwork == 'mainnet' ? _clientMainnet : _clientRopsten;
-
+    foreignClient.cache.reset();
     QueryResult result = await foreignClient.query(QueryOptions(
-      documentNode: gql(getTransfersEventsOnForeignQuery),
+      documentNode: gql(getTransferEventsQuery),
       variables: variables,
     ));
     if (result.hasException) {
-      throw 'Error! Get Transfers events failed - accountAddress: $to';
+      throw 'Error! Get Transfers events failed - accountAddress: $to ${result.exception}';
     } else {
       return result.data["transferEvents"];
+    }
+  }
+
+  Future<dynamic> getAccountTokens(String accountAddress, String tokenAddress) async {
+    _clientTokenRegistry.cache.reset();
+    QueryResult result = await _clientTokenRegistry.query(QueryOptions(
+      documentNode: gql(getTokens),
+      variables: <String, dynamic>{
+        'accountAddress': accountAddress,
+        'tokenAddress': tokenAddress,
+      },
+    ));
+    if (result.hasException) {
+      throw 'Error! Get account tokens request failed - walletAddress: $accountAddress ${result.exception}';
+    } else {
+      return result.data["accounts"];
     }
   }
 }

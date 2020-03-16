@@ -124,8 +124,8 @@ const String getTransfersQuery = r'''
   }
 ''';
 
-const String getTransfersEventsOnForeignQuery = r'''
-  query getTransfersEventsOnForeign(
+const String getTransferEventsQuery = r'''
+  query getTransferEvents(
     $to: String,
     $from: String,
     $tokenAddress: String!,
@@ -147,6 +147,24 @@ const String getTransfersEventsOnForeignQuery = r'''
       value
       blockNumber
       txHash
+    }
+  }
+''';
+
+
+const String getTokens = r'''
+  query getTokens($accountAddress: String!, $tokenAddress: String!) {
+    accounts (where:{address: $accountAddress}) {
+      balances (where: {token: $tokenAddress}){
+        amount
+        token {
+          name
+          imageUrl
+          symbol
+          decimals
+          address
+        }
+      }
     }
   }
 ''';
