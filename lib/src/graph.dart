@@ -254,7 +254,7 @@ class Graph {
     }
   }
 
-  Future<dynamic> getAccountToken(String accountAddress, {String tokenAddress}) async {
+  Future<dynamic> getAccountTokens(String accountAddress, {String tokenAddress}) async {
     Map<String, dynamic> variables = <String, dynamic>{
         'accountAddress': accountAddress
     };
@@ -264,7 +264,7 @@ class Graph {
     }
     _clientTokenRegistry.cache.reset();
     QueryResult result = await _clientTokenRegistry.query(QueryOptions(
-      documentNode: gql(getAccountTokenQuery),
+      documentNode: gql(getAccountTokensQuery),
       variables: variables,
     ));
     if (result.hasException) {
