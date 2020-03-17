@@ -151,9 +151,8 @@ const String getTransferEventsQuery = r'''
   }
 ''';
 
-
-const String getTokens = r'''
-  query getTokens($accountAddress: String!, $tokenAddress: String!) {
+const String getAccountTokenQuery = r'''
+  query getAccountToken($accountAddress: String!, $tokenAddress: String) {
     accounts (where:{address: $accountAddress}) {
       balances (where: {token: $tokenAddress}){
         amount
