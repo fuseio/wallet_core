@@ -254,14 +254,18 @@ class Graph {
     }
   }
 
-  Future<dynamic> getAccountTokens(String accountAddress, String tokenAddress) async {
+  Future<dynamic> getAccountTokens(String accountAddress, {String tokenAddress}) async {
+    Map<String, dynamic> variables = <String, dynamic>{
+        'accountAddress': accountAddress
+    };
+
+    if (tokenAddress != null) {
+      variables['tokenAddress'] = tokenAddress;
+    }
     _clientTokenRegistry.cache.reset();
     QueryResult result = await _clientTokenRegistry.query(QueryOptions(
-      documentNode: gql(getTokens),
-      variables: <String, dynamic>{
-        'accountAddress': accountAddress,
-        'tokenAddress': tokenAddress,
-      },
+      documentNode: gql(getAccountTokensQuery),
+      variables: variables,
     ));
     if (result.hasException) {
       throw 'Error! Get account tokens request failed - walletAddress: $accountAddress ${result.exception}';
