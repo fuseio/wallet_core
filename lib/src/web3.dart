@@ -38,7 +38,7 @@ class Web3 {
     String defaultCommunityAddress,
     String communityManagerAddress,
     String transferManagerAddress,
-    String daiPointsManagerContractAddress,
+    String daiPointsManagerAddress,
     int defaultGasLimit
   }) {
     _client = new Web3Client(url ?? RPC_URL, new Client());
@@ -47,7 +47,7 @@ class Web3 {
     _defaultCommunityContractAddress = defaultCommunityAddress;
     _communityManagerContractAddress = communityManagerAddress;
     _transferManagerContractAddress = transferManagerAddress;
-    _daiPointsManagerContractAddress = daiPointsManagerContractAddress;
+    _daiPointsManagerContractAddress = daiPointsManagerAddress;
     _defaultGasLimit = defaultGasLimit ?? DEFAULT_GAS_LIMIT;
   }
 
