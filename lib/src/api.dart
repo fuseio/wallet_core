@@ -168,9 +168,6 @@ class API {
     Map<String, dynamic> resp = await _get('v2/wallets', private: true);
     if (resp != null && resp["data"] != null) {
       Map<String, String> walletModules = Map<String, String>.from(resp['data']['walletModules']);
-      String dAIPointsManager = walletModules['DAIPointsManager'] != null
-          ? resp['data']['walletModules']['DAIPointsManager']
-          : null;
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
         "accountAddress": resp["data"]["accountAddress"],
@@ -179,7 +176,7 @@ class API {
         "updatedAt": resp["data"]["updatedAt"],
         "communityManager": walletModules['CommunityManager'],
         "transferManager": walletModules['TransferManager'],
-        "dAIPointsManager": dAIPointsManager,
+        "dAIPointsManager": walletModules['DAIPointsManager'] ?? null,
         "networks": resp['data']['networks'],
       };
     } else {
