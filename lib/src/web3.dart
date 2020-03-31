@@ -28,6 +28,7 @@ class Web3 {
   int _networkId;
   String _defaultCommunityContractAddress;
   String _communityManagerContractAddress;
+  String _daiPointsManagerContractAddress;
   String _transferManagerContractAddress;
   int _defaultGasLimit;
 
@@ -37,6 +38,7 @@ class Web3 {
     String defaultCommunityAddress,
     String communityManagerAddress,
     String transferManagerAddress,
+    String daiPointsManagerAddress,
     int defaultGasLimit
   }) {
     _client = new Web3Client(url ?? RPC_URL, new Client());
@@ -45,6 +47,7 @@ class Web3 {
     _defaultCommunityContractAddress = defaultCommunityAddress;
     _communityManagerContractAddress = communityManagerAddress;
     _transferManagerContractAddress = transferManagerAddress;
+    _daiPointsManagerContractAddress = daiPointsManagerAddress;
     _defaultGasLimit = defaultGasLimit ?? DEFAULT_GAS_LIMIT;
   }
 
@@ -246,6 +249,40 @@ class Web3 {
         'signing on message with accountAddress: ${await _credentials.extractAddress()}');
     Uint8List signature = await _credentials.signPersonalMessage(hash);
     return '0x' + HEX.encode(signature);
+  }
+
+  Future<Map<String, dynamic>> trasferDaiToDAIpOffChain(String walletAddress, num tokenAmount, int tokenDecimals) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    Decimal tokensAmountDecimal = Decimal.parse(tokenAmount.toString());
+    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+    BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+
+    String nonce = await getNonceForRelay();
+    print('nonce: $nonce');
+
+    DeployedContract contract = await _contract('DAIPointsManager', _daiPointsManagerContractAddress);
+    Uint8List data = contract.function('getDAIPoints').encodeCall([wallet, amount]);
+    String encodedData = '0x' + HEX.encode(data);
+    print('encodedData: $encodedData');
+
+    String signature = await signOffChain(
+        _daiPointsManagerContractAddress,
+        walletAddress,
+        BigInt.from(0),
+        encodedData,
+        nonce,
+        BigInt.from(0),
+        BigInt.from(_defaultGasLimit));
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedData,
+      "nonce": nonce,
+      "gasPrice": 0,
+      "gasLimit": _defaultGasLimit,
+      "signature": signature,
+      "walletModule": "DAIPointsManager"
+    };
   }
 
   Future<Map<String, dynamic>> joinCommunityOffChain(

@@ -167,14 +167,16 @@ class API {
   Future<dynamic> getWallet() async {
     Map<String, dynamic> resp = await _get('v2/wallets', private: true);
     if (resp != null && resp["data"] != null) {
+      Map<String, String> walletModules = Map<String, String>.from(resp['data']['walletModules']);
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
         "accountAddress": resp["data"]["accountAddress"],
         "walletAddress": resp["data"]["walletAddress"],
         "createdAt": resp["data"]["createdAt"],
         "updatedAt": resp["data"]["updatedAt"],
-        "communityManager": resp['data']['walletModules']['CommunityManager'],
-        "transferManager": resp['data']['walletModules']['TransferManager'],
+        "communityManager": walletModules['CommunityManager'],
+        "transferManager": walletModules['TransferManager'],
+        "dAIPointsManager": walletModules['DAIPointsManager'] ?? null,
         "networks": resp['data']['networks'],
       };
     } else {
@@ -243,6 +245,12 @@ class API {
         walletAddress, tokenAddress, receiverAddress, tokensAmount);
     Map<String, dynamic> resp =
         await _post('v2/relay', private: true, body: data);
+    return resp;
+  }
+
+  Future<dynamic> trasferDaiToDaiPointsOffChain(Web3 web3, String walletAddress, num tokensAmount, int tokenDecimals) async {
+    Map<String, dynamic> data = await web3.trasferDaiToDAIpOffChain(walletAddress, tokensAmount, tokenDecimals);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: data);
     return resp;
   }
 
