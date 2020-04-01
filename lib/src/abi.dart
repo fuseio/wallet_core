@@ -1059,6 +1059,285 @@ class ABI {
           }
         ];
         break;
+      case "DAIPointsManager":
+        abi = [
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_wallet", "type": "address"}
+            ],
+            "name": "init",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [
+              {"name": "_wallet", "type": "address"}
+            ],
+            "name": "getNonce",
+            "outputs": [
+              {"name": "nonce", "type": "uint256"}
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_manager", "type": "address"}
+            ],
+            "name": "addManager",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_manager", "type": "address"}
+            ],
+            "name": "revokeManager",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_wallet", "type": "address"},
+              {"name": "_module", "type": "address"}
+            ],
+            "name": "addModule",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [
+              {"name": "", "type": "address"}
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_token", "type": "address"}
+            ],
+            "name": "recoverToken",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_newOwner", "type": "address"}
+            ],
+            "name": "changeOwner",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_wallet", "type": "address"},
+              {"name": "_data", "type": "bytes"},
+              {"name": "_nonce", "type": "uint256"},
+              {"name": "_signatures", "type": "bytes"},
+              {"name": "_gasPrice", "type": "uint256"},
+              {"name": "_gasLimit", "type": "uint256"}
+            ],
+            "name": "execute",
+            "outputs": [
+              {"name": "success", "type": "bool"}
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "daiPoints",
+            "outputs": [
+              {"name": "", "type": "address"}
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [
+              {"name": "", "type": "address"}
+            ],
+            "name": "relayer",
+            "outputs": [
+              {"name": "nonce", "type": "uint256"}
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "isOnlyOwnerModule",
+            "outputs": [
+              {"name": "", "type": "bytes4"}
+            ],
+            "payable": false,
+            "stateMutability": "pure",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "dai",
+            "outputs": [
+              {"name": "", "type": "address"}
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [
+              {"name": "", "type": "address"}
+            ],
+            "name": "managers",
+            "outputs": [
+              {"name": "", "type": "bool"}
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {"name": "_registry", "type": "address"},
+              {"name": "_dai", "type": "address"},
+              {"name": "_daiPoints", "type": "address"}
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {"indexed": true, "name": "_manager", "type": "address"}
+            ],
+            "name": "ManagerAdded",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {"indexed": true, "name": "_manager", "type": "address"}
+            ],
+            "name": "ManagerRevoked",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {"indexed": true, "name": "_newOwner", "type": "address"}
+            ],
+            "name": "OwnerChanged",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {"indexed": true, "name": "wallet", "type": "address"},
+              {"indexed": true, "name": "success", "type": "bool"},
+              {"indexed": false, "name": "signedHash", "type": "bytes32"}
+            ],
+            "name": "TransactionExecuted",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {"indexed": false, "name": "name", "type": "bytes32"}
+            ],
+            "name": "ModuleCreated",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {"indexed": false, "name": "wallet", "type": "address"}
+            ],
+            "name": "ModuleInitialised",
+            "type": "event"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_wallet", "type": "address"},
+              {"name": "_amount", "type": "uint256"}
+            ],
+            "name": "getDAIPoints",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_wallet", "type": "address"},
+              {"name": "_amount", "type": "uint256"},
+              {"name": "_recipient", "type": "address"}
+            ],
+            "name": "getDAIPointsToAddress",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_dai", "type": "address"}
+            ],
+            "name": "setDaiAddress",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {"name": "_daiPoints", "type": "address"}
+            ],
+            "name": "setDaiPointsAddress",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
+        ];
+        break;
       default:
         throw 'ABI does not exists for $name';
     }

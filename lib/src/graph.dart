@@ -222,25 +222,27 @@ class Graph {
   Future<dynamic> getTransferEvents({
     String foreignNetwork,
     String to,
-    String from,
-    String tokenAddress,
-    int fromBlockNumber,
-    int toBlockNumber
   }) async {
+    // String from,
+    // String tokenAddress,
+    // int fromBlockNumber,
+    // int toBlockNumber
     Map<String, dynamic> variables = <String, dynamic>{
         'to': to,
-        'from': from,
-        'tokenAddress': tokenAddress,
         'skip': 0,
         'first': 20,
     };
 
-    if (fromBlockNumber != null) {
-      variables['fromBlockNumber'] = fromBlockNumber;
-    }
-    if (toBlockNumber != null) {
-      variables['toBlockNumber'] = toBlockNumber;
-    }
+    // 'from': from,
+    // 'tokenAddress': tokenAddress,
+
+    // if (fromBlockNumber != null) {
+    //   variables['fromBlockNumber'] = fromBlockNumber;
+    // }
+    // if (toBlockNumber != null) {
+    //   variables['toBlockNumber'] = toBlockNumber;
+    // }
+
     GraphQLClient foreignClient = foreignNetwork == 'mainnet' ? _clientMainnet : _clientRopsten;
     foreignClient.cache.reset();
     QueryResult result = await foreignClient.query(QueryOptions(

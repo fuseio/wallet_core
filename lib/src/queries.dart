@@ -126,28 +126,20 @@ const String getTransfersQuery = r'''
 
 const String getTransferEventsQuery = r'''
   query getTransferEvents(
-    $to: String,
-    $from: String,
-    $tokenAddress: String!,
-    $fromBlockNumber: Int,
-    $toBlockNumber: Int,
+    $to: String!,
     $skip: Int,
     $first: Int,
   ) {
     transferEvents(where: {
         to: $to,
-        from: $from,
-        tokenAddress: $tokenAddress,
-        blockNumber_gt: $fromBlockNumber,
-        blockNumber_lt: $toBlockNumber
     }, skip: $skip, first: $first) {
-      id
-      from
-      to
-      value
-      blockNumber
-      txHash
-    }
+        id
+        from
+        to
+        value
+        blockNumber
+        txHash
+      }
   }
 ''';
 

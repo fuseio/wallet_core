@@ -6,3 +6,4 @@ export 'src/graph.dart';
 export 'src/web3.dart';
 
 export 'src/api.dart';
+export 'src/tokens_api.dart';
