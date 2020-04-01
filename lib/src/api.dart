@@ -247,6 +247,12 @@ class API {
     return resp;
   }
 
+  Future<dynamic> approveTokenTransfer(Web3 web3, String walletAddress, String tokenAddress, num tokensAmount) async {
+    Map<String, dynamic> data = await web3.approveTokenOffChain(walletAddress, tokenAddress, tokensAmount);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: data);
+    return resp;
+  }
+
   Future<dynamic> trasferDaiToDaiPointsOffChain(Web3 web3, String walletAddress, num tokensAmount, int tokenDecimals) async {
     Map<String, dynamic> data = await web3.trasferDaiToDAIpOffChain(walletAddress, tokensAmount, tokenDecimals);
     Map<String, dynamic> resp = await _post('v2/relay', private: true, body: data);

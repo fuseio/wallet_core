@@ -392,4 +392,41 @@ class Web3 {
       "walletModule": "TransferManager"
     };
   }
+
+  Future<Map<String, dynamic>> approveTokenOffChain(String walletAddress, String tokenAddress, num tokensAmount) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
+    dynamic tokenDetails = await getTokenDetails(tokenAddress);
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
+    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+    BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+
+    String nonce = await getNonceForRelay();
+    DeployedContract contract =
+        await _contract('TransferManager', _transferManagerContractAddress);
+    Uint8List data = contract
+        .function('approveToken')
+        .encodeCall([wallet, token, wallet, amount]);
+    String encodedData = '0x' + HEX.encode(data);
+
+    String signature = await signOffChain(
+        _transferManagerContractAddress,
+        walletAddress,
+        BigInt.from(0),
+        encodedData,
+        nonce,
+        BigInt.from(0),
+        BigInt.from(_defaultGasLimit));
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedData,
+      "nonce": nonce,
+      "gasPrice": 0,
+      "gasLimit": _defaultGasLimit,
+      "signature": signature,
+      "walletModule": "TransferManager"
+    };
+  }
 }
