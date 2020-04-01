@@ -60,8 +60,7 @@ class TokensApi {
     }
   }
 
-  Future<dynamic> getTokenTransferEventsByAccountAddress(
-      String tokenAddress, String accountAddress,
+  Future<dynamic> getTokenTransferEventsByAccountAddress(String tokenAddress, String accountAddress,
       {String sort = 'desc', int startblock = 0}) async {
     try {
       Map<String, dynamic> resp = await _get(
@@ -72,8 +71,7 @@ class TokensApi {
     }
   }
 
-  Future<BigInt> getTokenBalanceByAccountAddress(
-      String tokenAddress, String accountAddress,
+  Future<BigInt> getTokenBalanceByAccountAddress(String tokenAddress, String accountAddress,
       {int startblock = 0, endBlock = 999999999}) async {
     try {
       Map<String, dynamic> resp = await _get(
@@ -106,6 +104,29 @@ class TokensApi {
     }
   }
 
+  // Retrieves the latest account and token balances for the specified address
+  Future<dynamic> getAddressBalances(String accountAddress) async {
+    try {
+      Map<String, dynamic> resp = await _amberDataGet('v2/addresses/$accountAddress/balances?includePrice=true');
+      List tokens = [];
+      if (resp['payload'] != null && resp['payload']['tokens'] != null) {
+        for (dynamic record in resp['payload']['tokens']) {
+          tokens.add({
+            "address": record['address'],
+            "decimals": record['decimals'],
+            "name": record['name'],
+            "timestamp": record["timestamp"],
+            "symbol": record['symbol'],
+            "amount": BigInt.from(num.parse(record['amount']))
+          });
+        }
+      }
+      return { "price": resp['payload']['price'] ?? {}, "tokens": tokens };
+    } catch (e) {
+      throw 'ERROR in get address balances $e';
+    }
+  }
+
   // Address Token Transfers [PRO]
   // Retrieves all token transfers involving the specified address.
   // /v2/addresses/hash/token-transfers
@@ -133,27 +154,4 @@ class TokensApi {
   //     throw e;
   //   }
   // }
-
-  // Retrieves the latest account and token balances for the specified address
-  Future<dynamic> getAddressBalances(String accountAddress) async {
-    try {
-      Map<String, dynamic> resp = await _amberDataGet('v2/addresses/$accountAddress/balances?includePrice=true');
-      List tokens = [];
-      if (resp['payload'] != null && resp['payload']['tokens'] != null) {
-        for (dynamic record in resp['payload']['tokens']) {
-          tokens.add({
-            "address": record['address'],
-            "decimals": record['decimals'],
-            "name": record['name'],
-            "timestamp": record["timestamp"],
-            "symbol": record['symbol'],
-            "amount": BigInt.from(num.parse(record['amount']))
-          });
-        }
-      }
-      return { "price": resp['payload']['price'] ?? {}, "tokens": tokens };
-    } catch (e) {
-      throw 'ERROR in get address balances $e';
-    }
-  }
 }
