@@ -26,7 +26,6 @@ class TokensApi {
   }
 
   Future<Map<String, dynamic>> _get(String endpoint) async {
-    print('GET $_base/$endpoint');
     Response response = await _client.get('$_base/$endpoint');
     return _responseHandler(response);
   }
