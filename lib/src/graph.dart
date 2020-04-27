@@ -92,7 +92,7 @@ class Graph {
   Future<dynamic> getTokenByAddress(String tokenAddress) async {
     _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
-      documentNode: gql(getAccountTokensQuery),
+      documentNode: gql(getTokenByAddressQuery),
       variables: <String, dynamic>{
         'address': tokenAddress,
       },
