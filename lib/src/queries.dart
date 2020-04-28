@@ -1,12 +1,12 @@
 const String getTokenByAddressQuery = r'''
   query getTokenByAddress($address: String!) {
-      token(id: $address) {
+      tokens(where: {address: $address}) {
         name
         decimals
         symbol
+        address
         totalSupply
         originNetwork
-        communityAddress
       }
   }
 ''';

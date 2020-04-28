@@ -100,7 +100,7 @@ class Graph {
     if (result.hasException) {
       throw 'Error! Get token failed - for $tokenAddress ${result.exception}';
     } else {
-      return result.data;
+      return result.data['tokens'][0];
     }
   }
 
