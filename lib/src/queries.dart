@@ -1,3 +1,16 @@
+const String getTokenByAddressQuery = r'''
+  query getTokenByAddress($address: String!) {
+      tokens(where: {address: $address}) {
+        name
+        decimals
+        symbol
+        address
+        totalSupply
+        originNetwork
+      }
+  }
+''';
+
 const String getCommunityByAddressQuery = r'''
   query getCommunityByAddress($address: String!) {
       communities(where:{address: $address}) {

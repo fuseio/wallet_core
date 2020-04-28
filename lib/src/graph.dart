@@ -89,6 +89,21 @@ class Graph {
     }
   }
 
+  Future<dynamic> getTokenByAddress(String tokenAddress) async {
+    _clientFuse.cache.reset();
+    QueryResult result = await _clientFuse.query(QueryOptions(
+      documentNode: gql(getTokenByAddressQuery),
+      variables: <String, dynamic>{
+        'address': tokenAddress,
+      },
+    ));
+    if (result.hasException) {
+      throw 'Error! Get token failed - for $tokenAddress ${result.exception}';
+    } else {
+      return result.data['tokens'][0];
+    }
+  }
+
   Future<BigInt> getTokenBalance(
       String accountAddress, String tokenAddress) async {
     _clientFuse.cache.reset();
