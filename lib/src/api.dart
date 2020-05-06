@@ -177,6 +177,7 @@ class API {
         "transferManager": resp['data']['walletModules']['TransferManager'],
         "dAIPointsManager": resp['data']['walletModules']['DAIPointsManager'] ?? null,
         "networks": resp['data']['networks'],
+        "backup": resp['backup'],
       };
     } else {
       return {};
