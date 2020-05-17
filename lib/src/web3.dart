@@ -436,4 +436,81 @@ class Web3 {
       "walletModule": "TransferManager"
     };
   }
+
+  Future<Map<String, dynamic>> callContractOffChain(String walletAddress, String contractAddress, num ethAmount, String data, {String network = "fuse"}) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
+    Decimal ethAmountDecimal = Decimal.parse(ethAmount.toString());
+    Decimal decimals = Decimal.parse(pow(10, 18).toString());
+    BigInt amount = BigInt.parse((ethAmountDecimal * decimals).toString());
+
+    String nonce = await getNonceForRelay();
+    DeployedContract TransferManagerContract =
+        await _contract('TransferManager', _transferManagerContractAddress);
+    Uint8List callContractData = TransferManagerContract
+        .function('callContract')
+        .encodeCall([wallet, contract, amount, data]);
+    String encodedCallContractData = '0x' + HEX.encode(callContractData);
+
+    String signature = await signOffChain(
+        _transferManagerContractAddress,
+        walletAddress,
+        BigInt.from(0),
+        encodedCallContractData,
+        nonce,
+        BigInt.from(0),
+        BigInt.from(_defaultGasLimit));
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedCallContractData,
+      "nonce": nonce,
+      "network": network,
+      "methodName": "callContract",
+      "gasPrice": 0,
+      "gasLimit": _defaultGasLimit,
+      "signature": signature,
+      "walletModule": "TransferManager"
+    };
+  }
+
+  Future<Map<String, dynamic>> approveTokenAndCallContractOffChain(String walletAddress, String tokenAddress, String contractAddress, num tokensAmount, String data, {String network = "fuse"}) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
+    EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
+    dynamic tokenDetails = await getTokenDetails(tokenAddress);
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
+    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+    BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+
+    String nonce = await getNonceForRelay();
+    DeployedContract TransferManagerContract =
+        await _contract('TransferManager', _transferManagerContractAddress);
+    Uint8List approveTokenAndCallContractData = TransferManagerContract
+        .function('approveTokenAndCallContract')
+        .encodeCall([wallet, token, contract, amount, data]);
+    String encodedApproveTokenAndCallContractData = '0x' + HEX.encode(approveTokenAndCallContractData);
+
+    String signature = await signOffChain(
+        _transferManagerContractAddress,
+        walletAddress,
+        BigInt.from(0),
+        encodedApproveTokenAndCallContractData,
+        nonce,
+        BigInt.from(0),
+        BigInt.from(_defaultGasLimit));
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedApproveTokenAndCallContractData,
+      "nonce": nonce,
+      "network": network,
+      "methodName": "approveTokenAndCallContract",
+      "gasPrice": 0,
+      "gasLimit": _defaultGasLimit,
+      "signature": signature,
+      "walletModule": "TransferManager"
+    };
+  }
 }

@@ -260,6 +260,18 @@ class API {
     return resp;
   }
 
+  Future<dynamic> callContract(Web3 web3, String walletAddress, String contractAddress, num ethAmount, String data, {String network}) async {
+    Map<String, dynamic> signedData = await web3.callContractOffChain(walletAddress, contractAddress, ethAmount, data, network: network);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: signedData);
+    return resp;
+  }
+
+  Future<dynamic> approveTokenAndCallContract(Web3 web3, String walletAddress, String tokenAddress, String contractAddress, num tokensAmount, String data, {String network}) async {
+    Map<String, dynamic> signedData = await web3.approveTokenAndCallContractOffChain(walletAddress, tokenAddress, contractAddress, tokensAmount, data, network: network);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: signedData);
+    return resp;
+  }
+
   Future<dynamic> getCommunityData(String communityAddress, {bool isRopsten = false, String walletAddress}) async {
     String url = walletAddress != null ? 'v1/communities/$communityAddress/$walletAddress' : 'v1/communities/$communityAddress';
     Map<String, dynamic> resp = await _get(
