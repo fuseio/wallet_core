@@ -449,7 +449,7 @@ class Web3 {
         await _contract('TransferManager', _transferManagerContractAddress);
     Uint8List callContractData = TransferManagerContract
         .function('callContract')
-        .encodeCall([wallet, contract, amount, data]);
+        .encodeCall([wallet, contract, amount, HEX.decode(data)]);
     String encodedCallContractData = '0x' + HEX.encode(callContractData);
 
     String signature = await signOffChain(
@@ -512,5 +512,12 @@ class Web3 {
       "signature": signature,
       "walletModule": "TransferManager"
     };
+  }
+
+  Future<String> getEncodedDataForContractCall(String contractName, String contractAddress, String methodName, List params) async {
+    DeployedContract contract = await _contract(contractName, contractAddress);
+    Uint8List data = contract.function(methodName).encodeCall(params);
+    String encodedData = HEX.encode(data);
+    return encodedData;
   }
 }
