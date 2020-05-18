@@ -545,7 +545,10 @@ class ABI {
             "inputs": [],
             "name": "securityWindow",
             "outputs": [
-              {"name": "", "type": "uint256"}
+              {
+                "name": "",
+                "type": "uint256"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -554,11 +557,17 @@ class ABI {
           {
             "constant": true,
             "inputs": [
-              {"name": "_wallet", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              }
             ],
             "name": "getNonce",
             "outputs": [
-              {"name": "nonce", "type": "uint256"}
+              {
+                "name": "nonce",
+                "type": "uint256"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -567,11 +576,17 @@ class ABI {
           {
             "constant": true,
             "inputs": [
-              {"name": "_wallet", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              }
             ],
             "name": "getCurrentLimit",
             "outputs": [
-              {"name": "_currentLimit", "type": "uint256"}
+              {
+                "name": "_currentLimit",
+                "type": "uint256"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -580,8 +595,14 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_module", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_module",
+                "type": "address"
+              }
             ],
             "name": "addModule",
             "outputs": [],
@@ -592,12 +613,21 @@ class ABI {
           {
             "constant": true,
             "inputs": [
-              {"name": "_wallet", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              }
             ],
             "name": "getDailyUnspent",
             "outputs": [
-              {"name": "_unspent", "type": "uint256"},
-              {"name": "_periodEnd", "type": "uint64"}
+              {
+                "name": "_unspent",
+                "type": "uint256"
+              },
+              {
+                "name": "_periodEnd",
+                "type": "uint64"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -608,7 +638,10 @@ class ABI {
             "inputs": [],
             "name": "securityPeriod",
             "outputs": [
-              {"name": "", "type": "uint256"}
+              {
+                "name": "",
+                "type": "uint256"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -619,7 +652,10 @@ class ABI {
             "inputs": [],
             "name": "oldLimitManager",
             "outputs": [
-              {"name": "", "type": "address"}
+              {
+                "name": "",
+                "type": "address"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -630,7 +666,10 @@ class ABI {
             "inputs": [],
             "name": "transferStorage",
             "outputs": [
-              {"name": "", "type": "address"}
+              {
+                "name": "",
+                "type": "address"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -639,7 +678,10 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_token", "type": "address"}
+              {
+                "name": "_token",
+                "type": "address"
+              }
             ],
             "name": "recoverToken",
             "outputs": [],
@@ -650,12 +692,21 @@ class ABI {
           {
             "constant": true,
             "inputs": [
-              {"name": "_wallet", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              }
             ],
             "name": "getPendingLimit",
             "outputs": [
-              {"name": "_pendingLimit", "type": "uint256"},
-              {"name": "_changeAfter", "type": "uint64"}
+              {
+                "name": "_pendingLimit",
+                "type": "uint256"
+              },
+              {
+                "name": "_changeAfter",
+                "type": "uint64"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -664,16 +715,37 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_data", "type": "bytes"},
-              {"name": "_nonce", "type": "uint256"},
-              {"name": "_signatures", "type": "bytes"},
-              {"name": "_gasPrice", "type": "uint256"},
-              {"name": "_gasLimit", "type": "uint256"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_data",
+                "type": "bytes"
+              },
+              {
+                "name": "_nonce",
+                "type": "uint256"
+              },
+              {
+                "name": "_signatures",
+                "type": "bytes"
+              },
+              {
+                "name": "_gasPrice",
+                "type": "uint256"
+              },
+              {
+                "name": "_gasLimit",
+                "type": "uint256"
+              }
             ],
             "name": "execute",
             "outputs": [
-              {"name": "success", "type": "bool"}
+              {
+                "name": "success",
+                "type": "bool"
+              }
             ],
             "payable": false,
             "stateMutability": "nonpayable",
@@ -684,7 +756,10 @@ class ABI {
             "inputs": [],
             "name": "priceProvider",
             "outputs": [
-              {"name": "", "type": "address"}
+              {
+                "name": "",
+                "type": "address"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -693,11 +768,17 @@ class ABI {
           {
             "constant": true,
             "inputs": [
-              {"name": "", "type": "address"}
+              {
+                "name": "",
+                "type": "address"
+              }
             ],
             "name": "relayer",
             "outputs": [
-              {"name": "nonce", "type": "uint256"}
+              {
+                "name": "nonce",
+                "type": "uint256"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -708,7 +789,10 @@ class ABI {
             "inputs": [],
             "name": "isOnlyOwnerModule",
             "outputs": [
-              {"name": "", "type": "bytes4"}
+              {
+                "name": "",
+                "type": "bytes4"
+              }
             ],
             "payable": false,
             "stateMutability": "pure",
@@ -719,7 +803,10 @@ class ABI {
             "inputs": [],
             "name": "guardianStorage",
             "outputs": [
-              {"name": "", "type": "address"}
+              {
+                "name": "",
+                "type": "address"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -730,7 +817,10 @@ class ABI {
             "inputs": [],
             "name": "defaultLimit",
             "outputs": [
-              {"name": "", "type": "uint256"}
+              {
+                "name": "",
+                "type": "uint256"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -738,14 +828,38 @@ class ABI {
           },
           {
             "inputs": [
-              {"name": "_registry", "type": "address"},
-              {"name": "_transferStorage", "type": "address"},
-              {"name": "_guardianStorage", "type": "address"},
-              {"name": "_priceProvider", "type": "address"},
-              {"name": "_securityPeriod", "type": "uint256"},
-              {"name": "_securityWindow", "type": "uint256"},
-              {"name": "_defaultLimit", "type": "uint256"},
-              {"name": "_oldLimitManager", "type": "address"}
+              {
+                "name": "_registry",
+                "type": "address"
+              },
+              {
+                "name": "_transferStorage",
+                "type": "address"
+              },
+              {
+                "name": "_guardianStorage",
+                "type": "address"
+              },
+              {
+                "name": "_priceProvider",
+                "type": "address"
+              },
+              {
+                "name": "_securityPeriod",
+                "type": "uint256"
+              },
+              {
+                "name": "_securityWindow",
+                "type": "uint256"
+              },
+              {
+                "name": "_defaultLimit",
+                "type": "uint256"
+              },
+              {
+                "name": "_oldLimitManager",
+                "type": "address"
+              }
             ],
             "payable": false,
             "stateMutability": "nonpayable",
@@ -754,9 +868,21 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "target", "type": "address"},
-              {"indexed": false, "name": "whitelistAfter", "type": "uint64"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "target",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "name": "whitelistAfter",
+                "type": "uint64"
+              }
             ],
             "name": "AddedToWhitelist",
             "type": "event"
@@ -764,8 +890,16 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "target", "type": "address"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "target",
+                "type": "address"
+              }
             ],
             "name": "RemovedFromWhitelist",
             "type": "event"
@@ -773,13 +907,41 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "id", "type": "bytes32"},
-              {"indexed": true, "name": "executeAfter", "type": "uint256"},
-              {"indexed": false, "name": "token", "type": "address"},
-              {"indexed": false, "name": "to", "type": "address"},
-              {"indexed": false, "name": "amount", "type": "uint256"},
-              {"indexed": false, "name": "data", "type": "bytes"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "id",
+                "type": "bytes32"
+              },
+              {
+                "indexed": true,
+                "name": "executeAfter",
+                "type": "uint256"
+              },
+              {
+                "indexed": false,
+                "name": "token",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "name": "to",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "name": "amount",
+                "type": "uint256"
+              },
+              {
+                "indexed": false,
+                "name": "data",
+                "type": "bytes"
+              }
             ],
             "name": "PendingTransferCreated",
             "type": "event"
@@ -787,8 +949,16 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "id", "type": "bytes32"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "id",
+                "type": "bytes32"
+              }
             ],
             "name": "PendingTransferExecuted",
             "type": "event"
@@ -796,8 +966,16 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "id", "type": "bytes32"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "id",
+                "type": "bytes32"
+              }
             ],
             "name": "PendingTransferCanceled",
             "type": "event"
@@ -805,9 +983,21 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "newLimit", "type": "uint256"},
-              {"indexed": true, "name": "startAfter", "type": "uint64"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "newLimit",
+                "type": "uint256"
+              },
+              {
+                "indexed": true,
+                "name": "startAfter",
+                "type": "uint64"
+              }
             ],
             "name": "LimitChanged",
             "type": "event"
@@ -815,11 +1005,31 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "token", "type": "address"},
-              {"indexed": true, "name": "amount", "type": "uint256"},
-              {"indexed": false, "name": "to", "type": "address"},
-              {"indexed": false, "name": "data", "type": "bytes"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "token",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "amount",
+                "type": "uint256"
+              },
+              {
+                "indexed": false,
+                "name": "to",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "name": "data",
+                "type": "bytes"
+              }
             ],
             "name": "Transfer",
             "type": "event"
@@ -827,10 +1037,26 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "token", "type": "address"},
-              {"indexed": false, "name": "amount", "type": "uint256"},
-              {"indexed": false, "name": "spender", "type": "address"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "token",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "name": "amount",
+                "type": "uint256"
+              },
+              {
+                "indexed": false,
+                "name": "spender",
+                "type": "address"
+              }
             ],
             "name": "Approved",
             "type": "event"
@@ -838,10 +1064,26 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "to", "type": "address"},
-              {"indexed": false, "name": "amount", "type": "uint256"},
-              {"indexed": false, "name": "data", "type": "bytes"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "to",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "name": "amount",
+                "type": "uint256"
+              },
+              {
+                "indexed": false,
+                "name": "data",
+                "type": "bytes"
+              }
             ],
             "name": "CalledContract",
             "type": "event"
@@ -849,9 +1091,21 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": true, "name": "wallet", "type": "address"},
-              {"indexed": true, "name": "success", "type": "bool"},
-              {"indexed": false, "name": "signedHash", "type": "bytes32"}
+              {
+                "indexed": true,
+                "name": "wallet",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "success",
+                "type": "bool"
+              },
+              {
+                "indexed": false,
+                "name": "signedHash",
+                "type": "bytes32"
+              }
             ],
             "name": "TransactionExecuted",
             "type": "event"
@@ -859,7 +1113,11 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": false, "name": "name", "type": "bytes32"}
+              {
+                "indexed": false,
+                "name": "name",
+                "type": "bytes32"
+              }
             ],
             "name": "ModuleCreated",
             "type": "event"
@@ -867,7 +1125,11 @@ class ABI {
           {
             "anonymous": false,
             "inputs": [
-              {"indexed": false, "name": "wallet", "type": "address"}
+              {
+                "indexed": false,
+                "name": "wallet",
+                "type": "address"
+              }
             ],
             "name": "ModuleInitialised",
             "type": "event"
@@ -875,7 +1137,10 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              }
             ],
             "name": "init",
             "outputs": [],
@@ -886,11 +1151,26 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_token", "type": "address"},
-              {"name": "_to", "type": "address"},
-              {"name": "_amount", "type": "uint256"},
-              {"name": "_data", "type": "bytes"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_token",
+                "type": "address"
+              },
+              {
+                "name": "_to",
+                "type": "address"
+              },
+              {
+                "name": "_amount",
+                "type": "uint256"
+              },
+              {
+                "name": "_data",
+                "type": "bytes"
+              }
             ],
             "name": "transferToken",
             "outputs": [],
@@ -901,10 +1181,56 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_token", "type": "address"},
-              {"name": "_spender", "type": "address"},
-              {"name": "_amount", "type": "uint256"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_token",
+                "type": "address"
+              },
+              {
+                "name": "_to",
+                "type": "address"
+              },
+              {
+                "name": "_amount",
+                "type": "uint256"
+              },
+              {
+                "name": "_fee",
+                "type": "uint256"
+              },
+              {
+                "name": "_data",
+                "type": "bytes"
+              }
+            ],
+            "name": "transferTokenWithFee",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_token",
+                "type": "address"
+              },
+              {
+                "name": "_spender",
+                "type": "address"
+              },
+              {
+                "name": "_amount",
+                "type": "uint256"
+              }
             ],
             "name": "approveToken",
             "outputs": [],
@@ -915,10 +1241,22 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_contract", "type": "address"},
-              {"name": "_value", "type": "uint256"},
-              {"name": "_data", "type": "bytes"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_contract",
+                "type": "address"
+              },
+              {
+                "name": "_value",
+                "type": "uint256"
+              },
+              {
+                "name": "_data",
+                "type": "bytes"
+              }
             ],
             "name": "callContract",
             "outputs": [],
@@ -929,8 +1267,44 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_target", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_token",
+                "type": "address"
+              },
+              {
+                "name": "_contract",
+                "type": "address"
+              },
+              {
+                "name": "_amount",
+                "type": "uint256"
+              },
+              {
+                "name": "_data",
+                "type": "bytes"
+              }
+            ],
+            "name": "approveTokenAndCallContract",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_target",
+                "type": "address"
+              }
             ],
             "name": "addToWhitelist",
             "outputs": [],
@@ -941,8 +1315,14 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_target", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_target",
+                "type": "address"
+              }
             ],
             "name": "removeFromWhitelist",
             "outputs": [],
@@ -953,12 +1333,30 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_token", "type": "address"},
-              {"name": "_to", "type": "address"},
-              {"name": "_amount", "type": "uint256"},
-              {"name": "_data", "type": "bytes"},
-              {"name": "_block", "type": "uint256"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_token",
+                "type": "address"
+              },
+              {
+                "name": "_to",
+                "type": "address"
+              },
+              {
+                "name": "_amount",
+                "type": "uint256"
+              },
+              {
+                "name": "_data",
+                "type": "bytes"
+              },
+              {
+                "name": "_block",
+                "type": "uint256"
+              }
             ],
             "name": "executePendingTransfer",
             "outputs": [],
@@ -969,8 +1367,14 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_id", "type": "bytes32"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_id",
+                "type": "bytes32"
+              }
             ],
             "name": "cancelPendingTransfer",
             "outputs": [],
@@ -981,8 +1385,14 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_newLimit", "type": "uint256"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_newLimit",
+                "type": "uint256"
+              }
             ],
             "name": "changeLimit",
             "outputs": [],
@@ -993,7 +1403,10 @@ class ABI {
           {
             "constant": false,
             "inputs": [
-              {"name": "_wallet", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              }
             ],
             "name": "disableLimit",
             "outputs": [],
@@ -1004,12 +1417,21 @@ class ABI {
           {
             "constant": true,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_target", "type": "address"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_target",
+                "type": "address"
+              }
             ],
             "name": "isWhitelisted",
             "outputs": [
-              {"name": "_isWhitelisted", "type": "bool"}
+              {
+                "name": "_isWhitelisted",
+                "type": "bool"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -1018,12 +1440,21 @@ class ABI {
           {
             "constant": true,
             "inputs": [
-              {"name": "_wallet", "type": "address"},
-              {"name": "_id", "type": "bytes32"}
+              {
+                "name": "_wallet",
+                "type": "address"
+              },
+              {
+                "name": "_id",
+                "type": "bytes32"
+              }
             ],
             "name": "getPendingTransfer",
             "outputs": [
-              {"name": "_executeAfter", "type": "uint64"}
+              {
+                "name": "_executeAfter",
+                "type": "uint64"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -1032,12 +1463,21 @@ class ABI {
           {
             "constant": true,
             "inputs": [
-              {"name": "_data", "type": "bytes"},
-              {"name": "_signature", "type": "bytes"}
+              {
+                "name": "_data",
+                "type": "bytes"
+              },
+              {
+                "name": "_signature",
+                "type": "bytes"
+              }
             ],
             "name": "isValidSignature",
             "outputs": [
-              {"name": "", "type": "bytes4"}
+              {
+                "name": "",
+                "type": "bytes4"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -1046,12 +1486,21 @@ class ABI {
           {
             "constant": true,
             "inputs": [
-              {"name": "_msgHash", "type": "bytes32"},
-              {"name": "_signature", "type": "bytes"}
+              {
+                "name": "_msgHash",
+                "type": "bytes32"
+              },
+              {
+                "name": "_signature",
+                "type": "bytes"
+              }
             ],
             "name": "isValidSignature",
             "outputs": [
-              {"name": "", "type": "bytes4"}
+              {
+                "name": "",
+                "type": "bytes4"
+              }
             ],
             "payable": false,
             "stateMutability": "view",
@@ -1331,6 +1780,724 @@ class ABI {
               {"name": "_daiPoints", "type": "address"}
             ],
             "name": "setDaiPointsAddress",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
+        ];
+        break;
+      case "DAIPointsToken":
+        abi = [
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "name",
+            "outputs": [
+              {
+                "name": "",
+                "type": "string"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "spender",
+                "type": "address"
+              },
+              {
+                "name": "value",
+                "type": "uint256"
+              }
+            ],
+            "name": "approve",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "totalSupply",
+            "outputs": [
+              {
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "sender",
+                "type": "address"
+              },
+              {
+                "name": "recipient",
+                "type": "address"
+              },
+              {
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "name": "transferFrom",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "daiToDaipConversionRate",
+            "outputs": [
+              {
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "DECIMALS",
+            "outputs": [
+              {
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "decimals",
+            "outputs": [
+              {
+                "name": "",
+                "type": "uint8"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "spender",
+                "type": "address"
+              },
+              {
+                "name": "addedValue",
+                "type": "uint256"
+              }
+            ],
+            "name": "increaseAllowance",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_to",
+                "type": "address"
+              },
+              {
+                "name": "_value",
+                "type": "uint256"
+              },
+              {
+                "name": "_data",
+                "type": "bytes"
+              }
+            ],
+            "name": "transferAndCall",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "account",
+                "type": "address"
+              },
+              {
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "name": "mint",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "name": "burn",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [
+              {
+                "name": "account",
+                "type": "address"
+              }
+            ],
+            "name": "balanceOf",
+            "outputs": [
+              {
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [],
+            "name": "renounceOwnership",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "account",
+                "type": "address"
+              },
+              {
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "name": "burnFrom",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [
+              {
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "isOwner",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "symbol",
+            "outputs": [
+              {
+                "name": "",
+                "type": "string"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "account",
+                "type": "address"
+              }
+            ],
+            "name": "addMinter",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [],
+            "name": "renounceMinter",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "spender",
+                "type": "address"
+              },
+              {
+                "name": "subtractedValue",
+                "type": "uint256"
+              }
+            ],
+            "name": "decreaseAllowance",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [
+              {
+                "name": "account",
+                "type": "address"
+              }
+            ],
+            "name": "isMinter",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [
+              {
+                "name": "owner",
+                "type": "address"
+              },
+              {
+                "name": "spender",
+                "type": "address"
+              }
+            ],
+            "name": "allowance",
+            "outputs": [
+              {
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "fee",
+            "outputs": [
+              {
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "bridge",
+            "outputs": [
+              {
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "newOwner",
+                "type": "address"
+              }
+            ],
+            "name": "transferOwnership",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "dai",
+            "outputs": [
+              {
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "name": "_dai",
+                "type": "address"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": true,
+                "name": "previousOwner",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "newOwner",
+                "type": "address"
+              }
+            ],
+            "name": "OwnershipTransferred",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": true,
+                "name": "account",
+                "type": "address"
+              }
+            ],
+            "name": "MinterAdded",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": true,
+                "name": "account",
+                "type": "address"
+              }
+            ],
+            "name": "MinterRemoved",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": false,
+                "name": "success",
+                "type": "bool"
+              },
+              {
+                "indexed": false,
+                "name": "data",
+                "type": "bytes"
+              }
+            ],
+            "name": "ContractFallback",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": true,
+                "name": "from",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "to",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "name": "value",
+                "type": "uint256"
+              },
+              {
+                "indexed": false,
+                "name": "data",
+                "type": "bytes"
+              }
+            ],
+            "name": "Transfer",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": true,
+                "name": "from",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "to",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "name": "value",
+                "type": "uint256"
+              }
+            ],
+            "name": "Transfer",
+            "type": "event"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": true,
+                "name": "owner",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "spender",
+                "type": "address"
+              },
+              {
+                "indexed": false,
+                "name": "value",
+                "type": "uint256"
+              }
+            ],
+            "name": "Approval",
+            "type": "event"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_address",
+                "type": "address"
+              }
+            ],
+            "name": "setDAI",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_fee",
+                "type": "uint256"
+              }
+            ],
+            "name": "setFee",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_address",
+                "type": "address"
+              }
+            ],
+            "name": "setBridge",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_rate",
+                "type": "uint256"
+              }
+            ],
+            "name": "setConversionRate",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_amount",
+                "type": "uint256"
+              }
+            ],
+            "name": "getDAIPoints",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_amount",
+                "type": "uint256"
+              },
+              {
+                "name": "_recipient",
+                "type": "address"
+              }
+            ],
+            "name": "getDAIPointsToAddress",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_recipient",
+                "type": "address"
+              },
+              {
+                "name": "_amount",
+                "type": "uint256"
+              }
+            ],
+            "name": "transfer",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_winner",
+                "type": "address"
+              }
+            ],
+            "name": "reward",
             "outputs": [],
             "payable": false,
             "stateMutability": "nonpayable",
