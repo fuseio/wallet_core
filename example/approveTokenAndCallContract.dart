@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:decimal/decimal.dart';
 import 'package:wallet_core/wallet_core.dart';
 
 Future<bool> approvalCallback() async {
@@ -34,15 +36,31 @@ void main() async {
   dynamic wallet = await api.getWallet();
   print('wallet: $wallet');
 
-  String data = await web3.getEncodedDataForContractCall('Community', web3.getDefaultCommunity(), 'join', []);
+  // dynamic resp = await api.createWalletOnForeign();
+  // print('resp: $resp');
+
+  String tokenAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
+  String receiverAddress = '0xB8Ce4A040E8aA33bBe2dE62E92851b7D7aFd52De';
+  String contractAddress = '0x782c578B5BC3b9A1B6E1E54f839B610Ac7036bA0'; // DAIPoints
+  num tokenAmount = 1;
+  num tokenDecimals = 18;
+
+  EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
+  Decimal tokensAmountDecimal = Decimal.parse(tokenAmount.toString());
+  Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+  BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+
+  String data = await web3.getEncodedDataForContractCall('DAIPointsToken', tokenAddress, 'getDAIPointsToAddress', [amount, receiver]);
   print('data: $data');
 
-  dynamic result = await api.callContract(
+  dynamic result = await api.approveTokenAndCallContract(
     web3,
     wallet["walletAddress"],
-    web3.getDefaultCommunity(),
-    0,
-    data
+    tokenAddress,
+    contractAddress,
+    tokenAmount,
+    data,
+    network: 'mainnet'
   );
   print('result: $result');
 }

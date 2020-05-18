@@ -478,8 +478,8 @@ class Web3 {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
     EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
-    dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    // dynamic tokenDetails = await getTokenDetails(tokenAddress);
+    int tokenDecimals = 18;
     Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
@@ -489,7 +489,7 @@ class Web3 {
         await _contract('TransferManager', _transferManagerContractAddress);
     Uint8List approveTokenAndCallContractData = TransferManagerContract
         .function('approveTokenAndCallContract')
-        .encodeCall([wallet, token, contract, amount, data]);
+        .encodeCall([wallet, token, contract, amount, HEX.decode(data)]);
     String encodedApproveTokenAndCallContractData = '0x' + HEX.encode(approveTokenAndCallContractData);
 
     String signature = await signOffChain(
