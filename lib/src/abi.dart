@@ -2505,6 +2505,172 @@ class ABI {
           }
         ];
         break;
+      case "Wrapper":
+        abi = [
+          {
+            "constant": false,
+            "inputs": [],
+            "name": "renounceOwnership",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [
+              {
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [],
+            "name": "isOwner",
+            "outputs": [
+              {
+                "name": "",
+                "type": "bool"
+              }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "newOwner",
+                "type": "address"
+              }
+            ],
+            "name": "transferOwnership",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "anonymous": false,
+            "inputs": [
+              {
+                "indexed": true,
+                "name": "previousOwner",
+                "type": "address"
+              },
+              {
+                "indexed": true,
+                "name": "newOwner",
+                "type": "address"
+              }
+            ],
+            "name": "OwnershipTransferred",
+            "type": "event"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_token",
+                "type": "address"
+              },
+              {
+                "name": "_recipient",
+                "type": "address"
+              },
+              {
+                "name": "_amount",
+                "type": "uint256"
+              },
+              {
+                "name": "_feeRecipient",
+                "type": "address"
+              },
+              {
+                "name": "_feeAmount",
+                "type": "uint256"
+              }
+            ],
+            "name": "transferWithFee",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_token",
+                "type": "address"
+              },
+              {
+                "name": "_recipient",
+                "type": "address"
+              },
+              {
+                "name": "_amount",
+                "type": "uint256"
+              },
+              {
+                "name": "_feeRecipient",
+                "type": "address"
+              },
+              {
+                "name": "_feeAmount",
+                "type": "uint256"
+              },
+              {
+                "name": "_data",
+                "type": "bytes"
+              }
+            ],
+            "name": "transferAndCallWithFee",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "constant": false,
+            "inputs": [
+              {
+                "name": "_token",
+                "type": "address"
+              },
+              {
+                "name": "_amount",
+                "type": "uint256"
+              },
+              {
+                "name": "_contractToApprove",
+                "type": "address"
+              },
+              {
+                "name": "_contractToCall",
+                "type": "address"
+              },
+              {
+                "name": "_data",
+                "type": "bytes"
+              }
+            ],
+            "name": "approveContractAndCallAnotherContract",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
+        ];
+        break;
       default:
         throw 'ABI does not exists for $name';
     }
