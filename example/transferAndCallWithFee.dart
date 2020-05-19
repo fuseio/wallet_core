@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:decimal/decimal.dart';
+import 'package:hex/hex.dart';
 import 'package:wallet_core/wallet_core.dart';
 
 Future<bool> approvalCallback() async {
@@ -36,14 +37,16 @@ void main() async {
   String walletAddress = 'YOUR_WALLET_ADDRESS';
   String wrapperAddress = '0xbA0e6955FfDA897d7DE5b3710517fB060559934E'; // Wrapper on Mainnet
   String tokenAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
-  String receiverAddress = 'RECEIVER_ADDRESS';
-  String feeReceiverAddress = 'FEE_RECEIVER_ADDRESS';
+  String contractAddress = '0x782c578B5BC3b9A1B6E1E54f839B610Ac7036bA0'; // DAIPoints
+  String receiverAddress = 'RECEIVER_ADDRESS'; // daipoints-and-wrapper-owner
+  String feeReceiverAddress = 'FEE_RECEIVER_ADDRESS'; // studio-prod-mainnet-deposits
   num tokenAmount = 0.1;
   num feeAmount = 0.05;
   num tokenDecimals = 18;
 
   EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
   EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
+  EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
   EthereumAddress feeReceiver = EthereumAddress.fromHex(feeReceiverAddress);
   Decimal tokenAmountDecimal = Decimal.parse(tokenAmount.toString());
   Decimal feeAmountDecimal = Decimal.parse(feeAmount.toString());
@@ -51,13 +54,21 @@ void main() async {
   BigInt amount = BigInt.parse((tokenAmountDecimal * decimals).toString());
   BigInt fee = BigInt.parse((feeAmountDecimal * decimals).toString());
 
-  String data = await web3.getEncodedDataForContractCall(
+  String getDAIPointsToAddressData = await web3.getEncodedDataForContractCall(
+    'DAIPointsToken',
+    contractAddress,
+    'getDAIPointsToAddress',
+    [amount, receiver]
+  );
+  print('getDAIPointsToAddressData: $getDAIPointsToAddressData');
+  
+  String transferAndCallWithFeeData = await web3.getEncodedDataForContractCall(
     'Wrapper',
     wrapperAddress,
-    'transferWithFee',
-    [token, receiver, amount, feeReceiver, fee]
+    'transferAndCallWithFee',
+    [token, contract, amount, feeReceiver, fee, HEX.decode(getDAIPointsToAddressData)]
   );
-  print('data: $data');
+  print('transferAndCallWithFeeData: $transferAndCallWithFeeData');
 
   dynamic result = await api.approveTokenAndCallContract(
     web3,
@@ -65,7 +76,7 @@ void main() async {
     tokenAddress,
     wrapperAddress,
     tokenAmount + feeAmount,
-    data,
+    transferAndCallWithFeeData,
     network: 'mainnet'
   );
   print('result: $result');
