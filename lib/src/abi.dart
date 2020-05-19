@@ -2638,36 +2638,6 @@ class ABI {
             "payable": false,
             "stateMutability": "nonpayable",
             "type": "function"
-          },
-          {
-            "constant": false,
-            "inputs": [
-              {
-                "name": "_token",
-                "type": "address"
-              },
-              {
-                "name": "_amount",
-                "type": "uint256"
-              },
-              {
-                "name": "_contractToApprove",
-                "type": "address"
-              },
-              {
-                "name": "_contractToCall",
-                "type": "address"
-              },
-              {
-                "name": "_data",
-                "type": "bytes"
-              }
-            ],
-            "name": "approveContractAndCallAnotherContract",
-            "outputs": [],
-            "payable": false,
-            "stateMutability": "nonpayable",
-            "type": "function"
           }
         ];
         break;

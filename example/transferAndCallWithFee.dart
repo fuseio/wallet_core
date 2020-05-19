@@ -35,11 +35,11 @@ void main() async {
   api.setJwtToken('YOUR_JWT');
 
   String walletAddress = 'YOUR_WALLET_ADDRESS';
-  String wrapperAddress = '0xbA0e6955FfDA897d7DE5b3710517fB060559934E'; // Wrapper on Mainnet
+  String wrapperAddress = '0x65E73b7fa9cA5ee312FC94F5eE4a46dB03767830'; // Wrapper on Mainnet
   String tokenAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
   String contractAddress = '0x782c578B5BC3b9A1B6E1E54f839B610Ac7036bA0'; // DAIPoints
-  String receiverAddress = 'RECEIVER_ADDRESS'; // daipoints-and-wrapper-owner
-  String feeReceiverAddress = 'FEE_RECEIVER_ADDRESS'; // studio-prod-mainnet-deposits
+  String receiverAddress = 'RECEIVER_ADDRESS';
+  String feeReceiverAddress = 'FEE_RECEIVER_ADDRESS';
   num tokenAmount = 0.1;
   num feeAmount = 0.05;
   num tokenDecimals = 18;
