@@ -12,10 +12,13 @@ void main() async {
   // init web3 module
   Web3 web3 = new Web3(
     approvalCallback,
+    url: 'https://mainnet.infura.io/v3/INFURA_API_KEY',
+    networkId: 1,
     defaultCommunityAddress: 'DEFAULT_COMMUNITY_ADDRESS',
     communityManagerAddress: 'COMMUNITY_MANAGER_ADDRESS',
     transferManagerAddress: 'TRANSFER_MANAGER_ADDRESS',
-    daiPointsManagerAddress: 'DAI_POINTS_MANAGER_ADDRESS'
+    daiPointsManagerAddress: 'DAI_POINTS_MANAGER_ADDRESS',
+    wrapperAddress: 'WRAPPER_ADDRESS'
   );
 
   // set web3 credentials with private key
@@ -35,31 +38,34 @@ void main() async {
 
   String walletAddress = 'YOUR_WALLET_ADDRESS';
   String tokenAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
-  String receiverAddress = 'RECEIVER_ADDRESS';
   String contractAddress = '0x782c578B5BC3b9A1B6E1E54f839B610Ac7036bA0'; // DAIPoints
-  num tokenAmount = 0.1;
+  String receiverAddress = 'RECEIVER_ADDRESS';
+  String feeReceiverAddress = 'FEE_RECEIVER_ADDRESS';
+  num tokenAmount = 1;
+  num feeAmount = 0.5;
   num tokenDecimals = 18;
 
   EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
-  Decimal tokensAmountDecimal = Decimal.parse(tokenAmount.toString());
+  Decimal tokenAmountDecimal = Decimal.parse(tokenAmount.toString());
   Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
-  BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+  BigInt amount = BigInt.parse((tokenAmountDecimal * decimals).toString());
 
-  String data = await web3.getEncodedDataForContractCall(
+  String getDAIPointsToAddressData = await web3.getEncodedDataForContractCall(
     'DAIPointsToken',
     contractAddress,
     'getDAIPointsToAddress',
     [amount, receiver]
   );
-  print('data: $data');
+  print('getDAIPointsToAddressData: $getDAIPointsToAddressData');
 
-  dynamic result = await api.approveTokenAndCallContract(
-    web3,
+  dynamic result = await api.transferAndCallWithFee(web3,
     walletAddress,
     tokenAddress,
     contractAddress,
     tokenAmount,
-    data,
+    feeReceiverAddress,
+    feeAmount,
+    getDAIPointsToAddressData,
     network: 'mainnet'
   );
   print('result: $result');
