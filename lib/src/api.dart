@@ -272,6 +272,28 @@ class API {
     return resp;
   }
 
+  Future<dynamic> transferWithFee(Web3 web3, String walletAddress, String tokenAddress, String receiverAddress, num tokenAmount, String feeReceiverAddress, num feeAmount, {String network}) async {
+    String data = await web3.getTransferWithFeeEncodedData(
+      tokenAddress, receiverAddress, tokenAmount, feeReceiverAddress, feeAmount
+    );
+
+    Map<String, dynamic> resp = await approveTokenAndCallContract(
+      web3, walletAddress, tokenAddress, web3.getWrapper(), tokenAmount + feeAmount, data, network: network
+    );
+    return resp;
+  }
+
+  Future<dynamic> transferAndCallWithFee(Web3 web3, String walletAddress, String tokenAddress, String contractAddress, num tokenAmount, String feeReceiverAddress, num feeAmount, String contractCallData, {String network}) async {
+    String data = await web3.getTransferAndCallWithFeeEncodedData(
+      tokenAddress, contractAddress, tokenAmount, feeReceiverAddress, feeAmount, contractCallData
+    );
+
+    Map<String, dynamic> resp = await approveTokenAndCallContract(
+      web3, walletAddress, tokenAddress, web3.getWrapper(), tokenAmount + feeAmount, data, network: network
+    );
+    return resp;
+  }
+
   Future<dynamic> getCommunityData(String communityAddress, {bool isRopsten = false, String walletAddress}) async {
     String url = walletAddress != null ? 'v1/communities/$communityAddress/$walletAddress' : 'v1/communities/$communityAddress';
     Map<String, dynamic> resp = await _get(
