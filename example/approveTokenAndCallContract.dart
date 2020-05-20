@@ -33,9 +33,9 @@ void main() async {
 
   api.setJwtToken('YOUR_JWT');
 
-  String walletAddress = "YOUR_WALLET_ADDRESS";
+  String walletAddress = 'YOUR_WALLET_ADDRESS';
   String tokenAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
-  String receiverAddress = '0xB8Ce4A040E8aA33bBe2dE62E92851b7D7aFd52De';
+  String receiverAddress = 'RECEIVER_ADDRESS';
   String contractAddress = '0x782c578B5BC3b9A1B6E1E54f839B610Ac7036bA0'; // DAIPoints
   num tokenAmount = 0.1;
   num tokenDecimals = 18;
@@ -45,7 +45,12 @@ void main() async {
   Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
   BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
 
-  String data = await web3.getEncodedDataForContractCall('DAIPointsToken', contractAddress, 'getDAIPointsToAddress', [amount, receiver]);
+  String data = await web3.getEncodedDataForContractCall(
+    'DAIPointsToken',
+    contractAddress,
+    'getDAIPointsToAddress',
+    [amount, receiver]
+  );
   print('data: $data');
 
   dynamic result = await api.approveTokenAndCallContract(

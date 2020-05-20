@@ -31,15 +31,19 @@ void main() async {
 
   api.setJwtToken('YOUR_JWT');
 
-  dynamic wallet = await api.getWallet();
-  print('wallet: $wallet');
+  String walletAddress = 'YOUR_WALLET_ADDRESS';
 
-  String data = await web3.getEncodedDataForContractCall('Community', web3.getDefaultCommunity(), 'join', []);
+  String data = await web3.getEncodedDataForContractCall(
+    'Community',
+    web3.getDefaultCommunity(),
+    'join',
+    []
+  );
   print('data: $data');
 
   dynamic result = await api.callContract(
     web3,
-    wallet["walletAddress"],
+    walletAddress,
     web3.getDefaultCommunity(),
     0,
     data
