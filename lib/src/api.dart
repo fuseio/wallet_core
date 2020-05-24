@@ -273,7 +273,7 @@ class API {
   }
 
   Future<dynamic> multiRelay(List<dynamic> items) async {
-    Map<String, dynamic> resp = await _post('v2/multi', private: true, body: items);
+    Map<String, dynamic> resp = await _post('v2/multi', private: true, body: { 'items': items });
     return resp;
   }
 
