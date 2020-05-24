@@ -272,6 +272,11 @@ class API {
     return resp;
   }
 
+  Future<dynamic> multiRelay(List<dynamic> items) async {
+    Map<String, dynamic> resp = await _post('v2/multi', private: true, body: items);
+    return resp;
+  }
+
   Future<dynamic> transferWithFee(Web3 web3, String walletAddress, String tokenAddress, String receiverAddress, num tokenAmount, String feeReceiverAddress, num feeAmount, {String network}) async {
     String data = await web3.getTransferWithFeeEncodedData(
       tokenAddress, receiverAddress, tokenAmount, feeReceiverAddress, feeAmount
