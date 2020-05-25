@@ -10,13 +10,12 @@ void main() async {
   // init web3 module
   Web3 web3 = new Web3(
     approvalCallback,
-    url: 'https://mainnet.infura.io/v3/INFURA_API_KEY',
-    networkId: 1,
     defaultCommunityAddress: 'DEFAULT_COMMUNITY_ADDRESS',
     communityManagerAddress: 'COMMUNITY_MANAGER_ADDRESS',
     transferManagerAddress: 'TRANSFER_MANAGER_ADDRESS',
     daiPointsManagerAddress: 'DAI_POINTS_MANAGER_ADDRESS',
-    wrapperAddress: 'WRAPPER_ADDRESS'
+    url: 'https://mainnet.infura.io/v3/INFURA_API_KEY',
+    networkId: 1
   );
 
   // set web3 credentials with private key
@@ -34,20 +33,36 @@ void main() async {
 
   api.setJwtToken('YOUR_JWT');
 
+  /*
+  curl -X POST \
+    https://api.totle.com/swap \
+    -H 'content-type: Application/JSON' \
+    -d '{ 
+    "address": "YOUR_WALLET_ADDRESS",
+    "config": {
+      "transactions": true
+    },
+    "swap":{ 
+        "sourceAsset":"DAI",
+        "destinationAsset":"USDC",
+        "sourceAmount":"500000000000000000"
+    }
+  }'
+  */
+
   String walletAddress = 'YOUR_WALLET_ADDRESS';
   String tokenAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
-  String receiverAddress = 'RECEIVER_ADDRESS';
-  String feeReceiverAddress = 'FEE_RECEIVER_ADDRESS';
-  num tokenAmount = 1;
-  num feeAmount = 0.5;
+  String approvalContractAddress = '0x74758AcFcE059f503a7E6B0fC2c8737600f9F2c4'; // TokenTransferProxy
+  String swapContractAddress = 'SWAP_TX_ADDRESS_FROM_RESPONSE';
+  String swapData = 'SWAP_TX_DATA_FROM_RESPONSE';
 
-  dynamic result = await api.transferWithFee(web3,
+  dynamic result = await api.totleSwap(
+    web3,
     walletAddress,
     tokenAddress,
-    receiverAddress,
-    tokenAmount,
-    feeReceiverAddress,
-    feeAmount,
+    approvalContractAddress, 
+    swapContractAddress,
+    swapData,
     network: 'mainnet'
   );
   print('result: $result');

@@ -30,7 +30,6 @@ class Web3 {
   String _communityManagerContractAddress;
   String _daiPointsManagerContractAddress;
   String _transferManagerContractAddress;
-  String _wrapperAddress;
   int _defaultGasLimit;
 
   Web3(Future<bool> approveCb(), {
@@ -40,7 +39,6 @@ class Web3 {
     String communityManagerAddress,
     String transferManagerAddress,
     String daiPointsManagerAddress,
-    String wrapperAddress,
     int defaultGasLimit
   }) {
     _client = new Web3Client(url ?? RPC_URL, new Client());
@@ -50,7 +48,6 @@ class Web3 {
     _communityManagerContractAddress = communityManagerAddress;
     _transferManagerContractAddress = transferManagerAddress;
     _daiPointsManagerContractAddress = daiPointsManagerAddress;
-    _wrapperAddress = wrapperAddress;
     _defaultGasLimit = defaultGasLimit ?? DEFAULT_GAS_LIMIT;
   }
 
@@ -207,10 +204,6 @@ class Web3 {
 
   String getDefaultCommunity() {
     return _defaultCommunityContractAddress;
-  }
-
-  String getWrapper() {
-    return _wrapperAddress;
   }
 
   // "old" join community
@@ -405,7 +398,7 @@ class Web3 {
     };
   }
 
-  Future<Map<String, dynamic>> approveTokenOffChain(String walletAddress, String tokenAddress, num tokensAmount, {String network = "fuse"}) async {
+  Future<Map<String, dynamic>> approveTokenOffChain(String walletAddress, String tokenAddress, num tokensAmount, {String spenderContract = null, String network = "fuse"}) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
@@ -413,13 +406,17 @@ class Web3 {
     Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+    EthereumAddress spender = wallet;
+    if (spenderContract != null) {
+      spender = EthereumAddress.fromHex(spenderContract);
+    }
 
     String nonce = await getNonceForRelay();
     DeployedContract contract =
         await _contract('TransferManager', _transferManagerContractAddress);
     Uint8List data = contract
         .function('approveToken')
-        .encodeCall([wallet, token, wallet, amount]);
+        .encodeCall([wallet, token, spender, amount]);
     String encodedData = '0x' + HEX.encode(data);
 
     String signature = await signOffChain(
@@ -525,45 +522,6 @@ class Web3 {
     DeployedContract contract = await _contract(contractName, contractAddress);
     Uint8List data = contract.function(methodName).encodeCall(params);
     String encodedData = HEX.encode(data);
-    return encodedData;
-  }
-
-  Future<String> getTransferWithFeeEncodedData(String tokenAddress, String receiverAddress, num tokenAmount, String feeReceiverAddress, num feeAmount) async {
-    EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
-    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
-    EthereumAddress feeReceiver = EthereumAddress.fromHex(feeReceiverAddress);
-    Decimal tokenAmountDecimal = Decimal.parse(tokenAmount.toString());
-    Decimal feeAmountDecimal = Decimal.parse(feeAmount.toString());
-    dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
-    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
-    BigInt amount = BigInt.parse((tokenAmountDecimal * decimals).toString());
-    BigInt fee = BigInt.parse((feeAmountDecimal * decimals).toString());
-    
-    String encodedData = await getEncodedDataForContractCall(
-      'Wrapper', _wrapperAddress, 'transferWithFee', [token, receiver, amount, feeReceiver, fee]
-    );
-    return encodedData;
-  }
-
-  Future<String> getTransferAndCallWithFeeEncodedData(String tokenAddress, String contractAddress, num tokenAmount, String feeReceiverAddress, num feeAmount, String contractCallData) async {
-    EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
-    EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
-    EthereumAddress feeReceiver = EthereumAddress.fromHex(feeReceiverAddress);
-    Decimal tokenAmountDecimal = Decimal.parse(tokenAmount.toString());
-    Decimal feeAmountDecimal = Decimal.parse(feeAmount.toString());
-    dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
-    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
-    BigInt amount = BigInt.parse((tokenAmountDecimal * decimals).toString());
-    BigInt fee = BigInt.parse((feeAmountDecimal * decimals).toString());
-    
-    String encodedData = await getEncodedDataForContractCall(
-      'Wrapper',
-      _wrapperAddress,
-      'transferAndCallWithFee',
-      [token, contract, amount, feeReceiver, fee, HEX.decode(contractCallData)]
-    );
     return encodedData;
   }
 }
