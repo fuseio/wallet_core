@@ -398,7 +398,7 @@ class Web3 {
     };
   }
 
-  Future<Map<String, dynamic>> approveTokenOffChain(String walletAddress, String tokenAddress, num tokensAmount, {String network = "fuse"}) async {
+  Future<Map<String, dynamic>> approveTokenOffChain(String walletAddress, String tokenAddress, num tokensAmount, {String spenderContract = null, String network = "fuse"}) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
@@ -406,13 +406,17 @@ class Web3 {
     Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+    EthereumAddress spender = wallet;
+    if (spenderContract != null) {
+      spender = EthereumAddress.fromHex(spenderContract);
+    }
 
     String nonce = await getNonceForRelay();
     DeployedContract contract =
         await _contract('TransferManager', _transferManagerContractAddress);
     Uint8List data = contract
         .function('approveToken')
-        .encodeCall([wallet, token, wallet, amount]);
+        .encodeCall([wallet, token, spender, amount]);
     String encodedData = '0x' + HEX.encode(data);
 
     String signature = await signOffChain(

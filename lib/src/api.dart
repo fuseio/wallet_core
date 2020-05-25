@@ -332,4 +332,11 @@ class API {
     Map<String, dynamic> data = _responseHandler(response);
     return data['data'];
   }
+
+  Future<dynamic> totleSwap(Web3 web3, String walletAddress, String tokenAddress, String approvalContractAddress, String swapContractAddress, String swapData, {String network}) async {
+    Map<String, dynamic> signedApprovalData = await web3.approveTokenOffChain(walletAddress, tokenAddress, 1000000, spenderContract: approvalContractAddress, network: network);
+    Map<String, dynamic> signedSwapData = await web3.callContractOffChain(walletAddress, swapContractAddress, 0, swapData.replaceFirst('0x', ''), network: network);
+    Map<String, dynamic> resp = await multiRelay([signedApprovalData, signedSwapData]);
+    return resp;
+  }
 }
