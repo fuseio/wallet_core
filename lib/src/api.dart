@@ -4,13 +4,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:wallet_core/models/api.dart';
 import 'package:wallet_core/src/utils.dart';
 import 'package:wallet_core/src/web3.dart';
 
-const String API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api';
+const String _API_BASE_URL = 'https://studio-qa-ropsten.fusenet.io/api';
 const String FUNDER_BASE_URL = 'https://funder-qa.fuse.io/api';
 
-class API {
+class API extends Api {
   String _base;
   Client _client;
   String _jwtToken;
@@ -20,7 +21,7 @@ class API {
   String _funderBase;
 
   API({String base, String jwtToken, String funderBase}) {
-    _base = base ?? API_BASE_URL;
+    _base = base ?? _API_BASE_URL;
     _jwtToken = jwtToken ?? null;
     _client = new Client();
     _funderBase = funderBase ?? FUNDER_BASE_URL;
@@ -28,20 +29,6 @@ class API {
 
   void setJwtToken(String jwtToken) {
     _jwtToken = jwtToken;
-  }
-
-  Map<String, dynamic> _responseHandler(Response response) {
-    print('response: ${response.statusCode}, ${response.reasonPhrase}');
-    switch (response.statusCode) {
-      case 200:
-        Map<String, dynamic> obj = json.decode(response.body);
-        return obj;
-      case 401:
-        throw 'Error! Unauthorized';
-        break;
-      default:
-        throw 'Error! status: ${response.statusCode}, reason: ${response.reasonPhrase}';
-    }
   }
 
   Future<Map<String, dynamic>> _get(String endpoint, {bool private, bool isRopsten = false}) async {
@@ -54,7 +41,7 @@ class API {
     } else {
       response = await _client.get('$uri/$endpoint');
     }
-    return _responseHandler(response);
+    return responseHandler(response);
   }
 
   Future<Map<String, dynamic>> _post(String endpoint,
@@ -74,7 +61,7 @@ class API {
       response = await _client.post('$uri/$endpoint',
           body: body, headers: {"Content-Type": 'application/json'});
     }
-    return _responseHandler(response);
+    return responseHandler(response);
   }
 
   Future<Map<String, dynamic>> _put(String endpoint,
@@ -93,7 +80,7 @@ class API {
       response = await _client.put('$_base/$endpoint',
           body: body, headers: {"Content-Type": 'application/json'});
     }
-    return _responseHandler(response);
+    return responseHandler(response);
   }
 
   Future<String> login(String token, String accountAddress, String identifier, {String appName}) async {
@@ -329,12 +316,12 @@ class API {
   Future<dynamic> getFunderJob(String id) async {
     Client funderClient = new Client();
     Response response = await funderClient.get('$_funderBase/job/$id');
-    Map<String, dynamic> data = _responseHandler(response);
+    Map<String, dynamic> data = responseHandler(response);
     return data['data'];
   }
 
-  Future<dynamic> totleSwap(Web3 web3, String walletAddress, String tokenAddress, String approvalContractAddress, String swapContractAddress, String swapData, {String network}) async {
-    Map<String, dynamic> signedApprovalData = await web3.approveTokenOffChain(walletAddress, tokenAddress, 1000000, spenderContract: approvalContractAddress, network: network);
+  Future<dynamic> totleSwap(Web3 web3, String walletAddress, String tokenAddress, num tokensAmount, String approvalContractAddress, String swapContractAddress, String swapData, {String network}) async {
+    Map<String, dynamic> signedApprovalData = await web3.approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, spenderContract: approvalContractAddress, network: network);
     Map<String, dynamic> signedSwapData = await web3.callContractOffChain(walletAddress, swapContractAddress, 0, swapData.replaceFirst('0x', ''), network: network);
     Map<String, dynamic> resp = await multiRelay([signedApprovalData, signedSwapData]);
     return resp;

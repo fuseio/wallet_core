@@ -482,8 +482,8 @@ class Web3 {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
     EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
-    // dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    int tokenDecimals = 18;
+    dynamic tokenDetails = await getTokenDetails(tokenAddress);
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
     Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
