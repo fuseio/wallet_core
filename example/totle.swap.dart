@@ -52,6 +52,7 @@ void main() async {
 
   String walletAddress = 'YOUR_WALLET_ADDRESS';
   String tokenAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
+  num tokensAmount = 0.01; // DAI
   String approvalContractAddress = '0x74758AcFcE059f503a7E6B0fC2c8737600f9F2c4'; // TokenTransferProxy
   String swapContractAddress = 'SWAP_TX_ADDRESS_FROM_RESPONSE';
   String swapData = 'SWAP_TX_DATA_FROM_RESPONSE';
@@ -60,6 +61,7 @@ void main() async {
     web3,
     walletAddress,
     tokenAddress,
+    tokensAmount,
     approvalContractAddress, 
     swapContractAddress,
     swapData,
