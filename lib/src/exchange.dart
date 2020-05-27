@@ -28,9 +28,7 @@ class Exchange extends Api {
     return responseHandler(response);
   }
 
-  Future<Map<String, dynamic>> swap(String walletAddress, String sourceAsset,
-      String destinationAsset, String sourceAmount,
-      {Map options}) async {
+  Future<Map<String, dynamic>> swap(String walletAddress, {Map options}) async {
     Map body = Map.from({
       'address': walletAddress,
       ...options,
