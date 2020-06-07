@@ -120,7 +120,11 @@ class TokensApi {
           });
         }
       }
-      return { "price": resp['payload']['price'] ?? {}, "tokens": tokens };
+      return {
+        "price": resp['payload']['price'] ?? {},
+        "tokens": tokens,
+        "balance": BigInt.from(num.parse(resp['payload']['balance'] ?? 0) ?? 0)
+      };
     } catch (e) {
       throw 'ERROR in get address balances $e';
     }
