@@ -110,21 +110,26 @@ class TokensApi {
       List tokens = [];
       if (resp['payload'] != null && resp['payload']['tokens'] != null) {
         for (dynamic record in resp['payload']['tokens']) {
-          tokens.add({
+          Map newToken = {
             "address": record['address'],
             "decimals": record['decimals'],
             "name": record['name'],
             "timestamp": record["timestamp"],
             "symbol": record['symbol'],
-            "amount": BigInt.from(num.parse(record['amount']))
-          });
+            "amount": BigInt.from(num.parse(record['amount'])),
+          };
+
+          if (record['price'] != null && record['price']['amount'] != null) {
+            newToken['price'] = record['price']['amount'];
+          }
+          tokens.add(newToken);
         }
+        return {
+          "price": resp['payload']['price'] ?? {},
+          "tokens": tokens,
+          "balance": BigInt.from(num.parse(resp['payload']['balance'] ?? 0) ?? 0)
+        };
       }
-      return {
-        "price": resp['payload']['price'] ?? {},
-        "tokens": tokens,
-        "balance": BigInt.from(num.parse(resp['payload']['balance'] ?? 0) ?? 0)
-      };
     } catch (e) {
       throw 'ERROR in get address balances $e';
     }
