@@ -81,10 +81,23 @@ class TokensApi {
     }
   }
 
+  // Retrieves the latest price (and other market information) for the specified token.
+  Future<String> getTokenLastestPrice(String tokenAddress) async {
+    try {
+      Map<String, dynamic> resp = await _amberDataGet('v2/market/tokens/prices/$tokenAddress/latest');
+      if (resp['payload'] != null && resp['payload'][0] != null) {
+        return resp['payload'][0]['priceUSD'];
+      }
+      throw 'ERROR in get token latest price ${resp.toString()}';
+    } catch (e) {
+      throw 'ERROR in get token latest price ${e.toString()}';
+    }
+  }
+
   // Retrieves the tokens this accountAddress is holding.
   Future<List> geTokensUserHolding(String accountAddress) async {
     try {
-      Map<String, dynamic> resp = await _amberDataGet('v1/addresses/$accountAddress/tokens');
+      Map<String, dynamic> resp = await _amberDataGet('v2/market/tokens/prices/$accountAddress/tokens');
       List tokens = [];
       if (resp['payload'] != null && resp['payload']['records'] != null) {
         for (dynamic record in resp['payload']['records']) {
