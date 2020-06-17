@@ -165,7 +165,51 @@ class API extends Api {
         "dAIPointsManager": resp['data']['walletModules']['DAIPointsManager'] ?? null,
         "networks": resp['data']['networks'],
         "backup": resp['backup'],
+        "balancesOnForeign": resp['balancesOnForeign']
       };
+    } else {
+      return {};
+    }
+  }
+
+  Future<List<dynamic>> getWalletTransactions(String walletAddress, {String tokenAddress}) async {
+    String endpoint = 'v2/wallets/transactions/$walletAddress';
+    endpoint = tokenAddress != null ? '$endpoint?tokenAddress=$tokenAddress' : endpoint;
+    Map<String, dynamic> resp = await _get(endpoint, private: true);
+    if (resp != null && resp["data"] != null) {
+      List<dynamic> transfers = [];
+      for (dynamic transfer in resp['data']) {
+        transfers.add({
+          "from": transfer['from'],
+          "to": transfer['to'],
+          "tokenAddress": transfer["tokenAddress"],
+          "txHash": transfer["hash"],
+          "value": transfer['value'],
+          "timestamp": DateTime.parse(transfer['timeStamp']).millisecondsSinceEpoch,
+          "status": transfer['status'],
+          "type": transfer["from"].toString().toLowerCase() ==
+                          walletAddress.toLowerCase()
+                      ? 'SEND'
+                      : 'RECEIVE',
+        });
+      }
+      return transfers;
+    } else {
+      return [];
+    }
+  }
+
+  Future<dynamic> getTransactionByHash({String hash, String tokenAddress}) async {
+    String endpoint = 'v2/wallets/transactions';
+    endpoint = hash != null ? '$endpoint?hash=$hash' : endpoint;
+    endpoint = tokenAddress != null
+        ? hash != null
+            ? '$endpoint&tokenAddress=$tokenAddress'
+            : '$endpoint?tokenAddress=$tokenAddress'
+        : '$endpoint?tokenAddress=$tokenAddress';
+    Map<String, dynamic> resp = await _get(endpoint, private: true);
+    if (resp != null && resp["data"] != null) {
+      return resp["data"][0];
     } else {
       return {};
     }
