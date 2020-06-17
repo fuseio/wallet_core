@@ -165,7 +165,7 @@ class API extends Api {
         "dAIPointsManager": resp['data']['walletModules']['DAIPointsManager'] ?? null,
         "networks": resp['data']['networks'],
         "backup": resp['backup'],
-        "balancesOnForeign": resp['balancesOnForeign']
+        "balancesOnForeign": resp['data']['balancesOnForeign']
       };
     } else {
       return {};
