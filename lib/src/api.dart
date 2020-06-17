@@ -202,7 +202,6 @@ class API extends Api {
   Future<dynamic> getTransactionByHash({String hash, String tokenAddress}) async {
     String endpoint = 'v2/wallets/transactions';
     endpoint = hash != null ? '$endpoint?hash=$hash' : endpoint;
-    endpoint = hash != null ? '$endpoint?hash=$hash' : endpoint;
     endpoint = tokenAddress != null
         ? hash != null
             ? '$endpoint&tokenAddress=$tokenAddress'
