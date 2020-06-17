@@ -31,6 +31,8 @@ class Web3 {
   String _daiPointsManagerContractAddress;
   String _transferManagerContractAddress;
   int _defaultGasLimit;
+  String _marketMakerContractAddress;
+  String _reserveContractAddress;
 
   Web3(Future<bool> approveCb(), {
     String url,
@@ -39,7 +41,9 @@ class Web3 {
     String communityManagerAddress,
     String transferManagerAddress,
     String daiPointsManagerAddress,
-    int defaultGasLimit
+    int defaultGasLimit,
+    String marketMakerContractAddress,
+    String reserveContractAddress
   }) {
     _client = new Web3Client(url ?? RPC_URL, new Client());
     _approveCb = approveCb();
@@ -49,6 +53,8 @@ class Web3 {
     _transferManagerContractAddress = transferManagerAddress;
     _daiPointsManagerContractAddress = daiPointsManagerAddress;
     _defaultGasLimit = defaultGasLimit ?? DEFAULT_GAS_LIMIT;
+    _marketMakerContractAddress = marketMakerContractAddress;
+    _reserveContractAddress = reserveContractAddress;
   }
 
   static String generateMnemonic() {
@@ -523,5 +529,23 @@ class Web3 {
     Uint8List data = contract.function(methodName).encodeCall(params);
     String encodedData = HEX.encode(data);
     return encodedData;
+  }
+
+  Future<String> setReserveRatioWeeklyReward(List params) async {
+    String data = await getEncodedDataForContractCall(
+      'Reserve',
+      _reserveContractAddress,
+      'setReserveRatioWeeklyReward',
+      params
+    );
+    print('data: $data');
+    return data;
+  }
+
+  Future<dynamic> reserveRatioWeeklyReward() async {
+    return {
+      "nextWeeklyReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'newReserveRatioWeeklyReward', [])).first,
+      "currentWeeklyReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'reserveRatioWeeklyReward', [])).first
+    };
   }
 }
