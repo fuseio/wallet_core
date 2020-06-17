@@ -165,6 +165,7 @@ class API extends Api {
         "dAIPointsManager": resp['data']['walletModules']['DAIPointsManager'] ?? null,
         "networks": resp['data']['networks'],
         "backup": resp['backup'],
+        "balancesOnForeign": resp['balancesOnForeign']
       };
     } else {
       return {};
@@ -198,9 +199,15 @@ class API extends Api {
     }
   }
 
-  Future<dynamic> getTransactionByHash(String hash, {String tokenAddress}) async {
+  Future<dynamic> getTransactionByHash({String hash, String tokenAddress}) async {
     String endpoint = 'v2/wallets/transactions';
     endpoint = hash != null ? '$endpoint?hash=$hash' : endpoint;
+    endpoint = hash != null ? '$endpoint?hash=$hash' : endpoint;
+    endpoint = tokenAddress != null
+        ? hash != null
+            ? '$endpoint&tokenAddress=$tokenAddress'
+            : '$endpoint?tokenAddress=$tokenAddress'
+        : '$endpoint?tokenAddress=$tokenAddress';
     Map<String, dynamic> resp = await _get(endpoint, private: true);
     if (resp != null && resp["data"] != null) {
       return resp["data"][0];
