@@ -171,6 +171,44 @@ class API extends Api {
     }
   }
 
+  Future<List<dynamic>> getWalletTransactions(String walletAddress, {String tokenAddress}) async {
+    String endpoint = 'v2/wallets/transactions/$walletAddress';
+    endpoint = tokenAddress != null ? '$endpoint?tokenAddress=$tokenAddress' : endpoint;
+    Map<String, dynamic> resp = await _get(endpoint, private: true);
+    if (resp != null && resp["data"] != null) {
+      List<dynamic> transfers = [];
+      for (dynamic transfer in resp['data']) {
+        transfers.add({
+          "from": transfer['from'],
+          "to": transfer['to'],
+          "tokenAddress": transfer["tokenAddress"],
+          "txHash": transfer["hash"],
+          "value": transfer['value'],
+          "timestamp": DateTime.parse(transfer['timeStamp']).millisecondsSinceEpoch,
+          "status": transfer['status'],
+          "type": transfer["from"].toString().toLowerCase() ==
+                          walletAddress.toLowerCase()
+                      ? 'SEND'
+                      : 'RECEIVE',
+        });
+      }
+      return transfers;
+    } else {
+      return [];
+    }
+  }
+
+  Future<dynamic> getTransactionByHash(String hash, {String tokenAddress}) async {
+    String endpoint = 'v2/wallets/transactions';
+    endpoint = hash != null ? '$endpoint?hash=$hash' : endpoint;
+    Map<String, dynamic> resp = await _get(endpoint, private: true);
+    if (resp != null && resp["data"] != null) {
+      return resp["data"][0];
+    } else {
+      return {};
+    }
+  }
+
   Future<dynamic> getJob(String id) async {
     Map<String, dynamic> resp = await _get('v2/jobs/$id', private: true);
     if (resp != null && resp["data"] != null) {
