@@ -152,6 +152,8 @@ const String getTransferEventsQuery = r'''
         value
         blockNumber
         txHash
+        tokenAddress
+        timestamp
       }
   }
 ''';
