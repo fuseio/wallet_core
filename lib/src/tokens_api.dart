@@ -59,12 +59,31 @@ class TokensApi {
     }
   }
 
-  Future<dynamic> getTokenTransferEventsByAccountAddress(String tokenAddress, String accountAddress,
+  Future<List<dynamic>> getTokenTransferEventsByAccountAddress(String tokenAddress, String accountAddress,
       {String sort = 'desc', int startblock = 0}) async {
     try {
-      Map<String, dynamic> resp = await _get(
-          '?module=account&action=tokentx&contractaddress=$tokenAddress&address=$accountAddress&startblock=$startblock&sort=$sort&apikey=$_apiKey');
-      return resp['result'];
+      Map<String, dynamic> resp = await _get('?module=account&action=tokentx&contractaddress=$tokenAddress&address=$accountAddress&startblock=$startblock&sort=$sort&apikey=$_apiKey');
+      if (resp['message'] == 'OK' && resp['status'] == '1') {
+        List transfers = [];
+        for (dynamic transferEvent in resp['result']) {
+          transfers.add({
+            'blockNumber': int.parse(transferEvent['blockNumber'].toString()),
+            'txHash': transferEvent['hash'],
+            'to': transferEvent['to'],
+            'from': transferEvent["from"],
+            'status': "CONFIRMED",
+            'timestamp': int.parse(transferEvent['timeStamp'].toString()),
+            'value': BigInt.from(num.parse(transferEvent['value'])),
+            'tokenAddress': tokenAddress,
+            'type': transferEvent["from"].toString().toLowerCase() == accountAddress.toLowerCase()
+                ? 'SEND'
+                : 'RECEIVE',
+          });
+        }
+        return transfers;
+      } else {
+        return [];
+      }
     } catch (e) {
       throw e;
     }
