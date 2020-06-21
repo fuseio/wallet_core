@@ -531,21 +531,21 @@ class Web3 {
     return encodedData;
   }
 
-  Future<String> setReserveRatioWeeklyReward(List params) async {
+  Future<String> setMintedReward(List params) async {
     String data = await getEncodedDataForContractCall(
       'Reserve',
       _reserveContractAddress,
-      'setReserveRatioWeeklyReward',
+      'setMintedReward',
       params
     );
-    print('data: $data');
+    print('setMintedReward data: $data');
     return data;
   }
 
-  Future<dynamic> reserveRatioWeeklyReward() async {
+  Future<dynamic> getMintedReward() async {
     return {
-      "nextWeeklyReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'newReserveRatioWeeklyReward', [])).first,
-      "currentWeeklyReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'reserveRatioWeeklyReward', [])).first
+      "newMintedReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'newMintedReward', [])).first,
+      "mintedReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'mintedReward', [])).first
     };
   }
 }
