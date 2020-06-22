@@ -186,7 +186,7 @@ class API extends Api {
           "txHash": transfer["hash"],
           "value": transfer['value'],
           "timestamp": DateTime.parse(transfer['timeStamp']).millisecondsSinceEpoch,
-          "status": transfer['status'],
+          "status": transfer['status']?.toUpperCase(),
           "type": transfer["from"].toString().toLowerCase() ==
                           walletAddress.toLowerCase()
                       ? 'SEND'
