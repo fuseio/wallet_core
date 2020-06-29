@@ -542,10 +542,10 @@ class Web3 {
     return data;
   }
 
-  Future<dynamic> getMintedReward() async {
+  Future<dynamic> getRewardsInfo() async {
     return {
-      "newMintedReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'newMintedReward', [])).first,
-      "mintedReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'mintedReward', [])).first
+      "newMintedReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'getNewMintedReward', [])).first,
+      "mintedReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'getMintedReward', [])).first,
     };
   }
 }
