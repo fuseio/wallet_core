@@ -370,6 +370,7 @@ class Web3 {
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
     int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    String tokenSymbol = tokenDetails["symbol"];
     Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
@@ -400,7 +401,15 @@ class Web3 {
       "gasPrice": 0,
       "gasLimit": _defaultGasLimit,
       "signature": signature,
-      "walletModule": "TransferManager"
+      "walletModule": "TransferManager",
+      "transactionBody": {
+        "tokenAddress": tokenAddress,
+        "from": walletAddress,
+        "to": receiverAddress,
+        "network": network == 'mainnet' ? 'main' : network,
+        "value": amount.toString(),
+        "asset": tokenSymbol
+      }
     };
   }
 
