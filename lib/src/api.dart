@@ -181,6 +181,7 @@ class API extends Api {
       for (dynamic transfer in resp['data']) {
         transfers.add({
           "from": transfer['from'],
+          "isSwap": transfer['isSwap'],
           "to": transfer['to'],
           "tokenAddress": transfer["tokenAddress"],
           "txHash": transfer["hash"],
