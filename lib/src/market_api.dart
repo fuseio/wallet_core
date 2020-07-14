@@ -1,0 +1,36 @@
+library market_api;
+
+import 'dart:async';
+
+import 'package:http/http.dart';
+import 'package:wallet_core/models/api.dart';
+
+const String MARKET_API_BASE_URL = 'https://api.coingecko.com/api/v3';
+
+class MarketApi extends Api {
+  String _base;
+  Client _client;
+
+  MarketApi({String marketBaseApi}) {
+    _base = marketBaseApi ?? MARKET_API_BASE_URL;
+    _client = new Client();
+  }
+
+  Future<Map<String, dynamic>> _get(String endpoint) async {
+    Response response = await _client.get('$_base/$endpoint');
+    return responseHandler(response);
+  }
+
+  // Get current price of tokens (using contract addresses) for a given platform in any other currency that you need.
+  Future<dynamic> getCurrentPriceOfTokens(
+      String contractAddresses, String vsCurrencies,
+      {String networkId = 'ethereum'}) async {
+    try {
+      Map<String, dynamic> response = await _get(
+          'simple/token_price/$networkId?contract_addresses=$contractAddresses&vs_currencies=$vsCurrencies');
+      return response;
+    } catch (e) {
+      throw e;
+    }
+  }
+}
