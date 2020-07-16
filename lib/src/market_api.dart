@@ -33,4 +33,30 @@ class MarketApi extends Api {
       throw e;
     }
   }
+
+  // Get the current price of any cryptocurrencies in any other supported currencies that you need.
+  Future<dynamic> getCurrentPriceOfToken(
+    String ids,
+    String vsCurrencies,
+  ) async {
+    try {
+      Map<String, dynamic> response =
+          await _get('/simple/price?ids=$ids&vs_currencies=$vsCurrencies');
+      return response;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Get coin info from contract address
+  Future<dynamic> getCoinInfoByAddress(String contractAddress,
+      {String networkId = 'ethereum'}) async {
+    try {
+      Map<String, dynamic> response =
+          await _get('/coins/$networkId/contract/$contractAddress');
+      return response;
+    } catch (e) {
+      throw e;
+    }
+  }
 }
