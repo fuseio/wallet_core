@@ -250,7 +250,7 @@ class API extends Api {
     return resp;
   }
 
-  Future<dynamic> backupWallet(String communityAddress) async {
+  Future<dynamic> backupWallet({String communityAddress}) async {
     Map<String, dynamic> resp = await _post('v2/wallets/backup',
       body: {"communityAddress": communityAddress}, private: true);
     return resp;
@@ -341,7 +341,7 @@ class API extends Api {
     return resp;
   }
 
-  Future<dynamic> invite(String phoneNumber, String communityAddress, {String name = '', String amount = '', String symbol = ''}) async {
+  Future<dynamic> invite(String phoneNumber, {String communityAddress = '', String name = '', String amount = '', String symbol = ''}) async {
     Map<String, dynamic> resp = await _post('v2/wallets/invite/$phoneNumber', body: {"communityAddress": communityAddress, "name": name, "amount": amount, "symbol": symbol}, private: true);
     return resp;
   }
