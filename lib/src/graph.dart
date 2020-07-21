@@ -163,7 +163,7 @@ class Graph {
           "value": t["value"],
           "type": "RECEIVE",
           "status": "CONFIRMED",
-          "timestamp": t['timestamp']
+          "timestamp": DateTime.fromMillisecondsSinceEpoch(t['timestamp'] * 1000).millisecondsSinceEpoch
         });
       }
 
@@ -209,7 +209,7 @@ class Graph {
           "value": t["value"],
           "type": "RECEIVE",
           "status": "CONFIRMED",
-          "timestamp": t['timestamp']
+          "timestamp": DateTime.fromMillisecondsSinceEpoch(num.parse(t['timestamp']) * 1000).millisecondsSinceEpoch
         });
       }
 
@@ -226,7 +226,7 @@ class Graph {
           "value": t["value"],
           "type": "SEND",
           "status": "CONFIRMED",
-          "timestamp": t['timestamp']
+          "timestamp": DateTime.fromMillisecondsSinceEpoch(t['timestamp'] * 1000).millisecondsSinceEpoch
         });
       }
       transfers.sort((a, b) => b["blockNumber"].compareTo(a["blockNumber"]));
