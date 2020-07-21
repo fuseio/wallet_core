@@ -551,6 +551,68 @@ class Web3 {
     return data;
   }
 
+  Future<Map<String, dynamic>> approveTokenOffChain(String contractName, String contractAddress, String walletAddress, String tokenAddress, num tokensAmount, {String network = "fuse"}) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    dynamic tokenDetails = await getTokenDetails(tokenAddress);
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
+    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+    BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+
+    String nonce = await getNonceForRelay();
+    DeployedContract contract =
+        await _contract(contractName, contractAddress);
+    Uint8List data = contract
+        .function('approve')
+        .encodeCall([wallet, amount]);
+    String encodedData = '0x' + HEX.encode(data);
+
+    String signature = await signOffChain(
+        contractAddress,
+        walletAddress,
+        BigInt.from(0),
+        encodedData,
+        nonce,
+        BigInt.from(0),
+        BigInt.from(_defaultGasLimit));
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedData,
+      "nonce": nonce,
+      "network": network,
+      "methodName": "approve",
+      "gasPrice": 0,
+      "gasLimit": _defaultGasLimit,
+      "signature": signature,
+      "walletModule": "TransferManager"
+    };
+  }
+
+  Future<String> sellToken(walletAddress, List params) async {
+    // String d = await approveTokenOffChain(EthereumAddress.fromHex(await getAddress()), _reserveContractAddress, ));
+    String data = await getEncodedDataForContractCall(
+      'Reserve',
+      _reserveContractAddress,
+      'setMintedReward',
+      params
+    );
+    print('setMintedReward data: $data');
+    return data;
+  }
+
+  Future<String> buyToken(List params) async {
+    String d = await approveTokenOffChain(params);
+    String data = await getEncodedDataForContractCall(
+      'Reserve',
+      _reserveContractAddress,
+      'setMintedReward',
+      params
+    );
+    print('setMintedReward data: $data');
+    return data;
+  }
+
   Future<dynamic> getRewardsInfo() async {
     return {
       "newMintedReward": (await _readFromContract('MarketMaker', _marketMakerContractAddress, 'getNewMintedReward', [])).first,
