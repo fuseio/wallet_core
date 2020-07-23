@@ -189,7 +189,7 @@ class API extends Api {
           "timestamp": DateTime.parse(transfer['timeStamp']).millisecondsSinceEpoch,
           "status": transfer['status']?.toUpperCase(),
           'blockNumber': transfer['blockNumber'] != null
-                ? int.parse(transfer['blockNumber'])
+                ? transfer['blockNumber']
                 : null,
           "type": transfer["from"].toString().toLowerCase() ==
                           walletAddress.toLowerCase()
