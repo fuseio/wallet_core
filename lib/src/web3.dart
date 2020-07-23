@@ -559,23 +559,17 @@ class Web3 {
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
 
-    String data = await getEncodedDataForContractCall(
-      'Seedbed',
-      tokenAddress,
-      'approve',
-      [wallet, amount]
-    );
+    Map approveTokenData = await approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, network: network);
 
-    Map signApproveData = await callContractOffChain(walletAddress, tokenAddress, 0, data, network: network);
 
-    String buyData = await getEncodedDataForContractCall(
+    String sellData = await getEncodedDataForContractCall(
       'Reserve',
       _reserveContractAddress,
       'sell',
       [wallet, amount, amount]
     );
-    Map<String, dynamic> sellSignedData = await callContractOffChain(walletAddress, _reserveContractAddress, 0, buyData, network: network);
-    return [signApproveData, sellSignedData];
+    Map<String, dynamic> sellSignedData = await callContractOffChain(walletAddress, _reserveContractAddress, 0, sellData, network: network);
+    return [approveTokenData, sellSignedData];
   }
 
   Future<List<dynamic>> buyToken(String tokenAddress, String walletAddress, num tokensAmount, {String network = 'fuse'}) async {
@@ -586,14 +580,7 @@ class Web3 {
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
 
-    String data = await getEncodedDataForContractCall(
-      'Seedbed',
-      tokenAddress,
-      'approve',
-      [wallet, amount]
-    );
-
-    Map signApproveData = await callContractOffChain(walletAddress, tokenAddress, 0, data, network: network);
+    Map approveTokenData = await approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, network: network);
 
     String buyData = await getEncodedDataForContractCall(
       'Reserve',
@@ -602,7 +589,7 @@ class Web3 {
       [wallet, amount, amount]
     );
     Map<String, dynamic> buySignedData = await callContractOffChain(walletAddress, _reserveContractAddress, 0, buyData, network: network);
-    return [signApproveData, buySignedData];
+    return [approveTokenData, buySignedData];
   }
 
   Future<dynamic> getRewardsInfo() async {
