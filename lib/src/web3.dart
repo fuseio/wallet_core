@@ -551,7 +551,7 @@ class Web3 {
     return data;
   }
 
-  Future<Map<String, dynamic>> approveTokenOffChain(String contractName, String contractAddress, String walletAddress, String tokenAddress, num tokensAmount, {String network = "fuse"}) async {
+  Future<List<dynamic>> sellToken(String tokenAddress, String walletAddress, num tokensAmount, {String network = 'fuse'}) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
     int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
@@ -559,58 +559,50 @@ class Web3 {
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
 
-    String nonce = await getNonceForRelay();
-    DeployedContract contract =
-        await _contract(contractName, contractAddress);
-    Uint8List data = contract
-        .function('approve')
-        .encodeCall([wallet, amount]);
-    String encodedData = '0x' + HEX.encode(data);
-
-    String signature = await signOffChain(
-        contractAddress,
-        walletAddress,
-        BigInt.from(0),
-        encodedData,
-        nonce,
-        BigInt.from(0),
-        BigInt.from(_defaultGasLimit));
-
-    return {
-      "walletAddress": walletAddress,
-      "methodData": encodedData,
-      "nonce": nonce,
-      "network": network,
-      "methodName": "approve",
-      "gasPrice": 0,
-      "gasLimit": _defaultGasLimit,
-      "signature": signature,
-      "walletModule": "TransferManager"
-    };
-  }
-
-  Future<String> sellToken(walletAddress, List params) async {
-    // String d = await approveTokenOffChain(EthereumAddress.fromHex(await getAddress()), _reserveContractAddress, ));
     String data = await getEncodedDataForContractCall(
+      'Seedbed',
+      tokenAddress,
+      'approve',
+      [wallet, amount]
+    );
+
+    Map signApproveData = await callContractOffChain(walletAddress, tokenAddress, 0, data, network: network);
+
+    String buyData = await getEncodedDataForContractCall(
       'Reserve',
       _reserveContractAddress,
-      'setMintedReward',
-      params
+      'sell',
+      [wallet, amount, amount]
     );
-    print('setMintedReward data: $data');
-    return data;
+    Map<String, dynamic> sellSignedData = await callContractOffChain(walletAddress, _reserveContractAddress, 0, buyData, network: network);
+    return [signApproveData, sellSignedData];
   }
 
-  Future<String> buyToken(List params) async {
-    String d = await approveTokenOffChain(params);
+  Future<List<dynamic>> buyToken(String tokenAddress, String walletAddress, num tokensAmount, {String network = 'fuse'}) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    dynamic tokenDetails = await getTokenDetails(tokenAddress);
+    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+    Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
+    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+    BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+
     String data = await getEncodedDataForContractCall(
+      'Seedbed',
+      tokenAddress,
+      'approve',
+      [wallet, amount]
+    );
+
+    Map signApproveData = await callContractOffChain(walletAddress, tokenAddress, 0, data, network: network);
+
+    String buyData = await getEncodedDataForContractCall(
       'Reserve',
       _reserveContractAddress,
-      'setMintedReward',
-      params
+      'buy',
+      [wallet, amount, amount]
     );
-    print('setMintedReward data: $data');
-    return data;
+    Map<String, dynamic> buySignedData = await callContractOffChain(walletAddress, _reserveContractAddress, 0, buyData, network: network);
+    return [signApproveData, buySignedData];
   }
 
   Future<dynamic> getRewardsInfo() async {

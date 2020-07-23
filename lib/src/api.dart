@@ -374,4 +374,16 @@ class API extends Api {
     Map<String, dynamic> resp = await multiRelay([signedApprovalData, signedSwapData]);
     return resp;
   }
+
+  Future<dynamic> sellToken(Web3 web3, String tokenToApprove, String walletAddress, num tokensAmount, {String network}) async {
+    List<dynamic> signData = await web3.sellToken(tokenToApprove, walletAddress, tokensAmount);
+    Map<String, dynamic> resp = await multiRelay(signData);
+    return resp;
+  }
+
+  Future<dynamic> buyToken(Web3 web3, String tokenToApprove, String walletAddress, num tokensAmount, {String network}) async {
+    List<dynamic> signData = await web3.buyToken(tokenToApprove, walletAddress, tokensAmount);
+    Map<String, dynamic> resp = await multiRelay(signData);
+    return resp;
+  }
 }
