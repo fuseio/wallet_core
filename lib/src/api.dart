@@ -356,8 +356,8 @@ class API extends Api {
     return resp;
   }
 
-  Future<dynamic> fetchMetadata(String uri) async {
-    Map<String, dynamic> resp = await _get('v1/metadata/$uri', private: false);
+  Future<dynamic> fetchMetadata(String uri, {bool isRopsten = false}) async {
+    Map<String, dynamic> resp = await _get('v1/metadata/$uri', private: false, isRopsten: isRopsten);
     return resp['data'];
   }
 
