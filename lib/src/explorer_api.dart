@@ -28,21 +28,23 @@ class ExplorerApi extends Api {
 
   Future<List<dynamic>> getTokenTransferEventsByAccountAddress(
       String tokenAddress, String accountAddress,
-      {String sort = 'desc', int startblock = 0}) async {
+      {String sort = 'desc', int startblock = 0, int endblock = 0}) async {
     try {
       Map<String, dynamic> resp = await _get(
-          '?module=account&action=tokentx&contractaddress=$tokenAddress&address=$accountAddress&startblock=$startblock&sort=$sort');
+          '?module=account&action=tokentx&contractaddress=$tokenAddress&address=$accountAddress&startblock=$startblock&endblock=$endblock&sort=$sort');
       if (resp['message'] == 'OK' && resp['status'] == '1') {
         List transfers = [];
         for (dynamic transferEvent in resp['result']) {
           transfers.add({
-            'blockNumber': int.parse(transferEvent['blockNumber'].toString()),
+            'blockNumber': num.parse(transferEvent['blockNumber']),
             'txHash': transferEvent['hash'],
             'to': transferEvent['to'],
             'from': transferEvent["from"],
             'status': "CONFIRMED",
-            'timestamp': int.parse(transferEvent['timeStamp'].toString()),
-            'value': BigInt.parse(transferEvent['value']),
+            'timestamp': DateTime.fromMillisecondsSinceEpoch(
+                    int.parse(transferEvent['timeStamp']) * 1000)
+                .millisecondsSinceEpoch,
+            'value': transferEvent['value'],
             'tokenAddress': tokenAddress,
             'type': transferEvent["from"].toString().toLowerCase() ==
                     accountAddress.toLowerCase()
