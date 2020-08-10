@@ -6,6 +6,6 @@ export 'src/graph.dart';
 export 'src/web3.dart';
 
 export 'src/api.dart';
-export 'src/tokens_api.dart';
+export 'src/explorer_api.dart';
 export 'src/exchange.dart';
 export 'src/market_api.dart';
