@@ -275,7 +275,7 @@ class API extends Api {
   }
 
   Future<dynamic> tokenTransfer(Web3 web3, String walletAddress,
-      String tokenAddress, String receiverAddress, num tokensAmount, {String network}) async {
+      String tokenAddress, String receiverAddress, num tokensAmount, {String network = 'fuse'}) async {
     Map<String, dynamic> data = await web3.transferTokenOffChain(
         walletAddress, tokenAddress, receiverAddress, tokensAmount, network: network);
     Map<String, dynamic> resp =

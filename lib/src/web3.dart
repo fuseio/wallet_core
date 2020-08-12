@@ -364,7 +364,7 @@ class Web3 {
   }
 
   Future<Map<String, dynamic>> transferTokenOffChain(String walletAddress,
-      String tokenAddress, String receiverAddress, num tokensAmount, {String network = "fuse"}) async {
+      String tokenAddress, String receiverAddress, num tokensAmount, {String network}) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
@@ -406,9 +406,12 @@ class Web3 {
         "tokenAddress": tokenAddress,
         "from": walletAddress,
         "to": receiverAddress,
-        "network": network == 'mainnet' ? 'main' : network,
         "value": amount.toString(),
-        "asset": tokenSymbol
+        "asset": tokenSymbol,
+        "status": 'pending',
+        'type': 'SEND',
+        'tokenName': tokenDetails['name'],
+        'tokenDecimal': tokenDecimals,
       }
     };
   }
