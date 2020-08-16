@@ -203,6 +203,30 @@ class API extends Api {
     }
   }
 
+  Future<List<dynamic>> fetchTokenTxByAddress(String walletAddress, String tokenAddress, {String sort = 'desc', int startblock}) async {
+    Map<String, dynamic> resp = await _get('v2/wallets/transfers/tokentx/$walletAddress?tokenAddress=$tokenAddress&sort=$sort&startblock=$startblock', private: true);
+    List<dynamic> transfers = [];
+    for (dynamic transferEvent in resp['data']) {
+      transfers.add({
+          'blockNumber': num.tryParse(transferEvent['blockNumber'] ?? '0'),
+          'txHash': transferEvent['hash'] ?? '',
+          'to': transferEvent['to'] ?? '',
+          'from': transferEvent["from"] ?? '',
+          'status': transferEvent['status']?.toUpperCase(),
+          'timestamp': DateTime.fromMillisecondsSinceEpoch(
+                  (int.tryParse(transferEvent['timeStamp'] ?? '') ?? 0) * 1000)
+              .millisecondsSinceEpoch,
+          'value': transferEvent['value'] ?? '0',
+          'tokenAddress': transferEvent['tokenAddress'],
+          'type': transferEvent["from"].toString().toLowerCase() ==
+                  walletAddress.toLowerCase()
+              ? 'SEND'
+              : 'RECEIVE',
+        });
+    }
+    return transfers;
+  }
+
   Future<dynamic> getTransactionByHash({String hash, String tokenAddress}) async {
     String endpoint = 'v2/wallets/transactions';
     endpoint = hash != null ? '$endpoint?hash=$hash' : endpoint;
