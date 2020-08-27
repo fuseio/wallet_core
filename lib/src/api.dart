@@ -186,7 +186,7 @@ class API extends Api {
           "tokenAddress": transfer["tokenAddress"],
           "txHash": transfer["hash"],
           "value": transfer['value'],
-          "timestamp": DateTime.parse(transfer['timeStamp']).millisecondsSinceEpoch,
+          "timestamp": DateTime.fromMillisecondsSinceEpoch(num.parse(transfer['timeStamp']) * 1000).millisecondsSinceEpoch,
           "status": transfer['status']?.toUpperCase(),
           'blockNumber': transfer['blockNumber'] != null
                 ? transfer['blockNumber']
@@ -207,15 +207,17 @@ class API extends Api {
     Map<String, dynamic> resp = await _get('v2/wallets/transfers/tokentx/$walletAddress?tokenAddress=$tokenAddress&sort=$sort&startblock=$startblock', private: true);
     List<dynamic> transfers = [];
     for (dynamic transferEvent in resp['data']) {
+      final bool isPending = transferEvent['status'] != null && transferEvent['status'] == 'pending';
+      final int timestamp = isPending
+          ? DateTime.fromMillisecondsSinceEpoch((DateTime.now().millisecondsSinceEpoch * 1000)).millisecondsSinceEpoch
+          : DateTime.fromMillisecondsSinceEpoch((int.tryParse(transferEvent['timeStamp'] ?? '') ?? 0) * 1000).millisecondsSinceEpoch;
       transfers.add({
           'blockNumber': num.tryParse(transferEvent['blockNumber'] ?? '0'),
           'txHash': transferEvent['hash'] ?? '',
           'to': transferEvent['to'] ?? '',
           'from': transferEvent["from"] ?? '',
           'status': transferEvent['status']?.toUpperCase(),
-          'timestamp': DateTime.fromMillisecondsSinceEpoch(
-                  (int.tryParse(transferEvent['timeStamp'] ?? '') ?? 0) * 1000)
-              .millisecondsSinceEpoch,
+          'timestamp': timestamp,
           'value': transferEvent['value'] ?? '0',
           'tokenAddress': transferEvent['tokenAddress'],
           'type': transferEvent["from"].toString().toLowerCase() ==
