@@ -219,7 +219,7 @@ class API extends Api {
           'status': transferEvent['status']?.toUpperCase(),
           'timestamp': timestamp,
           'value': transferEvent['value'] ?? '0',
-          'tokenAddress': transferEvent['tokenAddress'],
+          'tokenAddress': transferEvent['contractAddress'],
           'type': transferEvent["from"].toString().toLowerCase() ==
                   walletAddress.toLowerCase()
               ? 'SEND'
