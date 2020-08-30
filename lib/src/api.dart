@@ -209,8 +209,8 @@ class API extends Api {
     for (dynamic transferEvent in resp['data']) {
       final bool isPending = transferEvent['status'] != null && transferEvent['status'] == 'pending';
       final int timestamp = isPending
-          ? DateTime.fromMillisecondsSinceEpoch((DateTime.now().millisecondsSinceEpoch * 1000)).millisecondsSinceEpoch
-          : DateTime.fromMillisecondsSinceEpoch((int.tryParse(transferEvent['timeStamp'] ?? '') ?? 0) * 1000).millisecondsSinceEpoch;
+          ? DateTime.now().millisecondsSinceEpoch
+          : DateTime.fromMillisecondsSinceEpoch(DateTime.fromMillisecondsSinceEpoch(int.parse(transferEvent['timeStamp'])).millisecondsSinceEpoch * 1000).millisecondsSinceEpoch;
       transfers.add({
           'blockNumber': num.tryParse(transferEvent['blockNumber'] ?? '0'),
           'txHash': transferEvent['hash'] ?? '',

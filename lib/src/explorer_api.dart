@@ -42,7 +42,10 @@ class ExplorerApi extends Api {
             'from': transferEvent["from"],
             'status': "CONFIRMED",
             'timestamp': DateTime.fromMillisecondsSinceEpoch(
-                    int.parse(transferEvent['timeStamp']) * 1000)
+                    DateTime.fromMillisecondsSinceEpoch(
+                                int.parse(transferEvent['timeStamp']))
+                            .millisecondsSinceEpoch *
+                        1000)
                 .millisecondsSinceEpoch,
             'value': transferEvent['value'],
             'tokenAddress': tokenAddress,
