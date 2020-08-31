@@ -127,8 +127,10 @@ class API extends Api {
     }
   }
 
-  Future<dynamic> createWalletOnForeign() async {
-    Map<String, dynamic> resp = await _post('v2/wallets/foreign', private: true);
+  Future<dynamic> createWalletOnForeign({bool force = false}) async {
+    String endpoint = 'v2/wallets/foreign';
+    endpoint = force ? '$endpoint?force=true' : endpoint;
+    Map<String, dynamic> resp = await _post(endpoint, private: true);
     if (resp["job"] != null) {
       return resp;
     } else {
