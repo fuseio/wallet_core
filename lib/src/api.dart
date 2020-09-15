@@ -2,6 +2,7 @@ library api;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:wallet_core/models/api.dart';
@@ -377,6 +378,27 @@ class API extends Api {
   Future<dynamic> saveUserToDb(Map body) async {
     Map<String, dynamic> resp = await _post('v2/users', body: body, private: false);
     return resp;
+  }
+
+  Future<dynamic> updateAvatar(String accountAddress, String avatarHash) async {
+    Map<String, dynamic> resp = await _post('v2/users/$accountAddress/avatar', body: {"avatarHash": avatarHash}, private: true);
+    return resp;
+  }
+
+  Future<dynamic> updateDisplayName(String accountAddress, String name) async {
+    Map<String, dynamic> resp = await _post('v2/users/$accountAddress/name', body: {"name": name}, private: true);
+    return resp;
+  }
+
+  Future<dynamic> uploadImage(File imageFile) async {
+    MultipartRequest request = new MultipartRequest("POST", Uri.parse('$_base/v1/images'));
+    request.files.add(await MultipartFile.fromPath(
+      'image',
+      imageFile.path,
+    ));
+    StreamedResponse streamedResponse = await request.send();
+    Response response = await Response.fromStream(streamedResponse);
+    return responseHandler(response);
   }
 
   Future<dynamic> createProfile(String communityAddress, Map publicData) async {
