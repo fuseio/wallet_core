@@ -46,7 +46,7 @@ class API extends Api {
   }
 
   Future<Map<String, dynamic>> _post(String endpoint,
-      {dynamic body, bool private, bool isRopsten = false, Map<String, String> headers}) async {
+      {dynamic body, bool private, bool isRopsten = false}) async {
     print('POST $endpoint $body');
     Response response;
     body = body == null ? body : json.encode(body);
@@ -60,7 +60,7 @@ class API extends Api {
           body: body);
     } else {
       response = await _client.post('$uri/$endpoint',
-          body: body, headers: headers ?? {"Content-Type": 'application/json'});
+          body: body, headers: {"Content-Type": 'application/json'});
     }
     return responseHandler(response);
   }
@@ -396,13 +396,9 @@ class API extends Api {
       'image',
       imageFile.path,
     ));
-    try {
-      StreamedResponse streamedResponse = await request.send();
-      Response response = await Response.fromStream(streamedResponse);
-      return responseHandler(response);
-    } catch (e) {
-      rethrow;
-    }
+    StreamedResponse streamedResponse = await request.send();
+    Response response = await Response.fromStream(streamedResponse);
+    return responseHandler(response);
   }
 
   Future<dynamic> createProfile(String communityAddress, Map publicData) async {
