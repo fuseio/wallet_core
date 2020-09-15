@@ -381,12 +381,12 @@ class API extends Api {
   }
 
   Future<dynamic> updateAvatar(String accountAddress, String avatarHash) async {
-    Map<String, dynamic> resp = await _post('v2/users/$accountAddress/avatar', body: {"avatarHash": avatarHash}, private: true);
+    Map<String, dynamic> resp = await _put('v2/users/$accountAddress/avatar', body: {"avatarHash": avatarHash}, private: true);
     return resp;
   }
 
   Future<dynamic> updateDisplayName(String accountAddress, String name) async {
-    Map<String, dynamic> resp = await _post('v2/users/$accountAddress/name', body: {"name": name}, private: true);
+    Map<String, dynamic> resp = await _put('v2/users/$accountAddress/name', body: {"name": name}, private: true);
     return resp;
   }
 
