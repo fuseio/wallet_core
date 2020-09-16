@@ -385,8 +385,8 @@ class API extends Api {
     return resp;
   }
 
-  Future<dynamic> updateDisplayName(String accountAddress, String name) async {
-    Map<String, dynamic> resp = await _put('v2/users/$accountAddress/name', body: {"name": name}, private: true);
+  Future<dynamic> updateDisplayName(String accountAddress, String displayName) async {
+    Map<String, dynamic> resp = await _put('v2/users/$accountAddress/name', body: {"displayName": displayName}, private: true);
     return resp;
   }
 
