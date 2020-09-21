@@ -6,18 +6,30 @@ import 'package:graphql/client.dart';
 import 'package:wallet_core/src/queries.dart';
 
 const String BASE_URL = 'https://graph.fuse.io/subgraphs/name/fuseio';
-const String TOKEN_REGISTRY_URI = 'https://api.thegraph.com/subgraphs/name/protofire/token-registry';
+const String TOKEN_REGISTRY_URI =
+    'https://api.thegraph.com/subgraphs/name/protofire/token-registry';
 const String SUB_GRAPH = 'fuse-qa';
 
 class Graph {
   GraphQLClient _clientFuse;
+  GraphQLClient _clientRopstenBridgeHome;
+  GraphQLClient _clientMainnetBridgeHome;
   GraphQLClient _clientRopsten;
   GraphQLClient _clientMainnet;
   GraphQLClient _clientTokenRegistry;
 
-  Graph({String url, String subGraph, String tokenRegistryUri = TOKEN_REGISTRY_URI}) {
+  Graph(
+      {String url,
+      String subGraph,
+      String tokenRegistryUri = TOKEN_REGISTRY_URI}) {
     _clientFuse = GraphQLClient(
         link: HttpLink(uri: '${url ?? BASE_URL}/${subGraph ?? SUB_GRAPH}'),
+        cache: InMemoryCache());
+    _clientRopstenBridgeHome = GraphQLClient(
+        link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ropsten-bridge-home'),
+        cache: InMemoryCache());
+    _clientMainnetBridgeHome = GraphQLClient(
+        link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ethereum-bridge-home'),
         cache: InMemoryCache());
     _clientRopsten = GraphQLClient(
         link: HttpLink(uri: '${url ?? BASE_URL}/fuse-ropsten'),
@@ -26,12 +38,10 @@ class Graph {
         link: HttpLink(uri: '${url ?? BASE_URL}/fuse-mainnet'),
         cache: InMemoryCache());
     _clientTokenRegistry = GraphQLClient(
-        link: HttpLink(uri: '${tokenRegistryUri}'),
-        cache: InMemoryCache());
+        link: HttpLink(uri: '${tokenRegistryUri}'), cache: InMemoryCache());
   }
 
   Future<dynamic> getCommunityByAddress(String communityAddress) async {
-
     QueryResult result = await _clientFuse.query(QueryOptions(
       documentNode: gql(getCommunityByAddressQuery),
       variables: <String, dynamic>{
@@ -46,7 +56,6 @@ class Graph {
   }
 
   Future<dynamic> getCommunityBusinesses(String communityAddress) async {
-
     QueryResult result = await _clientFuse.query(QueryOptions(
       documentNode: gql(getCommunityBusinessesQuery),
       variables: <String, dynamic>{
@@ -60,8 +69,22 @@ class Graph {
     }
   }
 
-  Future<dynamic> getTokenOfCommunity(String communityAddress) async {
+  Future<dynamic> getHomeBridgedToken(String foreignTokenAddress, bool isRopsten) async {
+    GraphQLClient client = isRopsten ? _clientRopstenBridgeHome : _clientMainnetBridgeHome;
+    QueryResult result = await client.query(QueryOptions(
+      documentNode: gql(getHomeBridgedTokenQuery),
+      variables: <String, dynamic>{
+        'foreignAddress': foreignTokenAddress,
+      },
+    ));
+    if (result.hasException) {
+      throw 'Error! Get home bridge token request failed - communityAddress: $foreignTokenAddress';
+    } else {
+      return result.data["bridgedTokens"][0];
+    }
+  }
 
+  Future<dynamic> getTokenOfCommunity(String communityAddress) async {
     QueryResult result = await _clientFuse.query(QueryOptions(
       documentNode: gql(getTokenOfCommunityQuery),
       variables: <String, dynamic>{
@@ -80,7 +103,10 @@ class Graph {
     _clientFuse.cache.reset();
     QueryResult result = await _clientFuse.query(QueryOptions(
       documentNode: gql(isCommunityMemberQuery),
-      variables: <String, dynamic>{'address': accountAddress, 'entitiesList': entitiesListAddress},
+      variables: <String, dynamic>{
+        'address': accountAddress,
+        'entitiesList': entitiesListAddress
+      },
     ));
     if (result.hasException) {
       throw 'Error! Is community member request failed - accountAddress: $accountAddress, entitiesListAddress: $entitiesListAddress';
@@ -127,13 +153,14 @@ class Graph {
   }
 
   Future<dynamic> getReceivedTransfers(
-      String accountAddress, String tokenAddress, {int fromBlockNumber, int toBlockNumber}) async {
+      String accountAddress, String tokenAddress,
+      {int fromBlockNumber, int toBlockNumber}) async {
     _clientFuse.cache.reset();
 
     Map<String, dynamic> variables = <String, dynamic>{
-        'account': accountAddress,
-        'token': tokenAddress,
-        'n': 20,
+      'account': accountAddress,
+      'token': tokenAddress,
+      'n': 20,
     };
 
     if (fromBlockNumber != null) {
@@ -163,7 +190,9 @@ class Graph {
           "value": t["value"],
           "type": "RECEIVE",
           "status": "CONFIRMED",
-          "timestamp": DateTime.fromMillisecondsSinceEpoch(t['timestamp'] * 1000).millisecondsSinceEpoch
+          "timestamp":
+              DateTime.fromMillisecondsSinceEpoch(t['timestamp'] * 1000)
+                  .millisecondsSinceEpoch
         });
       }
 
@@ -171,14 +200,15 @@ class Graph {
       return {"count": transfers.length, "data": transfers};
     }
   }
-  Future<dynamic> getTransfers(
-      String accountAddress, String tokenAddress, {int fromBlockNumber, int toBlockNumber}) async {
+
+  Future<dynamic> getTransfers(String accountAddress, String tokenAddress,
+      {int fromBlockNumber, int toBlockNumber}) async {
     _clientFuse.cache.reset();
 
     Map<String, dynamic> variables = <String, dynamic>{
-        'account': accountAddress,
-        'token': tokenAddress,
-        'n': 20,
+      'account': accountAddress,
+      'token': tokenAddress,
+      'n': 20,
     };
 
     if (fromBlockNumber != null) {
@@ -209,7 +239,9 @@ class Graph {
           "value": t["value"],
           "type": "RECEIVE",
           "status": "CONFIRMED",
-          "timestamp": DateTime.fromMillisecondsSinceEpoch(num.parse(t['timestamp']) * 1000).millisecondsSinceEpoch
+          "timestamp": DateTime.fromMillisecondsSinceEpoch(
+                  num.parse(t['timestamp']) * 1000)
+              .millisecondsSinceEpoch
         });
       }
 
@@ -226,7 +258,9 @@ class Graph {
           "value": t["value"],
           "type": "SEND",
           "status": "CONFIRMED",
-          "timestamp": DateTime.fromMillisecondsSinceEpoch(t['timestamp'] * 1000).millisecondsSinceEpoch
+          "timestamp":
+              DateTime.fromMillisecondsSinceEpoch(t['timestamp'] * 1000)
+                  .millisecondsSinceEpoch
         });
       }
       transfers.sort((a, b) => b["blockNumber"].compareTo(a["blockNumber"]));
@@ -243,9 +277,9 @@ class Graph {
     // int fromBlockNumber,
     // int toBlockNumber
     Map<String, dynamic> variables = <String, dynamic>{
-        'to': to,
-        'skip': 0,
-        'first': 20,
+      'to': to,
+      'skip': 0,
+      'first': 20,
     };
 
     // 'from': from,
@@ -258,7 +292,8 @@ class Graph {
     //   variables['toBlockNumber'] = toBlockNumber;
     // }
 
-    GraphQLClient foreignClient = foreignNetwork == 'mainnet' ? _clientMainnet : _clientRopsten;
+    GraphQLClient foreignClient =
+        foreignNetwork == 'mainnet' ? _clientMainnet : _clientRopsten;
     foreignClient.cache.reset();
     QueryResult result = await foreignClient.query(QueryOptions(
       documentNode: gql(getTransferEventsQuery),
@@ -271,7 +306,8 @@ class Graph {
     }
   }
 
-  Future<dynamic> getAccountToken(String accountAddress, String tokenAddress) async {
+  Future<dynamic> getAccountToken(
+      String accountAddress, String tokenAddress) async {
     _clientTokenRegistry.cache.reset();
     QueryResult result = await _clientTokenRegistry.query(QueryOptions(
       documentNode: gql(getAccountTokenQuery),
