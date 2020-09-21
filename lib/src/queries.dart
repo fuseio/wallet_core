@@ -1,3 +1,15 @@
+const String getHomeBridgedTokenQuery = r'''
+  query getBridgedToken($foreignAddress: String!) {
+      bridgedTokens(where: {foreignAddress: $foreignAddress}) {
+        address
+        name
+        decimals
+        symbol
+        foreignAddress
+      }
+  }
+''';
+
 const String getTokenByAddressQuery = r'''
   query getTokenByAddress($address: String!) {
       tokens(where: {address: $address}) {
