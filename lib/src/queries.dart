@@ -82,76 +82,6 @@ const String isCommunityMemberQuery = r'''
   }
 ''';
 
-const String getTokenBalanceQuery = r'''
-  query getTokenBalance($account: String!, $token: String!) {
-      accounts(where:{address: $account}) {
-        id
-        tokens(where:{tokenAddress: $token}){
-          balance
-        }
-      }
-  }
-''';
-
-const String getReceivedTransfersQuery = r'''
-  query getTransfers($account: String!, $token: String!, $fromBlockNumber: Int, $toBlockNumber: Int) {
-      transfersIn: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
-        tokenAddress: $token,
-        to: $account,
-        blockNumber_gt: $fromBlockNumber,
-        blockNumber_lt: $toBlockNumber
-      }) {
-        id,
-        blockNumber,
-        txHash,
-        tokenAddress,
-        timestamp,
-        from,
-        to,
-        value,
-        data
-      }
-  }
-''';
-
-const String getTransfersQuery = r'''
-  query getTransfers($account: String!, $token: String!, $fromBlockNumber: Int, $toBlockNumber: Int) {
-      transfersIn: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
-        tokenAddress: $token,
-        to: $account,
-        blockNumber_gt: $fromBlockNumber,
-        blockNumber_lt: $toBlockNumber
-      }) {
-        id,
-        blockNumber,
-        txHash,
-        tokenAddress,
-        timestamp,
-        from,
-        to,
-        value,
-        data
-      }
-
-      transfersOut: transferEvents(orderBy: blockNumber, orderDirection: desc, first: $n, where: {
-        tokenAddress: $token,
-        from: $account,
-        blockNumber_gt: $fromBlockNumber,
-        blockNumber_lt: $toBlockNumber
-      }) {
-        id,
-        blockNumber,
-        txHash,
-        tokenAddress,
-        timestamp,
-        from,
-        to,
-        value,
-        data
-      }
-  }
-''';
-
 const String getTransferEventsQuery = r'''
   query getTransferEvents(
     $to: String!,
@@ -170,39 +100,5 @@ const String getTransferEventsQuery = r'''
         tokenAddress
         timestamp
       }
-  }
-''';
-
-const String getAccountTokensQuery = r'''
-  query getAccountTokens($accountAddress: String!) {
-    accounts (where:{address: $accountAddress}) {
-      balances {
-        amount
-        token {
-          name
-          imageUrl
-          symbol
-          decimals
-          address
-        }
-      }
-    }
-  }
-''';
-
-const String getAccountTokenQuery = r'''
-  query getAccountToken($accountAddress: String!, $tokenAddress: String!) {
-    accounts (where:{address: $accountAddress}) {
-      balances (where: {token: $tokenAddress}){
-        amount
-        token {
-          name
-          imageUrl
-          symbol
-          decimals
-          address
-        }
-      }
-    }
   }
 ''';

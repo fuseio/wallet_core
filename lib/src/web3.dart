@@ -287,7 +287,7 @@ class Web3 {
   }
 
   Future<Map<String, dynamic>> joinCommunityOffChain(
-      String walletAddress, String communityAddress) async {
+      String walletAddress, String communityAddress, String tokenAddress, {String network = 'fuse', String originNetwork = 'mainnet'}) async {
     String nonce = await getNonceForRelay();
     print('nonce: $nonce');
 
@@ -314,9 +314,16 @@ class Web3 {
       "methodData": encodedData,
       "nonce": nonce,
       "gasPrice": 0,
+      "network": network,
       "gasLimit": _defaultGasLimit,
       "signature": signature,
-      "walletModule": "CommunityManager"
+      "walletModule": "CommunityManager",
+      "methodName": "joinCommunity",
+      "transactionBody": {
+        "tokenAddress": tokenAddress,
+        "originNetwork": originNetwork,
+        "status": 'pending',
+      }
     };
   }
 
@@ -549,7 +556,7 @@ class Web3 {
       'relayTokens',
       [token, amount]
     );
-    print('transferTokenToHome - relayTokens data: $data');
+    print('relayTokens data: $data');
     Map<String, dynamic> transferToHomeData = await callContractOffChain(walletAddress, foreignBridgeMediator, 0, data, network: network);
     return [approveTokenData, transferToHomeData];
   }
@@ -565,7 +572,7 @@ class Web3 {
       'transferAndCall',
       [homeBridgeMediatorAddress, amount, []]
     );
-    print('transferTokenToForeign - transferAndCall data: $data');
+    print('transferAndCall data: $data');
     Map<String, dynamic> transferToHomeData = await callContractOffChain(walletAddress, homeBridgeMediatorAddress, 0, data, network: network);
     return [approveTokenData, transferToHomeData];
   }

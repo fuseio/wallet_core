@@ -64,6 +64,43 @@ class ExplorerApi extends Api {
     }
   }
 
+  Future<List<dynamic>> getTransferEventsByAccountAddress(String address,
+      {String sort = 'desc', int startblock = 0}) async {
+    try {
+      Map<String, dynamic> resp = await _get(
+          '?module=account&action=tokentx&address=$address&startblock=$startblock&sort=$sort');
+      if (resp['message'] == 'OK' && resp['status'] == '1') {
+        List transfers = [];
+        for (dynamic transferEvent in resp['result']) {
+          transfers.add({
+            'blockNumber': num.parse(transferEvent['blockNumber']),
+            'txHash': transferEvent['hash'],
+            'to': transferEvent['to'],
+            'from': transferEvent["from"],
+            'status': "CONFIRMED",
+            'timestamp': DateTime.fromMillisecondsSinceEpoch(
+                    DateTime.fromMillisecondsSinceEpoch(
+                                int.parse(transferEvent['timeStamp']))
+                            .millisecondsSinceEpoch *
+                        1000)
+                .millisecondsSinceEpoch,
+            'value': transferEvent['value'],
+            'tokenAddress': transferEvent['contractAddress'],
+            'type': transferEvent["from"].toString().toLowerCase() ==
+                    address.toLowerCase()
+                ? 'SEND'
+                : 'RECEIVE',
+          });
+        }
+        return transfers;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      throw 'Error! Get token transfers events failed for - address: $address --- $e';
+    }
+  }
+
   Future<BigInt> getTokenBalanceByAccountAddress(
     String tokenAddress,
     String accountAddress,
@@ -76,4 +113,18 @@ class ExplorerApi extends Api {
       throw 'Error! Get token balance failed for - accountAddress: $accountAddress --- $e';
     }
   }
+
+  // Only for fuse - v3
+  // Future<Map<String, dynamic>> getTokenInfo(String tokenAddress) async {
+  //   try {
+  //     Map<String, dynamic> resp = await _get(
+  //         '?module=token&action=getToken&contractaddress=$tokenAddress');
+  //     if (resp['message'] == 'OK' && resp['status'] == '1') {
+  //       return resp['result'];
+  //     }
+  //     return Map();
+  //   } catch (e) {
+  //     throw 'Error! Get token failed $tokenAddress - $e';
+  //   }
+  // }
 }
