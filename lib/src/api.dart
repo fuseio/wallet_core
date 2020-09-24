@@ -286,9 +286,9 @@ class API extends Api {
   }
 
   Future<dynamic> joinCommunity(
-      Web3 web3, String walletAddress, String communityAddress) async {
+      Web3 web3, String walletAddress, String communityAddress, String tokenAddress, {String network = 'fuse', String originNetwork}) async {
     Map<String, dynamic> data =
-        await web3.joinCommunityOffChain(walletAddress, communityAddress);
+        await web3.joinCommunityOffChain(walletAddress, communityAddress, tokenAddress, network: network, originNetwork: originNetwork);
     Map<String, dynamic> resp =
         await _post('v2/relay', private: true, body: data);
     return resp;
@@ -422,6 +422,18 @@ class API extends Api {
     Map<String, dynamic> signedApprovalData = await web3.approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, spenderContract: approvalContractAddress, network: network);
     Map<String, dynamic> signedSwapData = await web3.callContractOffChain(walletAddress, swapContractAddress, 0, swapData.replaceFirst('0x', ''), network: network);
     Map<String, dynamic> resp = await multiRelay([signedApprovalData, signedSwapData]);
+    return resp;
+  }
+
+  Future<dynamic> transferTokenToHomeWithAMBBridge(Web3 web3, String walletAddress, String foreignBridgeMediator, String tokenAddress, num tokensAmount, int tokenDecimals, {String network = 'mainnet'}) async {
+    List<dynamic> signData = await web3.transferTokenToHome(walletAddress, foreignBridgeMediator, tokenAddress, tokensAmount, tokenDecimals, network: network);
+    Map<String, dynamic> resp = await multiRelay(signData);
+    return resp;
+  }
+
+  Future<dynamic> transferTokenToForeignWithAMBBridge(Web3 web3, String walletAddress, String homeBridgeMediatorAddress, String tokenAddress, num tokensAmount, int tokenDecimals, {String network = 'fuse'}) async {
+    List<dynamic> signData = await web3.transferTokenToForeign(walletAddress, homeBridgeMediatorAddress, tokenAddress, tokensAmount, tokenDecimals, network: network);
+    Map<String, dynamic> resp = await multiRelay(signData);
     return resp;
   }
 

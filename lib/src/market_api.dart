@@ -11,8 +11,8 @@ class MarketApi extends Api {
   String _base;
   Client _client;
 
-  MarketApi({String marketBaseApi}) {
-    _base = marketBaseApi ?? MARKET_API_BASE_URL;
+  MarketApi({String marketBaseApi = MARKET_API_BASE_URL}) {
+    _base = marketBaseApi;
     _client = new Client();
   }
 
