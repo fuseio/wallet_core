@@ -189,7 +189,7 @@ class API extends Api {
           "tokenAddress": transfer["tokenAddress"],
           "txHash": transfer["hash"],
           "value": transfer['value'],
-          "timestamp": DateTime.fromMillisecondsSinceEpoch(DateTime.parse(transfer['timeStamp']).millisecondsSinceEpoch * 1000).millisecondsSinceEpoch,
+          "timestamp": DateTime.fromMillisecondsSinceEpoch(DateTime.parse(transfer['timeStamp']).millisecondsSinceEpoch).millisecondsSinceEpoch,
           "status": transfer['status']?.toUpperCase(),
           'blockNumber': transfer['blockNumber'] != null
                 ? transfer['blockNumber']
