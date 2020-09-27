@@ -565,12 +565,13 @@ class Web3 {
     Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+    EthereumAddress bridgeMediatorAddress = EthereumAddress.fromHex(homeBridgeMediatorAddress);
     Map approveTokenData = await approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, network: network, spenderContract: homeBridgeMediatorAddress);
     String data = await getEncodedDataForContractCall(
-      'HomeMultiAMBErc20ToErc677',
-      homeBridgeMediatorAddress,
+      'BasicToken',
+      tokenAddress,
       'transferAndCall',
-      [homeBridgeMediatorAddress, amount, []]
+      [bridgeMediatorAddress, amount, HEX.decode('')]
     );
     print('transferAndCall data: $data');
     Map<String, dynamic> transferToHomeData = await callContractOffChain(walletAddress, homeBridgeMediatorAddress, 0, data, network: network);
