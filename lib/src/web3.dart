@@ -561,20 +561,20 @@ class Web3 {
     return [approveTokenData, transferToHomeData];
   }
 
-  Future<List<dynamic>> transferTokenToForeign(String walletAddress, String homeBridgeMediatorAddress, String tokenAddress, num tokensAmount, int tokenDecimals, {String network = 'fuse'}) async {
+  Future<List<dynamic>> transferTokenToForeign(String walletAddress, String homeBridgeMediatorAddress, String tokenAddress, num tokensAmount, int tokenDecimals, {String network = 'home'}) async {
     Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
-    Map approveTokenData = await approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, network: network, spenderContract: homeBridgeMediatorAddress);
+    EthereumAddress bridgeMediatorAddress = EthereumAddress.fromHex(homeBridgeMediatorAddress);
     String data = await getEncodedDataForContractCall(
-      'HomeMultiAMBErc20ToErc677',
-      homeBridgeMediatorAddress,
+      'BasicToken',
+      tokenAddress,
       'transferAndCall',
-      [homeBridgeMediatorAddress, amount, []]
+      [bridgeMediatorAddress, amount, HEX.decode('')]
     );
     print('transferAndCall data: $data');
-    Map<String, dynamic> transferToHomeData = await callContractOffChain(walletAddress, homeBridgeMediatorAddress, 0, data, network: network);
-    return [approveTokenData, transferToHomeData];
+    Map<String, dynamic> approveTokenData = await approveTokenAndCallContractOffChain(walletAddress, tokenAddress, homeBridgeMediatorAddress, 0, data, network: network);
+    return [approveTokenData];
   }
 
   // SEEDBED CONTRACTS
