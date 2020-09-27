@@ -561,7 +561,7 @@ class Web3 {
     return [approveTokenData, transferToHomeData];
   }
 
-  Future<List<dynamic>> transferTokenToForeign(String walletAddress, String homeBridgeMediatorAddress, String tokenAddress, num tokensAmount, int tokenDecimals, {String network = 'home'}) async {
+  Future<List<dynamic>> transferTokenToForeign(String walletAddress, String homeBridgeMediatorAddress, String tokenAddress, num tokensAmount, int tokenDecimals, {String network = 'fuse'}) async {
     Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
