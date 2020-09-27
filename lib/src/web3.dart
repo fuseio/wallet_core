@@ -566,6 +566,7 @@ class Web3 {
     Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
     EthereumAddress bridgeMediatorAddress = EthereumAddress.fromHex(homeBridgeMediatorAddress);
+    Map approveTokenData = await approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, network: network, spenderContract: homeBridgeMediatorAddress);
     String data = await getEncodedDataForContractCall(
       'BasicToken',
       tokenAddress,
@@ -573,8 +574,8 @@ class Web3 {
       [bridgeMediatorAddress, amount, HEX.decode('')]
     );
     print('transferAndCall data: $data');
-    Map<String, dynamic> approveTokenData = await approveTokenAndCallContractOffChain(walletAddress, tokenAddress, homeBridgeMediatorAddress, 0, data, network: network);
-    return [approveTokenData];
+    Map<String, dynamic> transferToHomeData = await callContractOffChain(walletAddress, homeBridgeMediatorAddress, 0, data, network: network);
+    return [approveTokenData, transferToHomeData];
   }
 
   // SEEDBED CONTRACTS
