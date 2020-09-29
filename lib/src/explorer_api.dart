@@ -114,17 +114,44 @@ class ExplorerApi extends Api {
     }
   }
 
-  // Only for fuse - v3
-  // Future<Map<String, dynamic>> getTokenInfo(String tokenAddress) async {
-  //   try {
-  //     Map<String, dynamic> resp = await _get(
-  //         '?module=token&action=getToken&contractaddress=$tokenAddress');
-  //     if (resp['message'] == 'OK' && resp['status'] == '1') {
-  //       return resp['result'];
-  //     }
-  //     return Map();
-  //   } catch (e) {
-  //     throw 'Error! Get token failed $tokenAddress - $e';
-  //   }
-  // }
+  Future<Map<String, dynamic>> getTokenInfo(String tokenAddress) async {
+    try {
+      Map<String, dynamic> resp = await _get(
+          '?module=token&action=getToken&contractaddress=$tokenAddress');
+      if (resp['message'] == 'OK' && resp['status'] == '1') {
+        return Map.from({
+          ...resp['result'],
+          'decimals': int.parse(resp['result']['decimals'])
+        });
+      }
+      return Map();
+    } catch (e) {
+      throw 'Error! Get token failed $tokenAddress - $e';
+    }
+  }
+
+  Future<List<dynamic>> getListOfTokensByAddress(String address) async {
+    try {
+      Map<String, dynamic> resp =
+          await _get('?module=account&action=tokenlist&address=$address');
+      if (resp['message'] == 'OK' && resp['status'] == '1') {
+        List tokens = [];
+        for (dynamic token in resp['result']) {
+          tokens.add({
+            "amount": token['balance'],
+            "originNetwork": 'mainnet',
+            "address": token['contractAddress'].toLowerCase(),
+            "decimals": int.parse(token['decimals']),
+            "name": token['name'],
+            "symbol": token['symbol']
+          });
+        }
+        return tokens;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      throw 'Error! Get token list failed for - address: $address --- $e';
+    }
+  }
 }
