@@ -265,6 +265,12 @@ class API extends Api {
     return resp;
   }
 
+  Future<dynamic> deleteFirebaseToken(String walletAddress, String firebaseToken) async {
+    Map<String, dynamic> resp = await _put('$_apiPrefix/wallets/token/$walletAddress/delete',
+      body: {"firebaseToken": firebaseToken}, private: true);
+    return resp;
+  }
+
   Future<dynamic> backupWallet({String communityAddress}) async {
     Map<String, dynamic> resp = await _post('$_apiPrefix/wallets/backup',
       body: {"communityAddress": communityAddress}, private: true);
