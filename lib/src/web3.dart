@@ -287,7 +287,7 @@ class Web3 {
   }
 
   Future<Map<String, dynamic>> joinCommunityOffChain(
-      String walletAddress, String communityAddress, String tokenAddress, {String network = 'fuse', String originNetwork = 'mainnet'}) async {
+      String walletAddress, String communityAddress, {String network = 'fuse', String originNetwork = 'mainnet', String tokenAddress}) async {
     String nonce = await getNonceForRelay();
     print('nonce: $nonce');
 
