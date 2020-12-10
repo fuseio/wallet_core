@@ -294,16 +294,16 @@ class API extends Api {
   }
 
   Future<dynamic> tokenTransfer(Web3 web3, String walletAddress,
-      String tokenAddress, String receiverAddress, num tokensAmount, {String network = 'fuse', String communityAddress}) async {
+      String tokenAddress, String receiverAddress, num tokensAmount, {String network = 'fuse'}) async {
     Map<String, dynamic> data = await web3.transferTokenOffChain(
-        walletAddress, tokenAddress, receiverAddress, tokensAmount, network: network, communityAddress: communityAddress);
+        walletAddress, tokenAddress, receiverAddress, tokensAmount, network: network);
     Map<String, dynamic> resp =
         await _post('v2/relay', private: true, body: data);
     return resp;
   }
 
-  Future<dynamic> approveTokenTransfer(Web3 web3, String walletAddress, String tokenAddress, num tokensAmount, {String network, String communityAddress}) async {
-    Map<String, dynamic> data = await web3.approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, network: network, communityAddress: communityAddress);
+  Future<dynamic> approveTokenTransfer(Web3 web3, String walletAddress, String tokenAddress, num tokensAmount, {String network}) async {
+    Map<String, dynamic> data = await web3.approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, network: network);
     Map<String, dynamic> resp = await _post('v2/relay', private: true, body: data);
     return resp;
   }
@@ -314,14 +314,14 @@ class API extends Api {
     return resp;
   }
 
-  Future<dynamic> callContract(Web3 web3, String walletAddress, String contractAddress, num ethAmount, String data, {String network, String communityAddress}) async {
-    Map<String, dynamic> signedData = await web3.callContractOffChain(walletAddress, contractAddress, ethAmount, data, network: network, communityAddress: communityAddress);
+  Future<dynamic> callContract(Web3 web3, String walletAddress, String contractAddress, num ethAmount, String data, {String network}) async {
+    Map<String, dynamic> signedData = await web3.callContractOffChain(walletAddress, contractAddress, ethAmount, data, network: network);
     Map<String, dynamic> resp = await _post('v2/relay', private: true, body: signedData);
     return resp;
   }
 
-  Future<dynamic> approveTokenAndCallContract(Web3 web3, String walletAddress, String tokenAddress, String contractAddress, num tokensAmount, String data, {String network, String communityAddress}) async {
-    Map<String, dynamic> signedData = await web3.approveTokenAndCallContractOffChain(walletAddress, tokenAddress, contractAddress, tokensAmount, data, network: network, communityAddress: communityAddress);
+  Future<dynamic> approveTokenAndCallContract(Web3 web3, String walletAddress, String tokenAddress, String contractAddress, num tokensAmount, String data, {String network}) async {
+    Map<String, dynamic> signedData = await web3.approveTokenAndCallContractOffChain(walletAddress, tokenAddress, contractAddress, tokensAmount, data, network: network);
     Map<String, dynamic> resp = await _post('v2/relay', private: true, body: signedData);
     return resp;
   }
