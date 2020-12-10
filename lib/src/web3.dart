@@ -312,6 +312,7 @@ class Web3 {
     return {
       "walletAddress": walletAddress,
       "methodData": encodedData,
+      "communityAddress": communityAddress,
       "nonce": nonce,
       "gasPrice": 0,
       "network": network,
@@ -328,7 +329,7 @@ class Web3 {
   }
 
   Future<Map<String, dynamic>> transferOffChain(
-      String walletAddress, String receiverAddress, int amountInWei, {String network = "fuse"}) async {
+      String walletAddress, String receiverAddress, int amountInWei, {String network = "mainnet"}) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(NATIVE_TOKEN_ADDRESS);
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
@@ -354,6 +355,7 @@ class Web3 {
     return {
       "walletAddress": walletAddress,
       "methodData": encodedData,
+      "communityAddress": _defaultCommunityContractAddress,
       "nonce": nonce,
       "network": network,
       "methodName": "transferToken",
@@ -397,6 +399,7 @@ class Web3 {
       "walletAddress": walletAddress,
       "methodData": encodedData,
       "nonce": nonce,
+      "communityAddress": _defaultCommunityContractAddress,
       "network": network,
       "methodName": "transferToken",
       "gasPrice": 0,
@@ -450,6 +453,7 @@ class Web3 {
     return {
       "walletAddress": walletAddress,
       "methodData": encodedData,
+      "communityAddress": _defaultCommunityContractAddress,
       "nonce": nonce,
       "network": network,
       "methodName": "approveToken",
@@ -487,6 +491,7 @@ class Web3 {
     return {
       "walletAddress": walletAddress,
       "methodData": encodedCallContractData,
+      "communityAddress": _defaultCommunityContractAddress,
       "nonce": nonce,
       "network": network,
       "methodName": "callContract",
@@ -527,6 +532,7 @@ class Web3 {
     return {
       "walletAddress": walletAddress,
       "methodData": encodedApproveTokenAndCallContractData,
+      "communityAddress": _defaultCommunityContractAddress,
       "nonce": nonce,
       "network": network,
       "methodName": "approveTokenAndCallContract",

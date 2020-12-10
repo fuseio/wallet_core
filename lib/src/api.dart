@@ -20,12 +20,10 @@ class API extends Api {
   String _accountAddress;
   String _firebaseIdToken;
   String _funderBase;
-  String _apiPrefix;
 
-  API({String base, String jwtToken, String funderBase, String apiPrefix = 'v2'}) {
+  API({String base, String jwtToken, String funderBase}) {
     _base = base ?? _API_BASE_URL;
     _jwtToken = jwtToken ?? null;
-    _apiPrefix = apiPrefix;
     _client = new Client();
     _funderBase = funderBase ?? _FUNDER_BASE_URL;
   }
@@ -141,14 +139,14 @@ class API extends Api {
     }
   }
 
-  Future<dynamic> createWallet() async {
+  Future<dynamic> createWallet({String communityAddress}) async {
     dynamic wallet = await getWallet();
     if (wallet != null && wallet["walletAddress"] != null) {
       print('Wallet already exists - wallet: $wallet');
       return wallet;
     }
-
-    Map<String, dynamic> resp = await _post('$_apiPrefix/wallets', private: true);
+    final dynamic body = communityAddress != null ? Map<String, String>.from({ "communityAddress": communityAddress }) : null;
+    Map<String, dynamic> resp = await _post('v2/wallets', private: true, body: body);
     if (resp["job"] != null) {
       return resp;
     } else {
@@ -157,7 +155,7 @@ class API extends Api {
   }
 
   Future<dynamic> getWallet() async {
-    Map<String, dynamic> resp = await _get('$_apiPrefix/wallets', private: true);
+    Map<String, dynamic> resp = await _get('v2/wallets', private: true);
     if (resp != null && resp["data"] != null) {
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
@@ -178,7 +176,7 @@ class API extends Api {
   }
 
   Future<List<dynamic>> getWalletTransactions(String walletAddress, {String tokenAddress}) async {
-    String endpoint = '$_apiPrefix/wallets/transactions/$walletAddress';
+    String endpoint = 'v2/wallets/transactions/$walletAddress';
     endpoint = tokenAddress != null ? '$endpoint?tokenAddress=$tokenAddress' : endpoint;
     Map<String, dynamic> resp = await _get(endpoint, private: true);
     if (resp != null && resp["data"] != null) {
@@ -209,7 +207,7 @@ class API extends Api {
   }
 
   Future<List<dynamic>> fetchTokenTxByAddress(String walletAddress, String tokenAddress, {String sort = 'desc', int startblock}) async {
-    Map<String, dynamic> resp = await _get('$_apiPrefix/wallets/transfers/tokentx/$walletAddress?tokenAddress=$tokenAddress&sort=$sort&startblock=$startblock', private: true);
+    Map<String, dynamic> resp = await _get('v2/wallets/transfers/tokentx/$walletAddress?tokenAddress=$tokenAddress&sort=$sort&startblock=$startblock', private: true);
     List<dynamic> transfers = [];
     for (dynamic transferEvent in resp['data']) {
       final bool isPending = transferEvent['status'] != null && transferEvent['status'] == 'pending';
@@ -235,7 +233,7 @@ class API extends Api {
   }
 
   Future<dynamic> getJob(String id) async {
-    Map<String, dynamic> resp = await _get('$_apiPrefix/jobs/$id', private: true);
+    Map<String, dynamic> resp = await _get('v2/jobs/$id', private: true);
     if (resp != null && resp["data"] != null) {
       return resp["data"];
     } else {
@@ -245,7 +243,7 @@ class API extends Api {
 
   Future<dynamic> getWalletByPhoneNumber(String phoneNumber) async {
     Map<String, dynamic> resp =
-        await _get('$_apiPrefix/wallets/$phoneNumber', private: true);
+        await _get('v2/wallets/$phoneNumber', private: true);
     if (resp != null && resp["data"] != null) {
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
@@ -260,19 +258,19 @@ class API extends Api {
   }
 
   Future<dynamic> updateFirebaseToken(String walletAddress, String firebaseToken) async {
-    Map<String, dynamic> resp = await _put('$_apiPrefix/wallets/token/$walletAddress',
+    Map<String, dynamic> resp = await _put('v2/wallets/token/$walletAddress',
       body: {"firebaseToken": firebaseToken}, private: true);
     return resp;
   }
 
   Future<dynamic> deleteFirebaseToken(String walletAddress, String firebaseToken) async {
-    Map<String, dynamic> resp = await _put('$_apiPrefix/wallets/token/$walletAddress/delete',
+    Map<String, dynamic> resp = await _put('v2/wallets/token/$walletAddress/delete',
       body: {"firebaseToken": firebaseToken}, private: true);
     return resp;
   }
 
   Future<dynamic> backupWallet({String communityAddress}) async {
-    Map<String, dynamic> resp = await _post('$_apiPrefix/wallets/backup',
+    Map<String, dynamic> resp = await _post('v2/wallets/backup',
       body: {"communityAddress": communityAddress}, private: true);
     return resp;
   }
@@ -282,7 +280,7 @@ class API extends Api {
     Map<String, dynamic> data =
         await web3.joinCommunityOffChain(walletAddress, communityAddress, tokenAddress: tokenAddress, network: network, originNetwork: originNetwork);
     Map<String, dynamic> resp =
-        await _post('$_apiPrefix/relay', private: true, body: data);
+        await _post('v2/relay', private: true, body: data);
     return resp;
   }
 
@@ -291,7 +289,7 @@ class API extends Api {
     Map<String, dynamic> data = await web3.transferOffChain(
         walletAddress, receiverAddress, amountInWei);
     Map<String, dynamic> resp =
-        await _post('$_apiPrefix/relay', private: true, body: data);
+        await _post('v2/relay', private: true, body: data);
     return resp;
   }
 
@@ -300,36 +298,36 @@ class API extends Api {
     Map<String, dynamic> data = await web3.transferTokenOffChain(
         walletAddress, tokenAddress, receiverAddress, tokensAmount, network: network);
     Map<String, dynamic> resp =
-        await _post('$_apiPrefix/relay', private: true, body: data);
+        await _post('v2/relay', private: true, body: data);
     return resp;
   }
 
   Future<dynamic> approveTokenTransfer(Web3 web3, String walletAddress, String tokenAddress, num tokensAmount, {String network}) async {
     Map<String, dynamic> data = await web3.approveTokenOffChain(walletAddress, tokenAddress, tokensAmount, network: network);
-    Map<String, dynamic> resp = await _post('$_apiPrefix/relay', private: true, body: data);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: data);
     return resp;
   }
 
   Future<dynamic> trasferDaiToDaiPointsOffChain(Web3 web3, String walletAddress, num tokensAmount, int tokenDecimals, {String network}) async {
     Map<String, dynamic> data = await web3.trasferDaiToDAIpOffChain(walletAddress, tokensAmount, tokenDecimals, network: network);
-    Map<String, dynamic> resp = await _post('$_apiPrefix/relay', private: true, body: data);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: data);
     return resp;
   }
 
   Future<dynamic> callContract(Web3 web3, String walletAddress, String contractAddress, num ethAmount, String data, {String network}) async {
     Map<String, dynamic> signedData = await web3.callContractOffChain(walletAddress, contractAddress, ethAmount, data, network: network);
-    Map<String, dynamic> resp = await _post('$_apiPrefix/relay', private: true, body: signedData);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: signedData);
     return resp;
   }
 
   Future<dynamic> approveTokenAndCallContract(Web3 web3, String walletAddress, String tokenAddress, String contractAddress, num tokensAmount, String data, {String network}) async {
     Map<String, dynamic> signedData = await web3.approveTokenAndCallContractOffChain(walletAddress, tokenAddress, contractAddress, tokensAmount, data, network: network);
-    Map<String, dynamic> resp = await _post('$_apiPrefix/relay', private: true, body: signedData);
+    Map<String, dynamic> resp = await _post('v2/relay', private: true, body: signedData);
     return resp;
   }
 
   Future<dynamic> multiRelay(List<dynamic> items) async {
-    Map<String, dynamic> resp = await _post('$_apiPrefix/relay/multi', private: true, body: { 'items': items });
+    Map<String, dynamic> resp = await _post('v2/relay/multi', private: true, body: { 'items': items });
     return resp;
   }
 
@@ -363,7 +361,7 @@ class API extends Api {
   }
 
   Future<dynamic> invite(String phoneNumber, {String communityAddress = '', String name = '', String amount = '', String symbol = ''}) async {
-    Map<String, dynamic> resp = await _post('$_apiPrefix/wallets/invite/$phoneNumber', body: {"communityAddress": communityAddress, "name": name, "amount": amount, "symbol": symbol}, private: true);
+    Map<String, dynamic> resp = await _post('v2/wallets/invite/$phoneNumber', body: {"communityAddress": communityAddress, "name": name, "amount": amount, "symbol": symbol}, private: true);
     return resp;
   }
 
