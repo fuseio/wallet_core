@@ -27,8 +27,7 @@ void main() async {
 
   // init api module
   API api = new API(
-    base: 'https://studio.fuse.io/api',
-    funderBase: 'https://funder.fuse.io/api'
+    base: 'https://studio.fuse.io/api'
   );
 
   api.setJwtToken('YOUR_JWT');

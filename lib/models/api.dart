@@ -16,4 +16,12 @@ abstract class Api {
         throw 'Error! status: ${response.statusCode}, reason: ${response.reasonPhrase}';
     }
   }
+
+  String toRopsten(String baseURI) {
+    if (baseURI.contains('qa')) {
+      return baseURI;
+    } else {
+      return baseURI.replaceAll('studio', 'studio-ropsten');
+    }
+  }
 }

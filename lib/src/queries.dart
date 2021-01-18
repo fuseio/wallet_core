@@ -10,19 +10,6 @@ const String getHomeBridgedTokenQuery = r'''
   }
 ''';
 
-const String getTokenByAddressQuery = r'''
-  query getTokenByAddress($address: String!) {
-      tokens(where: {address: $address}) {
-        name
-        decimals
-        symbol
-        address
-        totalSupply
-        originNetwork
-      }
-  }
-''';
-
 const String getCommunityByAddressQuery = r'''
   query getCommunityByAddress($address: String!) {
       communities(where:{address: $address}) {
@@ -54,19 +41,6 @@ const String getCommunityBusinessesQuery = r'''
             isBusiness
           }
         }
-      }
-  }
-''';
-
-const String getTokenOfCommunityQuery = r'''
-  query getTokenOfCommunity($address: String!) {
-      tokens(where:{communityAddress: $address}) {
-        id,
-        symbol,
-        name,
-        address,
-        decimals,
-        originNetwork
       }
   }
 ''';

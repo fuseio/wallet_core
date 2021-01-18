@@ -5,28 +5,28 @@ import 'dart:async';
 import 'package:graphql/client.dart';
 import 'package:wallet_core/src/queries.dart';
 
-const String BASE_URL = 'https://graph.fuse.io/subgraphs/name/fuseio';
-
 class Graph {
-  GraphQLClient _clientFuse;
   GraphQLClient _clientFuseEntities;
   GraphQLClient _clientFuseRopstenBridge;
   GraphQLClient _clientFuseMainnetBridge;
 
   Graph({
-    String url = BASE_URL,
-    String subGraph,
+    String baseUrl,
   }) {
-    _clientFuse = GraphQLClient(
-        link: HttpLink(uri: '$url/$subGraph'), cache: InMemoryCache());
     _clientFuseEntities = GraphQLClient(
-        link: HttpLink(uri: '$url/fuse-entities'), cache: InMemoryCache());
+      link: HttpLink(uri: '$baseUrl/fuse-entities'),
+      cache: InMemoryCache(),
+    );
+
     _clientFuseRopstenBridge = GraphQLClient(
-        link: HttpLink(uri: '$url/fuse-ropsten-bridge'),
-        cache: InMemoryCache());
+      link: HttpLink(uri: '$baseUrl/fuse-ropsten-bridge'),
+      cache: InMemoryCache(),
+    );
+
     _clientFuseMainnetBridge = GraphQLClient(
-        link: HttpLink(uri: '$url/fuse-ethereum-bridge'),
-        cache: InMemoryCache());
+      link: HttpLink(uri: '$baseUrl/fuse-ethereum-bridge'),
+      cache: InMemoryCache(),
+    );
   }
 
   Future<dynamic> getCommunityByAddress(String communityAddress) async {
@@ -74,20 +74,6 @@ class Graph {
     }
   }
 
-  Future<dynamic> getTokenOfCommunity(String communityAddress) async {
-    QueryResult result = await _clientFuse.query(QueryOptions(
-      documentNode: gql(getTokenOfCommunityQuery),
-      variables: <String, dynamic>{
-        'address': communityAddress,
-      },
-    ));
-    if (result.hasException) {
-      throw 'Error! Get token of community request failed - communityAddress: $communityAddress';
-    } else {
-      return result.data["tokens"][0];
-    }
-  }
-
   Future<bool> isCommunityMember(
       String accountAddress, String entitiesListAddress) async {
     _clientFuseEntities.cache.reset();
@@ -102,21 +88,6 @@ class Graph {
       throw 'Error! Is community member request failed - accountAddress: $accountAddress, entitiesListAddress: $entitiesListAddress';
     } else {
       return result.data["communityEntities"].length > 0;
-    }
-  }
-
-  Future<dynamic> getTokenByAddress(String tokenAddress) async {
-    _clientFuse.cache.reset();
-    QueryResult result = await _clientFuse.query(QueryOptions(
-      documentNode: gql(getTokenByAddressQuery),
-      variables: <String, dynamic>{
-        'address': tokenAddress,
-      },
-    ));
-    if (result.hasException) {
-      throw 'Error! Get token failed - for $tokenAddress ${result.exception}';
-    } else {
-      return result.data['tokens'];
     }
   }
 }
