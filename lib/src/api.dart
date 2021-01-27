@@ -311,7 +311,10 @@ class API extends Api {
   }
 
   Future<dynamic> getJob(String id) async {
-    Map<String, dynamic> resp = await _get('v2/jobs/$id', private: true);
+    Map<String, dynamic> resp = await _get(
+      'v2/jobs/$id',
+      private: true,
+    );
     if (resp != null && resp["data"] != null) {
       return resp["data"];
     } else {
@@ -502,13 +505,14 @@ class API extends Api {
   }
 
   Future<dynamic> approveTokenAndCallContract(
-      Web3 web3,
-      String walletAddress,
-      String tokenAddress,
-      String contractAddress,
-      num tokensAmount,
-      String data,
-      {String network}) async {
+    Web3 web3,
+    String walletAddress,
+    String tokenAddress,
+    String contractAddress,
+    num tokensAmount,
+    String data, {
+    String network,
+  }) async {
     Map<String, dynamic> signedData =
         await web3.approveTokenAndCallContractOffChain(
       walletAddress,
@@ -555,21 +559,31 @@ class API extends Api {
 
   Future<dynamic> getBusinessList(String communityAddress) async {
     Map<String, dynamic> resp = await _get(
-        'v1/entities/$communityAddress?type=business&withMetadata=true');
+      'v1/entities/$communityAddress?type=business&withMetadata=true',
+    );
     return resp;
   }
 
-  Future<dynamic> getEntityMetadata(String communityAddress, String account,
-      {bool isRopsten = false}) async {
+  Future<dynamic> getEntityMetadata(
+    String communityAddress,
+    String account, {
+    bool isRopsten = false,
+  }) async {
     Map<String, dynamic> resp = await _get(
-        'v1/entities/metadata/$communityAddress/$account',
-        isRopsten: isRopsten);
+      'v1/entities/metadata/$communityAddress/$account',
+      isRopsten: isRopsten,
+    );
     return resp['data'];
   }
 
-  Future<dynamic> syncContacts(List<String> phoneNumbers) async {
-    Map<String, dynamic> resp = await _post('v2/contacts',
-        body: {"contacts": phoneNumbers}, private: true);
+  Future<dynamic> syncContacts(
+    List<String> phoneNumbers,
+  ) async {
+    Map<String, dynamic> resp = await _post(
+      'v2/contacts',
+      body: {"contacts": phoneNumbers},
+      private: true,
+    );
     return resp["data"];
   }
 
@@ -579,11 +593,13 @@ class API extends Api {
     return resp;
   }
 
-  Future<dynamic> invite(String phoneNumber,
-      {String communityAddress = '',
-      String name = '',
-      String amount = '',
-      String symbol = ''}) async {
+  Future<dynamic> invite(
+    String phoneNumber, {
+    String communityAddress = '',
+    String name = '',
+    String amount = '',
+    String symbol = '',
+  }) async {
     Map<String, dynamic> resp = await _post('v2/wallets/invite/$phoneNumber',
         body: {
           "communityAddress": communityAddress,
@@ -601,14 +617,19 @@ class API extends Api {
     return resp;
   }
 
-  Future<dynamic> updateAvatar(String accountAddress, String avatarHash) async {
+  Future<dynamic> updateAvatar(
+    String accountAddress,
+    String avatarHash,
+  ) async {
     Map<String, dynamic> resp = await _put('v2/users/$accountAddress/avatar',
         body: {"avatarHash": avatarHash}, private: true);
     return resp;
   }
 
   Future<dynamic> updateDisplayName(
-      String accountAddress, String displayName) async {
+    String accountAddress,
+    String displayName,
+  ) async {
     Map<String, dynamic> resp = await _put(
       'v2/users/$accountAddress/name',
       body: {"displayName": displayName},
@@ -617,7 +638,9 @@ class API extends Api {
     return resp;
   }
 
-  Future<dynamic> uploadImage(File imageFile) async {
+  Future<dynamic> uploadImage(
+    File imageFile,
+  ) async {
     MultipartRequest request =
         new MultipartRequest("POST", Uri.parse('$_base/v1/images'));
     request.files.add(await MultipartFile.fromPath(
@@ -629,7 +652,10 @@ class API extends Api {
     return responseHandler(response);
   }
 
-  Future<dynamic> createProfile(String communityAddress, Map publicData) async {
+  Future<dynamic> createProfile(
+    String communityAddress,
+    Map publicData,
+  ) async {
     Map<String, dynamic> resp = await _put(
       'v1/profiles/$communityAddress',
       body: {"publicData": publicData},
@@ -679,13 +705,14 @@ class API extends Api {
   }
 
   Future<dynamic> transferTokenToHomeWithAMBBridge(
-      Web3 web3,
-      String walletAddress,
-      String foreignBridgeMediator,
-      String tokenAddress,
-      num tokensAmount,
-      int tokenDecimals,
-      {String network = 'mainnet'}) async {
+    Web3 web3,
+    String walletAddress,
+    String foreignBridgeMediator,
+    String tokenAddress,
+    num tokensAmount,
+    int tokenDecimals, {
+    String network = 'mainnet',
+  }) async {
     List<dynamic> signData = await web3.transferTokenToHome(
       walletAddress,
       foreignBridgeMediator,
@@ -701,13 +728,14 @@ class API extends Api {
   }
 
   Future<dynamic> transferTokenToForeignWithAMBBridge(
-      Web3 web3,
-      String walletAddress,
-      String homeBridgeMediatorAddress,
-      String tokenAddress,
-      num tokensAmount,
-      int tokenDecimals,
-      {String network = 'fuse'}) async {
+    Web3 web3,
+    String walletAddress,
+    String homeBridgeMediatorAddress,
+    String tokenAddress,
+    num tokensAmount,
+    int tokenDecimals, {
+    String network = 'fuse',
+  }) async {
     List<dynamic> signData = await web3.transferTokenToForeign(
       walletAddress,
       homeBridgeMediatorAddress,
@@ -724,13 +752,14 @@ class API extends Api {
 
   // SEEDBED CONTRACTS
   Future<dynamic> sellToken(
-      String reserveContractAddress,
-      String daiTokenAddress,
-      Web3 web3,
-      String tokenToApprove,
-      String walletAddress,
-      num tokensAmount,
-      {String network}) async {
+    String reserveContractAddress,
+    String daiTokenAddress,
+    Web3 web3,
+    String tokenToApprove,
+    String walletAddress,
+    num tokensAmount, {
+    String network,
+  }) async {
     List<dynamic> signData = await web3.sellToken(
       reserveContractAddress,
       daiTokenAddress,
@@ -746,13 +775,14 @@ class API extends Api {
 
   // SEEDBED CONTRACTS
   Future<dynamic> buyToken(
-      String reserveContractAddress,
-      String daiTokenAddress,
-      Web3 web3,
-      String tokenToApprove,
-      String walletAddress,
-      num tokensAmount,
-      {String network}) async {
+    String reserveContractAddress,
+    String daiTokenAddress,
+    Web3 web3,
+    String tokenToApprove,
+    String walletAddress,
+    num tokensAmount, {
+    String network,
+  }) async {
     List<dynamic> signData = await web3.buyToken(
       reserveContractAddress,
       daiTokenAddress,
