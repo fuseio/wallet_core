@@ -213,16 +213,17 @@ class API extends Api {
       final bool isPending = transferEvent['status'] != null && transferEvent['status'] == 'pending';
       final int timestamp = isPending
           ? DateTime.now().millisecondsSinceEpoch
-          : DateTime.fromMillisecondsSinceEpoch(DateTime.fromMillisecondsSinceEpoch(int.parse(transferEvent['timeStamp'])).millisecondsSinceEpoch * 1000).millisecondsSinceEpoch;
+          : DateTime.fromMillisecondsSinceEpoch(DateTime.fromMillisecondsSinceEpoch(int.tryParse(transferEvent['timeStamp']) ?? (DateTime.now().millisecondsSinceEpoch / 1000)).millisecondsSinceEpoch * 1000).millisecondsSinceEpoch;
       transfers.add({
-          'blockNumber': num.tryParse(transferEvent['blockNumber'] ?? '0'),
+          'blockNumber': num.tryParse(transferEvent['blockNumber'] ?? '0') ?? 0,
           'txHash': transferEvent['hash'] ?? '',
           'to': transferEvent['to'] ?? '',
           'from': transferEvent["from"] ?? '',
           'status': transferEvent['status']?.toUpperCase(),
           'timestamp': timestamp,
+          'actionType': transferEvent['actionType'] ?? null,
           'value': transferEvent['value'] ?? '0',
-          'tokenAddress': transferEvent['contractAddress'],
+          'tokenAddress': transferEvent['contractAddress'] ?? tokenAddress,
           'type': transferEvent["from"].toString().toLowerCase() ==
                   walletAddress.toLowerCase()
               ? 'SEND'
