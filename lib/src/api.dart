@@ -210,12 +210,13 @@ class API extends Api {
     Map<String, dynamic> resp = await _get('v2/wallets/transfers/tokentx/$walletAddress?tokenAddress=$tokenAddress&sort=$sort&startblock=$startblock', private: true);
     List<dynamic> transfers = [];
     for (dynamic transferEvent in resp['data']) {
+      final blockNumber = transferEvent['blockNumber'].runtimeType == int ? transferEvent['blockNumber'] : num.tryParse(transferEvent['blockNumber'] ?? '0');
       final bool isPending = transferEvent['status'] != null && transferEvent['status'] == 'pending';
       final int timestamp = isPending
           ? DateTime.now().millisecondsSinceEpoch
           : DateTime.fromMillisecondsSinceEpoch(DateTime.fromMillisecondsSinceEpoch(int.tryParse(transferEvent['timeStamp']) ?? (DateTime.now().millisecondsSinceEpoch / 1000)).millisecondsSinceEpoch * 1000).millisecondsSinceEpoch;
       transfers.add({
-          'blockNumber': num.tryParse(transferEvent['blockNumber']) ?? transferEvent['blockNumber'] ?? 0,
+          'blockNumber': blockNumber,
           'txHash': transferEvent['hash'] ?? '',
           'to': transferEvent['to'] ?? '',
           'from': transferEvent["from"] ?? '',
