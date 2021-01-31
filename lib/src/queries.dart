@@ -55,24 +55,3 @@ const String isCommunityMemberQuery = r'''
       }
   }
 ''';
-
-const String getTransferEventsQuery = r'''
-  query getTransferEvents(
-    $to: String!,
-    $skip: Int,
-    $first: Int,
-  ) {
-    transferEvents(where: {
-        to: $to,
-    }, skip: $skip, first: $first) {
-        id
-        from
-        to
-        value
-        blockNumber
-        txHash
-        tokenAddress
-        timestamp
-      }
-  }
-''';
