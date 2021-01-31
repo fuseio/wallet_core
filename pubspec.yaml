@@ -1,6 +1,6 @@
 name: wallet_core
 author: Lior Rabin <lior9586@gmail.com>
-version: 0.2.4+21
+version: 0.2.5+1
 homepage: https://github.com/fuseio/wallet_core
 description: Fuse wallet core Dart library to interact with Ethereum based networks and APIs.
 environment:

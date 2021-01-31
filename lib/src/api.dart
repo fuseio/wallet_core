@@ -282,25 +282,31 @@ class API extends Api {
     );
     List<dynamic> transfers = [];
     for (dynamic transferEvent in resp['data']) {
+      final blockNumber = transferEvent['blockNumber'].runtimeType == int
+          ? transferEvent['blockNumber']
+          : num.tryParse(transferEvent['blockNumber'] ?? '0');
       final bool isPending = transferEvent['status'] != null &&
           transferEvent['status'] == 'pending';
       final int timestamp = isPending
           ? DateTime.now().millisecondsSinceEpoch
           : DateTime.fromMillisecondsSinceEpoch(
                   DateTime.fromMillisecondsSinceEpoch(
-                              int.parse(transferEvent['timeStamp']))
+                              int.tryParse(transferEvent['timeStamp']) ??
+                                  (DateTime.now().millisecondsSinceEpoch /
+                                      1000))
                           .millisecondsSinceEpoch *
                       1000)
               .millisecondsSinceEpoch;
       transfers.add({
-        'blockNumber': num.tryParse(transferEvent['blockNumber'] ?? '0'),
+        'blockNumber': blockNumber,
         'txHash': transferEvent['hash'] ?? '',
         'to': transferEvent['to'] ?? '',
         'from': transferEvent["from"] ?? '',
         'status': transferEvent['status']?.toUpperCase(),
         'timestamp': timestamp,
+        'actionType': transferEvent['actionType'] ?? null,
         'value': transferEvent['value'] ?? '0',
-        'tokenAddress': transferEvent['contractAddress'],
+        'tokenAddress': transferEvent['contractAddress'] ?? tokenAddress,
         'type': transferEvent["from"].toString().toLowerCase() ==
                 walletAddress.toLowerCase()
             ? 'SEND'
