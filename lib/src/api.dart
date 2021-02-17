@@ -345,6 +345,7 @@ class API extends Api {
         String tokenName;
         int tokenDecimal;
         String tokenSymbol;
+        String communityName;
         String to;
         if (jobData.containsKey('transactionBody')) {
           status = jobData['transactionBody']['status'] ?? null;
@@ -352,6 +353,9 @@ class API extends Api {
           from = jobData['transactionBody']['from'] ?? null;
           value = jobData['transactionBody']['value'] ?? null;
           blockNumber = jobData['transactionBody']['blockNumber'] ?? null;
+          communityName = jobData['transactionBody'].containsKey('communityName')
+            ? jobData['transactionBody']['communityName']
+            : null;
           tokenAddress = jobData['transactionBody']['tokenAddress'] ?? null;
           tokenName = jobData['transactionBody']['tokenName'] ?? null;
           tokenDecimal = jobData['transactionBody']['tokenDecimal'] ?? null;
@@ -363,6 +367,7 @@ class API extends Api {
           'name': actionName ?? actionType,
           'communityAddress': communityAddress,
           'blockNumber': blockNumber,
+          'communityName': communityName,
           'txHash': txHash,
           'tokenName': tokenName,
           'tokenDecimal': tokenDecimal,
@@ -458,6 +463,7 @@ class API extends Api {
     String tokenAddress,
     String network = 'fuse',
     String originNetwork,
+    String communityName,
   }) async {
     Map<String, dynamic> data = await web3.joinCommunityOffChain(
       walletAddress,
@@ -465,6 +471,7 @@ class API extends Api {
       tokenAddress: tokenAddress,
       network: network,
       originNetwork: originNetwork,
+      communityName: communityAddress,
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',

@@ -333,6 +333,7 @@ class Web3 {
     String originNetwork = 'mainnet',
     String tokenAddress,
     bool isFunderDeprecated = true,
+    String communityName,
   }) async {
     String nonce = await getNonceForRelay();
     print('nonce: $nonce');
@@ -374,6 +375,7 @@ class Web3 {
         "tokenAddress": tokenAddress,
         "originNetwork": originNetwork,
         "status": 'pending',
+        "communityName": communityName,
       }
     };
   }
