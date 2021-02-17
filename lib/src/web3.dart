@@ -332,6 +332,7 @@ class Web3 {
     String network = 'fuse',
     String originNetwork = 'mainnet',
     String tokenAddress,
+    bool isFunderDeprecated = true,
   }) async {
     String nonce = await getNonceForRelay();
     print('nonce: $nonce');
@@ -348,15 +349,17 @@ class Web3 {
     print('encodedData: $encodedData');
 
     String signature = await signOffChain(
-        _communityManagerContractAddress,
-        walletAddress,
-        BigInt.from(0),
-        encodedData,
-        nonce,
-        BigInt.from(0),
-        BigInt.from(_defaultGasLimit));
+      _communityManagerContractAddress,
+      walletAddress,
+      BigInt.from(0),
+      encodedData,
+      nonce,
+      BigInt.from(0),
+      BigInt.from(_defaultGasLimit),
+    );
 
     return {
+      'isFunderDeprecated': isFunderDeprecated,
       "walletAddress": walletAddress,
       "methodData": encodedData,
       "communityAddress": communityAddress,

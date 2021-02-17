@@ -316,6 +316,73 @@ class API extends Api {
     return transfers;
   }
 
+  Future<List<dynamic>> getActionsByWalletAddress(
+    String walletAddress, {
+    int updatedAt = 0,
+  }) async {
+    try {
+      Map<String, dynamic> resp = await _get(
+        'v2/wallets/actions/$walletAddress?updatedAt=$updatedAt',
+        private: true,
+      );
+      List<dynamic> actions = [];
+      for (Map walletAction in (resp['data']['docs'] ?? [])) {
+        final String actionName = walletAction['name'];
+        final String communityAddress =
+            walletAction['communityAddress'] ?? null;
+        final String updatedAt = walletAction['updatedAt'];
+        final String bonusType = walletAction.containsKey('data')
+            ? walletAction['data']['bonusType']
+            : null;
+        Map jobData = walletAction['job']['data'] ?? Map();
+        String txHash = jobData['txHash'] ?? null;
+        String status = jobData['status'] ?? null;
+        String actionType;
+        String from;
+        String value;
+        int blockNumber = 0;
+        String tokenAddress;
+        String tokenName;
+        int tokenDecimal;
+        String tokenSymbol;
+        String to;
+        if (jobData.containsKey('transactionBody')) {
+          status = jobData['transactionBody']['status'] ?? null;
+          actionType = jobData['transactionBody']['actionType'] ?? null;
+          from = jobData['transactionBody']['from'] ?? null;
+          value = jobData['transactionBody']['value'] ?? null;
+          blockNumber = jobData['transactionBody']['blockNumber'] ?? null;
+          tokenAddress = jobData['transactionBody']['tokenAddress'] ?? null;
+          tokenName = jobData['transactionBody']['tokenName'] ?? null;
+          tokenDecimal = jobData['transactionBody']['tokenDecimal'] ?? null;
+          tokenSymbol = jobData['transactionBody']['asset'] ?? null;
+          to = jobData['transactionBody']['to'] ?? null;
+        }
+        actions.add({
+          'bonusType': bonusType,
+          'name': actionName ?? actionType,
+          'communityAddress': communityAddress,
+          'blockNumber': blockNumber,
+          'txHash': txHash,
+          'tokenName': tokenName,
+          'tokenDecimal': tokenDecimal,
+          'tokenSymbol': tokenSymbol,
+          'to': to,
+          'from': from,
+          'status': status?.toUpperCase(),
+          'timestamp': DateTime.parse(updatedAt).millisecondsSinceEpoch,
+          'actionType': actionType,
+          'value': value,
+          'tokenAddress': tokenAddress,
+        });
+      }
+      return actions;
+    } catch(e) {
+      print('ERRROR getActionsByWalletAddress ' + e.toString());
+      return [];
+    }
+  }
+
   Future<dynamic> getJob(String id) async {
     Map<String, dynamic> resp = await _get(
       'v2/jobs/$id',
@@ -374,6 +441,7 @@ class API extends Api {
 
   Future<dynamic> backupWallet({
     String communityAddress,
+    bool isFunderDeprecated = true,
   }) async {
     Map<String, dynamic> resp = await _post(
       'v2/wallets/backup',
@@ -605,21 +673,28 @@ class API extends Api {
     String name = '',
     String amount = '',
     String symbol = '',
+    bool isFunderDeprecated = true,
   }) async {
-    Map<String, dynamic> resp = await _post('v2/wallets/invite/$phoneNumber',
-        body: {
-          "communityAddress": communityAddress,
-          "name": name,
-          "amount": amount,
-          "symbol": symbol
-        },
-        private: true);
+    Map<String, dynamic> resp = await _post(
+      'v2/wallets/invite/$phoneNumber',
+      body: {
+        "communityAddress": communityAddress,
+        "name": name,
+        "amount": amount,
+        "symbol": symbol,
+        'isFunderDeprecated': isFunderDeprecated,
+      },
+      private: true,
+    );
     return resp;
   }
 
   Future<dynamic> saveUserToDb(Map body) async {
-    Map<String, dynamic> resp =
-        await _post('v2/users', body: body, private: false);
+    Map<String, dynamic> resp = await _post(
+      'v2/users',
+      body: body,
+      private: false,
+    );
     return resp;
   }
 
@@ -627,8 +702,11 @@ class API extends Api {
     String accountAddress,
     String avatarHash,
   ) async {
-    Map<String, dynamic> resp = await _put('v2/users/$accountAddress/avatar',
-        body: {"avatarHash": avatarHash}, private: true);
+    Map<String, dynamic> resp = await _put(
+      'v2/users/$accountAddress/avatar',
+      body: {"avatarHash": avatarHash},
+      private: true,
+    );
     return resp;
   }
 
