@@ -353,9 +353,10 @@ class API extends Api {
           from = jobData['transactionBody']['from'] ?? null;
           value = jobData['transactionBody']['value'] ?? null;
           blockNumber = jobData['transactionBody']['blockNumber'] ?? null;
-          communityName = jobData['transactionBody'].containsKey('communityName')
-            ? jobData['transactionBody']['communityName']
-            : null;
+          communityName =
+              jobData['transactionBody'].containsKey('communityName')
+                  ? jobData['transactionBody']['communityName']
+                  : null;
           tokenAddress = jobData['transactionBody']['tokenAddress'] ?? null;
           tokenName = jobData['transactionBody']['tokenName'] ?? null;
           tokenDecimal = jobData['transactionBody']['tokenDecimal'] ?? null;
@@ -382,7 +383,7 @@ class API extends Api {
         });
       }
       return actions;
-    } catch(e) {
+    } catch (e) {
       print('ERRROR getActionsByWalletAddress ' + e.toString());
       return [];
     }
@@ -471,7 +472,7 @@ class API extends Api {
       tokenAddress: tokenAddress,
       network: network,
       originNetwork: originNetwork,
-      communityName: communityAddress,
+      communityName: communityName,
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
