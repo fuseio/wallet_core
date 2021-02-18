@@ -336,7 +336,7 @@ class API extends Api {
             : null;
         Map jobData = walletAction['job']['data'] ?? Map();
         String txHash = jobData['txHash'] ?? null;
-        String status = jobData['status'] ?? null;
+        String status = jobData['status'] ?? 'pending';
         String actionType;
         String from;
         String value;
