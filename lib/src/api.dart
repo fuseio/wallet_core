@@ -316,76 +316,15 @@ class API extends Api {
     return transfers;
   }
 
-  Future<List<dynamic>> getActionsByWalletAddress(
+  Future<Map<String, dynamic>> getActionsByWalletAddress(
     String walletAddress, {
     int updatedAt = 0,
   }) async {
-    try {
-      Map<String, dynamic> resp = await _get(
-        'v2/wallets/actions/$walletAddress?updatedAt=$updatedAt',
-        private: true,
-      );
-      List<dynamic> actions = [];
-      for (Map walletAction in (resp['data']['docs'] ?? [])) {
-        final String actionName = walletAction['name'];
-        final String communityAddress =
-            walletAction['communityAddress'] ?? null;
-        final String updatedAt = walletAction['updatedAt'];
-        final String bonusType = walletAction.containsKey('data')
-            ? walletAction['data']['bonusType']
-            : null;
-        Map jobData = walletAction['job']['data'] ?? Map();
-        String txHash = jobData['txHash'] ?? null;
-        String status = walletAction['status'] ?? 'pending';
-        String actionType;
-        String from;
-        String value;
-        int blockNumber = 0;
-        String tokenAddress;
-        String tokenName;
-        int tokenDecimal;
-        String tokenSymbol;
-        String communityName;
-        String to;
-        if (jobData.containsKey('transactionBody')) {
-          actionType = jobData['transactionBody']['actionType'] ?? null;
-          from = jobData['transactionBody']['from'] ?? null;
-          value = jobData['transactionBody']['value'] ?? null;
-          blockNumber = jobData['transactionBody']['blockNumber'] ?? null;
-          communityName =
-              jobData['transactionBody'].containsKey('communityName')
-                  ? jobData['transactionBody']['communityName']
-                  : null;
-          tokenAddress = jobData['transactionBody']['tokenAddress'] ?? null;
-          tokenName = jobData['transactionBody']['tokenName'] ?? null;
-          tokenDecimal = jobData['transactionBody']['tokenDecimal'] ?? null;
-          tokenSymbol = jobData['transactionBody']['asset'] ?? null;
-          to = jobData['transactionBody']['to'] ?? null;
-        }
-        actions.add({
-          'bonusType': bonusType,
-          'name': actionName ?? actionType,
-          'communityAddress': communityAddress,
-          'blockNumber': blockNumber,
-          'communityName': communityName,
-          'txHash': txHash,
-          'tokenName': tokenName,
-          'tokenDecimal': tokenDecimal,
-          'tokenSymbol': tokenSymbol,
-          'to': to,
-          'from': from,
-          'status': status?.toUpperCase(),
-          'timestamp': DateTime.parse(updatedAt).millisecondsSinceEpoch,
-          'actionType': actionType,
-          'value': value,
-          'tokenAddress': tokenAddress,
-        });
-      }
-      return actions;
-    } catch (e) {
-      print('ERRROR getActionsByWalletAddress ' + e.toString());
-      return [];
-    }
+    Map<String, dynamic> resp = await _get(
+      'v2/wallets/actions/$walletAddress?updatedAt=$updatedAt',
+      private: true,
+    );
+    return resp['data'];
   }
 
   Future<dynamic> getJob(String id) async {
