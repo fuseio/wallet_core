@@ -202,6 +202,24 @@ class Web3 {
         .first;
   }
 
+  Future<dynamic> getTokenAllowance(
+    String tokenAddress, {
+    String owner,
+    String spender,
+  }) async {
+    List<dynamic> params = [
+      EthereumAddress.fromHex(owner),
+      EthereumAddress.fromHex(spender),
+    ];
+    final res = await _readFromContract(
+      'BasicToken',
+      tokenAddress,
+      'allowance',
+      params,
+    );
+    return res.first;
+  }
+
   Future<String> tokenTransfer(
     String tokenAddress,
     String receiverAddress,
