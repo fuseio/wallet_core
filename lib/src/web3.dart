@@ -105,7 +105,7 @@ class Web3 {
     if (address != null && address != "") {
       a = EthereumAddress.fromHex(address);
     } else {
-      a = EthereumAddress.fromHex(await getAddress());
+      a = await _credentials.extractAddress();
     }
     return await _client.getBalance(a);
   }
@@ -195,29 +195,38 @@ class Web3 {
     if (address != null && address != "") {
       params = [EthereumAddress.fromHex(address)];
     } else {
-      params = [EthereumAddress.fromHex(await getAddress())];
+      EthereumAddress address = await _credentials.extractAddress();
+      params = [address];
     }
-    return (await _readFromContract(
-            'BasicToken', tokenAddress, 'balanceOf', params))
-        .first;
+    final List<dynamic> response = await _readFromContract(
+      'BasicToken',
+      tokenAddress,
+      'balanceOf',
+      params,
+    );
+    return response.first;
   }
 
   Future<dynamic> getTokenAllowance(
-    String tokenAddress, {
+    String tokenAddress,
+    String spender, {
     String owner,
-    String spender,
   }) async {
-    List<dynamic> params = [
-      EthereumAddress.fromHex(owner),
-      EthereumAddress.fromHex(spender),
-    ];
-    final res = await _readFromContract(
+    List<EthereumAddress> params = [];
+    if (owner != null && owner != "") {
+      params.add(EthereumAddress.fromHex(owner));
+    } else {
+      EthereumAddress address = await _credentials.extractAddress();
+      params.add(address);
+    }
+    params.add(EthereumAddress.fromHex(spender));
+    final List<dynamic> response = await _readFromContract(
       'BasicToken',
       tokenAddress,
       'allowance',
       params,
     );
-    return res.first;
+    return response.first;
   }
 
   Future<String> tokenTransfer(
@@ -509,8 +518,13 @@ class Web3 {
   }
 
   Future<Map<String, dynamic>> approveTokenOffChain(
-      String walletAddress, String tokenAddress, num tokensAmount,
-      {String spenderContract = null, String network = "fuse"}) async {
+    String walletAddress,
+    String tokenAddress,
+    num tokensAmount, {
+    String spenderContract = null,
+    String network = "fuse",
+    Map transactionBody,
+  }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
@@ -553,7 +567,8 @@ class Web3 {
       "gasPrice": 0,
       "gasLimit": _defaultGasLimit,
       "signature": signature,
-      "walletModule": "TransferManager"
+      "walletModule": "TransferManager",
+      "transactionBody": transactionBody,
     };
   }
 
@@ -563,6 +578,7 @@ class Web3 {
     num ethAmount,
     String data, {
     String network = "fuse",
+    Map transactionBody,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
@@ -602,7 +618,8 @@ class Web3 {
       "gasPrice": 0,
       "gasLimit": _defaultGasLimit,
       "signature": signature,
-      "walletModule": "TransferManager"
+      "walletModule": "TransferManager",
+      "transactionBody": transactionBody,
     };
   }
 
