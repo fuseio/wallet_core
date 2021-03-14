@@ -307,7 +307,7 @@ class Web3 {
     return '0x' + HEX.encode(signature);
   }
 
-  Future<Map<String, dynamic>> trasferDaiToDAIpOffChain(
+  Future<Map<String, dynamic>> transferDaiToDAIpOffChain(
     String walletAddress,
     num tokenAmount,
     int tokenDecimals, {
@@ -410,8 +410,9 @@ class Web3 {
   Future<Map<String, dynamic>> transferOffChain(
     String walletAddress,
     String receiverAddress,
-    int amountInWei, {
-    String network = "mainnet",
+    num amountInWei, {
+    String network = "fuse",
+    Map transactionBody,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(
@@ -453,7 +454,8 @@ class Web3 {
       "gasPrice": 0,
       "gasLimit": _defaultGasLimit,
       "signature": signature,
-      "walletModule": "TransferManager"
+      "walletModule": "TransferManager",
+      "transactionBody": transactionBody,
     };
   }
 

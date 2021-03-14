@@ -92,7 +92,7 @@ class API extends Api {
   }
 
   // Login using Firebase
-  Future<String> loginwithFirebase(
+  Future<String> loginWithFirebase(
     String token,
     String accountAddress,
     String identifier, {
@@ -424,12 +424,16 @@ class API extends Api {
     Web3 web3,
     String walletAddress,
     String receiverAddress,
-    int amountInWei,
-  ) async {
+    num amountInWei, {
+    String network = "fuse",
+    Map transactionBody,
+  }) async {
     Map<String, dynamic> data = await web3.transferOffChain(
       walletAddress,
       receiverAddress,
       amountInWei,
+      network: network,
+      transactionBody: transactionBody,
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
@@ -480,14 +484,14 @@ class API extends Api {
     return resp;
   }
 
-  Future<dynamic> trasferDaiToDaiPointsOffChain(
+  Future<dynamic> transferDaiToDaiPointsOffChain(
     Web3 web3,
     String walletAddress,
     num tokensAmount,
     int tokenDecimals, {
     String network,
   }) async {
-    Map<String, dynamic> data = await web3.trasferDaiToDAIpOffChain(
+    Map<String, dynamic> data = await web3.transferDaiToDAIpOffChain(
       walletAddress,
       tokensAmount,
       tokenDecimals,
