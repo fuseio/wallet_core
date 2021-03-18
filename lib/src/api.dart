@@ -536,6 +536,7 @@ class API extends Api {
     num tokensAmount,
     String data, {
     String network,
+    Map transactionBody,
   }) async {
     Map<String, dynamic> signedData =
         await web3.approveTokenAndCallContractOffChain(
@@ -545,6 +546,7 @@ class API extends Api {
       tokensAmount,
       data,
       network: network,
+      transactionBody: transactionBody,
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',

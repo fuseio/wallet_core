@@ -632,6 +632,7 @@ class Web3 {
     num tokensAmount,
     String data, {
     String network = "fuse",
+    Map transactionBody,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
@@ -677,7 +678,8 @@ class Web3 {
       "gasPrice": 0,
       "gasLimit": _defaultGasLimit,
       "signature": signature,
-      "walletModule": "TransferManager"
+      "walletModule": "TransferManager",
+      'transactionBody': transactionBody,
     };
   }
 
