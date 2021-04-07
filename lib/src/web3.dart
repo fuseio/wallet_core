@@ -8,7 +8,7 @@ import 'package:http/http.dart';
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:hex/hex.dart';
-import 'package:wallet_core/constans/variables.dart';
+import 'package:wallet_core/constants/variables.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:decimal/decimal.dart';
