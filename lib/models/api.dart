@@ -11,7 +11,6 @@ abstract class Api {
         return obj;
       case 401:
         throw 'Error! Unauthorized';
-        break;
       default:
         throw 'Error! status: ${response.statusCode}, reason: ${response.reasonPhrase}';
     }

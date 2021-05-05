@@ -4,47 +4,66 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:http/http.dart';
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:decimal/decimal.dart';
 import 'package:hex/hex.dart';
-import 'package:wallet_core/constants/variables.dart';
+import 'package:http/http.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
-import 'package:decimal/decimal.dart';
-import './abi.dart';
+
+import 'package:wallet_core/constants/variables.dart';
+
 import '../utils/crypto.dart';
+import './abi.dart';
 
 class Web3 {
-  Web3Client _client;
-  Future<bool> _approveCb;
-  Credentials _credentials;
-  int _networkId;
-  String _defaultCommunityContractAddress;
-  String _communityManagerContractAddress;
-  String _daiPointsManagerContractAddress;
-  String _transferManagerContractAddress;
-  int _defaultGasLimit;
-
+  late final Web3Client _client;
+  late final Future<bool> _approveCb;
+  late final Credentials _credentials;
+  late final int _networkId;
+  late final String _defaultCommunityContractAddress;
+  late final String _communityManagerContractAddress;
+  late final String _daiPointsManagerContractAddress;
+  late final String _transferManagerContractAddress;
+  late final int _defaultGasLimit;
   Web3(
     Future<bool> approveCb(), {
-    String url,
-    int networkId,
-    String defaultCommunityAddress,
-    String communityManagerAddress,
-    String transferManagerAddress,
-    String daiPointsManagerAddress,
-    int defaultGasLimit = Variables.DEFAULT_GAS_LIMIT,
-  }) {
-    _client = new Web3Client(url, new Client());
-    _approveCb = approveCb();
-    _networkId = networkId;
-    _defaultCommunityContractAddress = defaultCommunityAddress;
-    _communityManagerContractAddress = communityManagerAddress;
-    _transferManagerContractAddress = transferManagerAddress;
-    _daiPointsManagerContractAddress = daiPointsManagerAddress;
-    _defaultGasLimit = defaultGasLimit;
-  }
+    required String url,
+    required int networkId,
+    required String defaultCommunityAddress,
+    required String communityManagerAddress,
+    required String daiPointsManagerAddress,
+    required String transferManagerAddress,
+    required int? defaultGasLimit,
+  })   : _client = new Web3Client(url, new Client()),
+        _approveCb = approveCb(),
+        _networkId = networkId,
+        _defaultCommunityContractAddress = defaultCommunityAddress,
+        _communityManagerContractAddress = communityManagerAddress,
+        _transferManagerContractAddress = transferManagerAddress,
+        _daiPointsManagerContractAddress = daiPointsManagerAddress,
+        _defaultGasLimit = defaultGasLimit ?? Variables.DEFAULT_GAS_LIMIT;
+
+  // Web3(
+  //   Future<bool> approveCb(), {
+  //   String url,
+  //   int networkId,
+  //   String defaultCommunityAddress,
+  //   String communityManagerAddress,
+  //   String transferManagerAddress,
+  //   String daiPointsManagerAddress,
+  //   int defaultGasLimit = Variables.DEFAULT_GAS_LIMIT,
+  // }) {
+  //   _client = new Web3Client(url, new Client());
+  //   _approveCb = approveCb();
+  //   _networkId = networkId;
+  //   _defaultCommunityContractAddress = defaultCommunityAddress;
+  //   _communityManagerContractAddress = communityManagerAddress;
+  //   _transferManagerContractAddress = transferManagerAddress;
+  //   _daiPointsManagerContractAddress = daiPointsManagerAddress;
+  //   _defaultGasLimit = defaultGasLimit;
+  // }
 
   static String generateMnemonic() {
     return bip39.generateMnemonic();
@@ -52,7 +71,7 @@ class Web3 {
 
   static String privateKeyFromMnemonic(String mnemonic, {int childIndex = 0}) {
     String seed = bip39.mnemonicToSeedHex(mnemonic);
-    bip32.BIP32 root = bip32.BIP32.fromSeed(HEX.decode(seed));
+    bip32.BIP32 root = bip32.BIP32.fromSeed(HEX.decode(seed) as Uint8List);
     bip32.BIP32 child = root.derivePath("m/44'/60'/0'/0/$childIndex");
     String privateKey = HEX.encode(child.privateKey);
     return privateKey;
@@ -75,7 +94,7 @@ class Web3 {
     print('sendTransactionAndWaitForReceipt');
     String txHash = await _client.sendTransaction(_credentials, transaction,
         chainId: _networkId);
-    TransactionReceipt receipt;
+    TransactionReceipt? receipt;
     try {
       receipt = await _client.getTransactionReceipt(txHash);
     } catch (err) {
@@ -100,7 +119,7 @@ class Web3 {
     return txHash;
   }
 
-  Future<EtherAmount> getBalance({String address}) async {
+  Future<EtherAmount> getBalance({String? address}) async {
     EthereumAddress a;
     if (address != null && address != "") {
       a = EthereumAddress.fromHex(address);
@@ -189,7 +208,7 @@ class Web3 {
 
   Future<dynamic> getTokenBalance(
     String tokenAddress, {
-    String address,
+    String? address,
   }) async {
     List<dynamic> params = [];
     if (address != null && address != "") {
@@ -210,7 +229,7 @@ class Web3 {
   Future<dynamic> getTokenAllowance(
     String tokenAddress,
     String spender, {
-    String owner,
+    String? owner,
   }) async {
     List<EthereumAddress> params = [];
     if (owner != null && owner != "") {
@@ -311,7 +330,7 @@ class Web3 {
     String walletAddress,
     num tokenAmount,
     int tokenDecimals, {
-    String network = "fuse",
+    String? network = "fuse",
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     Decimal tokensAmountDecimal = Decimal.parse(tokenAmount.toString());
@@ -357,10 +376,10 @@ class Web3 {
     String walletAddress,
     String communityAddress, {
     String network = 'fuse',
-    String originNetwork = 'mainnet',
-    String tokenAddress,
+    String? originNetwork = 'mainnet',
+    String? tokenAddress,
     bool isFunderDeprecated = true,
-    String communityName,
+    String? communityName,
   }) async {
     String nonce = await getNonceForRelay();
     print('nonce: $nonce');
@@ -412,7 +431,7 @@ class Web3 {
     String receiverAddress,
     num amountInWei, {
     String network = "fuse",
-    Map transactionBody,
+    Map? transactionBody,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(
@@ -464,7 +483,7 @@ class Web3 {
     String tokenAddress,
     String receiverAddress,
     num tokensAmount, {
-    String network,
+    String? network,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
@@ -523,9 +542,9 @@ class Web3 {
     String walletAddress,
     String tokenAddress,
     num tokensAmount, {
-    String spenderContract = null,
-    String network = "fuse",
-    Map transactionBody,
+    String? spenderContract,
+    String? network = "fuse",
+    Map? transactionBody,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
@@ -579,8 +598,8 @@ class Web3 {
     String contractAddress,
     num ethAmount,
     String data, {
-    String network = "fuse",
-    Map transactionBody,
+    String? network = "fuse",
+    Map? transactionBody,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
@@ -631,9 +650,9 @@ class Web3 {
     String contractAddress,
     num tokensAmount,
     String data, {
-    String network = "fuse",
-    Map transactionBody,
-    Map txMetadata,
+    String? network = "fuse",
+    Map? transactionBody,
+    Map? txMetadata,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
@@ -790,7 +809,7 @@ class Web3 {
     String walletAddress,
     num tokensAmount, {
     String network = 'fuse',
-    BigInt minReturn,
+    BigInt? minReturn,
   }) async {
     EthereumAddress token = EthereumAddress.fromHex(daiTokenAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);
@@ -831,7 +850,7 @@ class Web3 {
     String walletAddress,
     num tokensAmount, {
     String network = 'fuse',
-    BigInt minReturn,
+    BigInt? minReturn,
   }) async {
     EthereumAddress token = EthereumAddress.fromHex(daiTokenAddress);
     dynamic tokenDetails = await getTokenDetails(tokenAddress);

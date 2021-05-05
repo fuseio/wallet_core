@@ -5,24 +5,23 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
+
 import 'package:wallet_core/models/api.dart';
 import 'package:wallet_core/src/web3.dart';
 
 class API extends Api {
-  String _base;
-  Client _client;
-  String _jwtToken;
-  String _phoneNumber;
-  String _accountAddress;
+  late String _base;
+  late Client _client;
+  late String _jwtToken;
+  late String _phoneNumber;
+  late String _accountAddress;
 
-  API({
+  API(
     String base,
     String jwtToken,
-  }) {
-    _base = base;
-    _jwtToken = jwtToken;
-    _client = new Client();
-  }
+  )   : _base = base,
+        _jwtToken = jwtToken,
+        _client = Client();
 
   void setJwtToken(String jwtToken) {
     _jwtToken = jwtToken;
@@ -30,17 +29,17 @@ class API extends Api {
 
   Future<Map<String, dynamic>> _get(
     String endpoint, {
-    bool private,
+    bool? private,
     bool isRopsten = false,
   }) async {
     print('GET $endpoint');
     Response response;
     String uri = isRopsten ? toRopsten(_base) : _base;
     if (private != null && private) {
-      response = await _client.get('$uri/$endpoint',
+      response = await _client.get(Uri.parse('$uri/$endpoint'),
           headers: {"Authorization": "Bearer $_jwtToken"});
     } else {
-      response = await _client.get('$uri/$endpoint');
+      response = await _client.get(Uri.parse('$uri/$endpoint'));
     }
     return responseHandler(response);
   }
@@ -48,7 +47,7 @@ class API extends Api {
   Future<Map<String, dynamic>> _post(
     String endpoint, {
     dynamic body,
-    bool private,
+    bool? private,
     bool isRopsten = false,
   }) async {
     print('POST $endpoint $body');
@@ -56,14 +55,14 @@ class API extends Api {
     body = body == null ? body : json.encode(body);
     String uri = isRopsten ? toRopsten(_base) : _base;
     if (private != null && private) {
-      response = await _client.post('$uri/$endpoint',
+      response = await _client.post(Uri.parse('$uri/$endpoint'),
           headers: {
             "Authorization": "Bearer $_jwtToken",
             "Content-Type": 'application/json'
           },
           body: body);
     } else {
-      response = await _client.post('$uri/$endpoint',
+      response = await _client.post(Uri.parse('$uri/$endpoint'),
           body: body, headers: {"Content-Type": 'application/json'});
     }
     return responseHandler(response);
@@ -72,20 +71,20 @@ class API extends Api {
   Future<Map<String, dynamic>> _put(
     String endpoint, {
     dynamic body,
-    bool private,
+    bool? private,
   }) async {
     print('PUT $endpoint $body');
     Response response;
     body = body == null ? body : json.encode(body);
     if (private != null && private) {
-      response = await _client.put('$_base/$endpoint',
+      response = await _client.put(Uri.parse('$_base/$endpoint'),
           headers: {
             "Authorization": "Bearer $_jwtToken",
             "Content-Type": 'application/json'
           },
           body: body);
     } else {
-      response = await _client.put('$_base/$endpoint',
+      response = await _client.put(Uri.parse('$_base/$endpoint'),
           body: body, headers: {"Content-Type": 'application/json'});
     }
     return responseHandler(response);
@@ -96,7 +95,7 @@ class API extends Api {
     String token,
     String accountAddress,
     String identifier, {
-    String appName,
+    String? appName,
   }) async {
     Map<String, dynamic> resp = await _post(
       'v2/login/wallet/firebase/verify',
@@ -190,7 +189,7 @@ class API extends Api {
     }
   }
 
-  Future<dynamic> createWallet({String communityAddress}) async {
+  Future<dynamic> createWallet({String? communityAddress}) async {
     dynamic wallet = await getWallet();
     if (wallet != null && wallet["walletAddress"] != null) {
       print('Wallet already exists - wallet: $wallet');
@@ -213,7 +212,7 @@ class API extends Api {
 
   Future<dynamic> getWallet() async {
     Map<String, dynamic> resp = await _get('v2/wallets', private: true);
-    if (resp != null && resp["data"] != null) {
+    if (resp["data"] != null) {
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
         "accountAddress": resp["data"]["accountAddress"],
@@ -234,15 +233,15 @@ class API extends Api {
   }
 
   Future<List<dynamic>> getWalletTransactions(
-    String walletAddress, {
+    String walletAddress,
     String tokenAddress,
-  }) async {
+  ) async {
     String endpoint = 'v2/wallets/transactions/$walletAddress';
-    endpoint = tokenAddress != null
+    endpoint = tokenAddress.isNotEmpty
         ? '$endpoint?tokenAddress=$tokenAddress'
         : endpoint;
     Map<String, dynamic> resp = await _get(endpoint, private: true);
-    if (resp != null && resp["data"] != null) {
+    if (resp["data"] != null) {
       List<dynamic> transfers = [];
       for (dynamic transfer in resp['data']) {
         transfers.add({
@@ -274,7 +273,7 @@ class API extends Api {
     String walletAddress,
     String tokenAddress, {
     String sort = 'desc',
-    int startblock,
+    int? startblock = 0,
   }) async {
     Map<String, dynamic> resp = await _get(
       'v2/wallets/transfers/tokentx/$walletAddress?tokenAddress=$tokenAddress&sort=$sort&startblock=$startblock',
@@ -285,25 +284,25 @@ class API extends Api {
       final blockNumber = transferEvent['blockNumber'].runtimeType == int
           ? transferEvent['blockNumber']
           : num.tryParse(transferEvent['blockNumber'] ?? '0');
-      final bool isPending = transferEvent['status'] != null &&
-          transferEvent['status'] == 'pending';
-      final int timestamp = isPending
-          ? DateTime.now().millisecondsSinceEpoch
-          : DateTime.fromMillisecondsSinceEpoch(
-                  DateTime.fromMillisecondsSinceEpoch(
-                              int.tryParse(transferEvent['timeStamp']) ??
-                                  (DateTime.now().millisecondsSinceEpoch /
-                                      1000))
-                          .millisecondsSinceEpoch *
-                      1000)
-              .millisecondsSinceEpoch;
+      // final bool isPending = transferEvent['status'] != null &&
+      //     transferEvent['status'] == 'pending';
+      // final int timestamp = isPending
+      //     ? DateTime.now().millisecondsSinceEpoch
+      //     : DateTime.fromMillisecondsSinceEpoch(
+      //             DateTime.fromMillisecondsSinceEpoch(
+      //                         int.tryParse(transferEvent['timeStamp']) ??
+      //                             (DateTime.now().millisecondsSinceEpoch /
+      //                                 1000))
+      //                     .millisecondsSinceEpoch *
+      //                 1000)
+      //         .millisecondsSinceEpoch;
       transfers.add({
         'blockNumber': blockNumber,
         'txHash': transferEvent['hash'] ?? '',
         'to': transferEvent['to'] ?? '',
         'from': transferEvent["from"] ?? '',
         'status': transferEvent['status']?.toUpperCase(),
-        'timestamp': timestamp,
+        'timestamp': 0,
         'actionType': transferEvent['actionType'] ?? null,
         'value': transferEvent['value'] ?? '0',
         'tokenAddress': transferEvent['contractAddress'] ?? tokenAddress,
@@ -319,7 +318,7 @@ class API extends Api {
   Future<Map<String, dynamic>> getActionsByWalletAddress(
     String walletAddress, {
     int updatedAt = 0,
-    String tokenAddress,
+    String? tokenAddress,
   }) async {
     String url = 'v2/wallets/actions/$walletAddress?updatedAt=$updatedAt';
     url = tokenAddress != null ? '$url&tokenAddress=$tokenAddress' : url;
@@ -335,7 +334,7 @@ class API extends Api {
       'v2/jobs/$id',
       private: true,
     );
-    if (resp != null && resp["data"] != null) {
+    if (resp["data"] != null) {
       return resp["data"];
     } else {
       return null;
@@ -349,7 +348,7 @@ class API extends Api {
       'v2/wallets/$phoneNumber',
       private: true,
     );
-    if (resp != null && resp["data"] != null) {
+    if (resp["data"] != null) {
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
         "accountAddress": resp["data"]["accountAddress"],
@@ -387,7 +386,7 @@ class API extends Api {
   }
 
   Future<dynamic> backupWallet({
-    String communityAddress,
+    String? communityAddress,
     bool isFunderDeprecated = true,
   }) async {
     Map<String, dynamic> resp = await _post(
@@ -402,10 +401,10 @@ class API extends Api {
     Web3 web3,
     String walletAddress,
     String communityAddress, {
-    String tokenAddress,
+    String? tokenAddress,
     String network = 'fuse',
-    String originNetwork,
-    String communityName,
+    String? originNetwork,
+    String? communityName,
   }) async {
     Map<String, dynamic> data = await web3.joinCommunityOffChain(
       walletAddress,
@@ -429,7 +428,7 @@ class API extends Api {
     String receiverAddress,
     num amountInWei, {
     String network = "fuse",
-    Map transactionBody,
+    Map? transactionBody,
   }) async {
     Map<String, dynamic> data = await web3.transferOffChain(
       walletAddress,
@@ -474,7 +473,7 @@ class API extends Api {
     String walletAddress,
     String tokenAddress,
     num tokensAmount, {
-    String network,
+    String? network,
   }) async {
     Map<String, dynamic> data = await web3.approveTokenOffChain(
         walletAddress, tokenAddress, tokensAmount,
@@ -492,7 +491,7 @@ class API extends Api {
     String walletAddress,
     num tokensAmount,
     int tokenDecimals, {
-    String network,
+    String? network,
   }) async {
     Map<String, dynamic> data = await web3.transferDaiToDAIpOffChain(
       walletAddress,
@@ -514,7 +513,7 @@ class API extends Api {
     String contractAddress,
     num ethAmount,
     String data, {
-    String network,
+    String? network,
   }) async {
     Map<String, dynamic> signedData = await web3.callContractOffChain(
       walletAddress,
@@ -538,9 +537,9 @@ class API extends Api {
     String contractAddress,
     num tokensAmount,
     String data, {
-    String network,
-    Map transactionBody,
-    Map txMetadata,
+    String? network,
+    Map? transactionBody,
+    Map? txMetadata,
   }) async {
     Map<String, dynamic> signedData =
         await web3.approveTokenAndCallContractOffChain(
@@ -575,7 +574,7 @@ class API extends Api {
   Future<dynamic> getCommunityData(
     String communityAddress, {
     bool isRopsten = false,
-    String walletAddress,
+    String? walletAddress,
   }) async {
     String url = walletAddress != null
         ? 'v1/communities/$communityAddress/$walletAddress'
@@ -722,7 +721,7 @@ class API extends Api {
     String approvalContractAddress,
     String swapContractAddress,
     String swapData, {
-    String network,
+    String? network,
   }) async {
     Map<String, dynamic> signedApprovalData = await web3.approveTokenOffChain(
       walletAddress,
@@ -799,7 +798,7 @@ class API extends Api {
     String tokenToApprove,
     String walletAddress,
     num tokensAmount, {
-    String network,
+    String? network,
   }) async {
     List<dynamic> signData = await web3.sellToken(
       reserveContractAddress,
@@ -822,7 +821,7 @@ class API extends Api {
     String tokenToApprove,
     String walletAddress,
     num tokensAmount, {
-    String network,
+    String? network,
   }) async {
     List<dynamic> signData = await web3.buyToken(
       reserveContractAddress,
