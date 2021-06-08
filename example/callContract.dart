@@ -35,7 +35,7 @@ void main() async {
 
   String data = await web3.getEncodedDataForContractCall(
     'Community',
-    web3.getDefaultCommunity(),
+    web3.getDefaultCommunity()!,
     'join',
     []
   );
@@ -44,7 +44,7 @@ void main() async {
   dynamic result = await api.callContract(
     web3,
     walletAddress,
-    web3.getDefaultCommunity(),
+    web3.getDefaultCommunity()!,
     0,
     data
   );

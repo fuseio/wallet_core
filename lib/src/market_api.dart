@@ -8,16 +8,17 @@ import 'package:wallet_core/models/api.dart';
 const String MARKET_API_BASE_URL = 'https://api.coingecko.com/api/v3';
 
 class MarketApi extends Api {
-  String _base;
-  Client _client;
+  String? _base;
+  late Client _client;
 
   MarketApi({String marketBaseApi = MARKET_API_BASE_URL}) {
     _base = marketBaseApi;
     _client = new Client();
   }
 
-  Future<Map<String, dynamic>> _get(String endpoint) async {
-    Response response = await _client.get('$_base/$endpoint');
+  Future<Map<String, dynamic>?> _get(String endpoint) async {
+    Uri uri = Uri.parse('$_base/$endpoint');
+    Response response = await _client.get(uri);
     return responseHandler(response);
   }
 
@@ -26,7 +27,7 @@ class MarketApi extends Api {
       String contractAddresses, String vsCurrencies,
       {String networkId = 'ethereum'}) async {
     try {
-      Map<String, dynamic> response = await _get(
+      Map<String, dynamic>? response = await _get(
           'simple/token_price/$networkId?contract_addresses=$contractAddresses&vs_currencies=$vsCurrencies');
       return response;
     } catch (e) {
@@ -40,7 +41,7 @@ class MarketApi extends Api {
     String vsCurrencies,
   ) async {
     try {
-      Map<String, dynamic> response =
+      Map<String, dynamic>? response =
           await _get('/simple/price?ids=$ids&vs_currencies=$vsCurrencies');
       return response;
     } catch (e) {
@@ -52,7 +53,7 @@ class MarketApi extends Api {
   Future<dynamic> getCoinInfoByAddress(String contractAddress,
       {String networkId = 'ethereum'}) async {
     try {
-      Map<String, dynamic> response =
+      Map<String, dynamic>? response =
           await _get('/coins/$networkId/contract/$contractAddress');
       return response;
     } catch (e) {

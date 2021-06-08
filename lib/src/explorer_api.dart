@@ -6,22 +6,24 @@ import 'package:http/http.dart';
 import 'package:wallet_core/models/api.dart';
 
 class ExplorerApi extends Api {
-  String _base;
-  String _apiKey;
-  Client _client;
+  String? _base;
+  String? _apiKey;
+  late Client _client;
 
-  ExplorerApi({String base, String apiKey}) {
+  ExplorerApi({String? base, String? apiKey}) {
     _base = base;
     _apiKey = apiKey;
     _client = new Client();
   }
 
-  Future<Map<String, dynamic>> _get(String endpoint) async {
+  Future<Map<String, dynamic>?> _get(String endpoint) async {
     Response response;
     if ([null, ''].contains(_apiKey)) {
-      response = await _client.get('$_base$endpoint');
+    Uri uri = Uri.parse('$_base$endpoint');
+      response = await _client.get(uri);
     } else {
-      response = await _client.get('$_base$endpoint&apikey=$_apiKey');
+    Uri uri = Uri.parse('$_base$endpoint&apikey=$_apiKey');
+      response = await _client.get(uri);
     }
     return responseHandler(response);
   }
@@ -30,8 +32,8 @@ class ExplorerApi extends Api {
       String tokenAddress, String accountAddress,
       {String sort = 'desc', int startblock = 0}) async {
     try {
-      Map<String, dynamic> resp = await _get(
-          '?module=account&action=tokentx&contractaddress=$tokenAddress&address=$accountAddress&startblock=$startblock&sort=$sort');
+      Map<String, dynamic> resp = await (_get(
+          '?module=account&action=tokentx&contractaddress=$tokenAddress&address=$accountAddress&startblock=$startblock&sort=$sort') as FutureOr<Map<String, dynamic>>);
       if (resp['message'] == 'OK' && resp['status'] == '1') {
         List transfers = [];
         for (dynamic transferEvent in resp['result']) {
@@ -67,8 +69,8 @@ class ExplorerApi extends Api {
   Future<List<dynamic>> getTransferEventsByAccountAddress(String address,
       {String sort = 'desc', int startblock = 0}) async {
     try {
-      Map<String, dynamic> resp = await _get(
-          '?module=account&action=tokentx&address=$address&startblock=$startblock&sort=$sort');
+      Map<String, dynamic> resp = await (_get(
+          '?module=account&action=tokentx&address=$address&startblock=$startblock&sort=$sort') as FutureOr<Map<String, dynamic>>);
       if (resp['message'] == 'OK' && resp['status'] == '1') {
         List transfers = [];
         for (dynamic transferEvent in resp['result']) {
@@ -106,8 +108,8 @@ class ExplorerApi extends Api {
     String accountAddress,
   ) async {
     try {
-      Map<String, dynamic> resp = await _get(
-          '?module=account&action=tokenbalance&contractaddress=$tokenAddress&address=$accountAddress');
+      Map<String, dynamic> resp = await (_get(
+          '?module=account&action=tokenbalance&contractaddress=$tokenAddress&address=$accountAddress') as FutureOr<Map<String, dynamic>>);
       return BigInt.from(num.parse(resp['result']));
     } catch (e) {
       throw 'Error! Get token balance failed for - accountAddress: $accountAddress --- $e';
@@ -116,8 +118,8 @@ class ExplorerApi extends Api {
 
   Future<Map<String, dynamic>> getTokenInfo(String tokenAddress) async {
     try {
-      Map<String, dynamic> resp = await _get(
-          '?module=token&action=getToken&contractaddress=$tokenAddress');
+      Map<String, dynamic> resp = await (_get(
+          '?module=token&action=getToken&contractaddress=$tokenAddress') as FutureOr<Map<String, dynamic>>);
       if (resp['message'] == 'OK' && resp['status'] == '1') {
         return Map.from({
           ...resp['result'],
@@ -133,7 +135,7 @@ class ExplorerApi extends Api {
   Future<List<dynamic>> getListOfTokensByAddress(String address) async {
     try {
       Map<String, dynamic> resp =
-          await _get('?module=account&action=tokenlist&address=$address');
+          await (_get('?module=account&action=tokenlist&address=$address') as FutureOr<Map<String, dynamic>>);
       if (resp['message'] == 'OK' && resp['status'] == '1') {
         List tokens = [];
         for (dynamic token in resp['result']) {

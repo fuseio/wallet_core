@@ -14,7 +14,7 @@ void main() async {
   Web3 web3 = new Web3(approvalCallback);
 
   print('enter private key and press ENTER');
-  String privateKey = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+  String privateKey = stdin.readLineSync(encoding: Encoding.getByName('utf-8')!)!;
 
   // set web3 credentials with private key
   await web3.setCredentials(privateKey);
@@ -30,8 +30,8 @@ void main() async {
   dynamic tokenDetails = await web3.getTokenDetails(tokenAddress);
   print('token details: $tokenDetails');
 
-  String tokenName = tokenDetails["name"];
-  String tokenSymbol = tokenDetails["symbol"];
+  String? tokenName = tokenDetails["name"];
+  String? tokenSymbol = tokenDetails["symbol"];
   dynamic tokenDecimals = int.parse(tokenDetails["decimals"].toString());
   tokenDecimals = BigInt.from(pow(10, tokenDecimals));
 

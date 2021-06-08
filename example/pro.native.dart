@@ -15,7 +15,7 @@ void main() async {
   Web3 web3 = new Web3(approvalCallback);
 
   print('enter private key and press ENTER');
-  String privateKey = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+  String privateKey = stdin.readLineSync(encoding: Encoding.getByName('utf-8')!)!;
 
   // set web3 credentials with private key
   await web3.setCredentials(privateKey);
@@ -32,7 +32,7 @@ void main() async {
   // transfer 0.1 ETH to another address
   String receiverAddress = '0xF3a4C2862188781365966A040B1f47b9614b2DC7';
   num amount = 1e17;
-  String txHash = await web3.transfer(receiverAddress, amount);
+  String txHash = await web3.transfer(receiverAddress, amount as int);
   print('transction $txHash successful');
 
   // get balance after transfer
@@ -61,7 +61,7 @@ void main() async {
   // transfer 0.1 ETH to another address
   receiverAddress = '0xF3a4C2862188781365966A040B1f47b9614b2DC7';
   amount = 1e17;
-  txHash = await web3Ropsten.transfer(receiverAddress, amount);
+  txHash = await web3Ropsten.transfer(receiverAddress, amount as int);
   print('transction $txHash successful');
 
   // get balance after transfer
