@@ -39,7 +39,7 @@ class Graph {
     if (result.hasException) {
       throw 'Error! Get community request failed - communityAddress: $communityAddress';
     } else {
-      return result.data["communities"][0];
+      return result.data?["communities"][0];
     }
   }
 
@@ -53,7 +53,8 @@ class Graph {
     if (result.hasException) {
       throw 'Error! Get community businesses request failed - communityAddress: $communityAddress';
     } else {
-      return result.data["communities"][0]['entitiesList']['communityEntities'];
+      return result.data?["communities"][0]['entitiesList']
+          ['communityEntities'];
     }
   }
 
@@ -70,7 +71,7 @@ class Graph {
     if (result.hasException) {
       throw 'Error! Get home bridge token request failed - foreignTokenAddress: $foreignTokenAddress ${result.exception.toString()}';
     } else {
-      return result.data["bridgedTokens"][0];
+      return result.data?["bridgedTokens"][0];
     }
   }
 
@@ -86,7 +87,7 @@ class Graph {
     if (result.hasException) {
       throw 'Error! Is community member request failed - accountAddress: $accountAddress, entitiesListAddress: $entitiesListAddress';
     } else {
-      return result.data["communityEntities"].length > 0;
+      return result.data?["communityEntities"].length > 0;
     }
   }
 }

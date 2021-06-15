@@ -18,62 +18,45 @@ import '../utils/crypto.dart';
 import './abi.dart';
 
 class Web3 {
-  late final Web3Client _client;
-  late final Future<bool> _approveCb;
+  final Web3Client _client;
+  final Future<bool> _approveCb;
   late final Credentials _credentials;
-  late final int _networkId;
-  late final String _defaultCommunityContractAddress;
-  late final String _communityManagerContractAddress;
-  late final String _daiPointsManagerContractAddress;
-  late final String _transferManagerContractAddress;
-  late final int _defaultGasLimit;
-  Web3(
-    Future<bool> approveCb(), {
+  final int _networkId;
+  final String _defaultCommunityContractAddress;
+  final String _communityManagerContractAddress;
+  final String _daiPointsManagerContractAddress;
+  final String _transferManagerContractAddress;
+  final int _defaultGasLimit;
+
+  Web3({
+    required Future<bool> approveCb(),
     required String url,
     required int networkId,
     required String defaultCommunityAddress,
     required String communityManagerAddress,
     required String daiPointsManagerAddress,
     required String transferManagerAddress,
-    required int? defaultGasLimit,
-  })   : _client = new Web3Client(url, new Client()),
+    int defaultGasLimit = Variables.DEFAULT_GAS_LIMIT,
+  })  : _client = new Web3Client(url, new Client()),
         _approveCb = approveCb(),
         _networkId = networkId,
         _defaultCommunityContractAddress = defaultCommunityAddress,
         _communityManagerContractAddress = communityManagerAddress,
         _transferManagerContractAddress = transferManagerAddress,
         _daiPointsManagerContractAddress = daiPointsManagerAddress,
-        _defaultGasLimit = defaultGasLimit ?? Variables.DEFAULT_GAS_LIMIT;
+        _defaultGasLimit = defaultGasLimit;
 
-  // Web3(
-  //   Future<bool> approveCb(), {
-  //   String url,
-  //   int networkId,
-  //   String defaultCommunityAddress,
-  //   String communityManagerAddress,
-  //   String transferManagerAddress,
-  //   String daiPointsManagerAddress,
-  //   int defaultGasLimit = Variables.DEFAULT_GAS_LIMIT,
-  // }) {
-  //   _client = new Web3Client(url, new Client());
-  //   _approveCb = approveCb();
-  //   _networkId = networkId;
-  //   _defaultCommunityContractAddress = defaultCommunityAddress;
-  //   _communityManagerContractAddress = communityManagerAddress;
-  //   _transferManagerContractAddress = transferManagerAddress;
-  //   _daiPointsManagerContractAddress = daiPointsManagerAddress;
-  //   _defaultGasLimit = defaultGasLimit;
-  // }
-
-  static String generateMnemonic() {
-    return bip39.generateMnemonic();
+  static String generateMnemonic({int strength = 128}) {
+    return bip39.generateMnemonic(
+      strength: strength,
+    );
   }
 
   static String privateKeyFromMnemonic(String mnemonic, {int childIndex = 0}) {
     String seed = bip39.mnemonicToSeedHex(mnemonic);
     bip32.BIP32 root = bip32.BIP32.fromSeed(HEX.decode(seed) as Uint8List);
     bip32.BIP32 child = root.derivePath("m/44'/60'/0'/0/$childIndex");
-    String privateKey = HEX.encode(child.privateKey);
+    String privateKey = HEX.encode(child.privateKey!);
     return privateKey;
   }
 

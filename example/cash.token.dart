@@ -11,17 +11,26 @@
 
 // void main() async {
 //   // init web3 module
-//   Web3 web3 = new Web3(approvalCallback);
+//   Web3 web3 = new Web3(
+//     approveCb: approvalCallback,
+//     networkId: 122,
+//     url: 'https://rpc.fuse.io',
+//     defaultCommunityAddress: 'DEFAULT_COMMUNITY_ADDRESS',
+//     communityManagerAddress: 'COMMUNITY_MANAGER_ADDRESS',
+//     transferManagerAddress: 'TRANSFER_MANAGER_ADDRESS',
+//     daiPointsManagerAddress: 'DAI_POINTS_MANAGER_ADDRESS',
+//   );
 
 //   print('enter private key and press ENTER');
-//   String privateKey = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+//   String? privateKey =
+//       stdin.readLineSync(encoding: Encoding.getByName('utf-8')!);
 
 //   // set web3 credentials with private key
-//   await web3.setCredentials(privateKey);
+//   await web3.setCredentials(privateKey!);
 
 //   print('enter wallet address and press ENTER');
-//   String walletAddress =
-//       stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+//   String? walletAddress =
+//       stdin.readLineSync(encoding: Encoding.getByName('utf-8')!);
 
 //   String tokenAddress = '0x0F99E2090D1511e0f2474A56141D9fAB952C19e2';
 //   String receiverAddress = '0xF3a4C2862188781365966A040B1f47b9614b2DC7';
@@ -36,11 +45,11 @@
 //   tokenDecimals = BigInt.from(pow(10, tokenDecimals));
 
 //   // init graph module
-//   Graph graph = new Graph();
+//   Graph graph = new Graph('https://graph.fuse.io/subgraphs/name/fuseio');
 
 //   // get own token balance before transfer
-//   // dynamic tokenBalance =
-//   //     await graph.getTokenBalance(walletAddress, tokenAddress);
+//   dynamic tokenBalance =
+//       await graph.getTokenBalance(walletAddress, tokenAddress);
 //   tokenBalance = (tokenBalance / tokenDecimals).toStringAsFixed(2);
 //   print(
 //       '$walletAddress has $tokenBalance $tokenName($tokenSymbol) tokens before transfer');

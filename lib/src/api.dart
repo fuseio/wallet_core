@@ -18,9 +18,7 @@ class API extends Api {
 
   API(
     String base,
-    String jwtToken,
   )   : _base = base,
-        _jwtToken = jwtToken,
         _client = Client();
 
   void setJwtToken(String jwtToken) {
@@ -267,52 +265,6 @@ class API extends Api {
     } else {
       return [];
     }
-  }
-
-  Future<List<dynamic>> fetchTokenTxByAddress(
-    String walletAddress,
-    String tokenAddress, {
-    String sort = 'desc',
-    int? startblock = 0,
-  }) async {
-    Map<String, dynamic> resp = await _get(
-      'v2/wallets/transfers/tokentx/$walletAddress?tokenAddress=$tokenAddress&sort=$sort&startblock=$startblock',
-      private: true,
-    );
-    List<dynamic> transfers = [];
-    for (dynamic transferEvent in resp['data']) {
-      final blockNumber = transferEvent['blockNumber'].runtimeType == int
-          ? transferEvent['blockNumber']
-          : num.tryParse(transferEvent['blockNumber'] ?? '0');
-      // final bool isPending = transferEvent['status'] != null &&
-      //     transferEvent['status'] == 'pending';
-      // final int timestamp = isPending
-      //     ? DateTime.now().millisecondsSinceEpoch
-      //     : DateTime.fromMillisecondsSinceEpoch(
-      //             DateTime.fromMillisecondsSinceEpoch(
-      //                         int.tryParse(transferEvent['timeStamp']) ??
-      //                             (DateTime.now().millisecondsSinceEpoch /
-      //                                 1000))
-      //                     .millisecondsSinceEpoch *
-      //                 1000)
-      //         .millisecondsSinceEpoch;
-      transfers.add({
-        'blockNumber': blockNumber,
-        'txHash': transferEvent['hash'] ?? '',
-        'to': transferEvent['to'] ?? '',
-        'from': transferEvent["from"] ?? '',
-        'status': transferEvent['status']?.toUpperCase(),
-        'timestamp': 0,
-        'actionType': transferEvent['actionType'] ?? null,
-        'value': transferEvent['value'] ?? '0',
-        'tokenAddress': transferEvent['contractAddress'] ?? tokenAddress,
-        'type': transferEvent["from"].toString().toLowerCase() ==
-                walletAddress.toLowerCase()
-            ? 'SEND'
-            : 'RECEIVE',
-      });
-    }
-    return transfers;
   }
 
   Future<Map<String, dynamic>> getActionsByWalletAddress(
@@ -618,8 +570,10 @@ class API extends Api {
   }
 
   Future<dynamic> ackSync(int nonce) async {
-    Map<String, dynamic> resp =
-        await _post('v2/contacts/$nonce', private: true);
+    Map<String, dynamic> resp = await _post(
+      'v2/contacts/$nonce',
+      private: true,
+    );
     return resp;
   }
 
