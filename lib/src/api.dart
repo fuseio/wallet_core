@@ -27,15 +27,19 @@ class API extends Api {
 
   Future<Map<String, dynamic>> _get(
     String endpoint, {
-    bool? private,
+    bool private = true,
     bool isRopsten = false,
   }) async {
     print('GET $endpoint');
     Response response;
     String uri = isRopsten ? toRopsten(_base) : _base;
-    if (private != null && private) {
-      response = await _client.get(Uri.parse('$uri/$endpoint'),
-          headers: {"Authorization": "Bearer $_jwtToken"});
+    if (private) {
+      response = await _client.get(
+        Uri.parse('$uri/$endpoint'),
+        headers: {
+          "Authorization": "Bearer $_jwtToken",
+        },
+      );
     } else {
       response = await _client.get(Uri.parse('$uri/$endpoint'));
     }
@@ -45,23 +49,28 @@ class API extends Api {
   Future<Map<String, dynamic>> _post(
     String endpoint, {
     dynamic body,
-    bool? private,
+    bool private = true,
     bool isRopsten = false,
   }) async {
     print('POST $endpoint $body');
     Response response;
     body = body == null ? body : json.encode(body);
     String uri = isRopsten ? toRopsten(_base) : _base;
-    if (private != null && private) {
-      response = await _client.post(Uri.parse('$uri/$endpoint'),
-          headers: {
-            "Authorization": "Bearer $_jwtToken",
-            "Content-Type": 'application/json'
-          },
-          body: body);
+    if (private) {
+      response = await _client.post(
+        Uri.parse('$uri/$endpoint'),
+        body: body,
+        headers: {
+          "Authorization": "Bearer $_jwtToken",
+          "Content-Type": 'application/json'
+        },
+      );
     } else {
-      response = await _client.post(Uri.parse('$uri/$endpoint'),
-          body: body, headers: {"Content-Type": 'application/json'});
+      response = await _client.post(
+        Uri.parse('$uri/$endpoint'),
+        body: body,
+        headers: {"Content-Type": 'application/json'},
+      );
     }
     return responseHandler(response);
   }
@@ -75,15 +84,22 @@ class API extends Api {
     Response response;
     body = body == null ? body : json.encode(body);
     if (private != null && private) {
-      response = await _client.put(Uri.parse('$_base/$endpoint'),
-          headers: {
-            "Authorization": "Bearer $_jwtToken",
-            "Content-Type": 'application/json'
-          },
-          body: body);
+      response = await _client.put(
+        Uri.parse('$_base/$endpoint'),
+        body: body,
+        headers: {
+          "Authorization": "Bearer $_jwtToken",
+          "Content-Type": 'application/json'
+        },
+      );
     } else {
-      response = await _client.put(Uri.parse('$_base/$endpoint'),
-          body: body, headers: {"Content-Type": 'application/json'});
+      response = await _client.put(
+        Uri.parse('$_base/$endpoint'),
+        body: body,
+        headers: {
+          "Content-Type": 'application/json',
+        },
+      );
     }
     return responseHandler(response);
   }
@@ -179,7 +195,9 @@ class API extends Api {
   Future<dynamic> createWalletOnForeign({bool force = false}) async {
     String endpoint = 'v2/wallets/foreign';
     endpoint = force ? '$endpoint?force=true' : endpoint;
-    Map<String, dynamic> resp = await _post(endpoint, private: true);
+    Map<String, dynamic> resp = await _post(
+      endpoint,
+    );
     if (resp["job"] != null) {
       return resp;
     } else {
@@ -198,7 +216,6 @@ class API extends Api {
         : null;
     Map<String, dynamic> resp = await _post(
       'v2/wallets',
-      private: true,
       body: body,
     );
     if (resp["job"] != null) {
@@ -209,7 +226,7 @@ class API extends Api {
   }
 
   Future<dynamic> getWallet() async {
-    Map<String, dynamic> resp = await _get('v2/wallets', private: true);
+    Map<String, dynamic> resp = await _get('v2/wallets');
     if (resp["data"] != null) {
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
@@ -222,7 +239,7 @@ class API extends Api {
         "dAIPointsManager":
             resp['data']['walletModules']['DAIPointsManager'] ?? null,
         "networks": resp['data']['networks'],
-        "backup": resp['backup'],
+        "backup": resp["data"]['backup'],
         "balancesOnForeign": resp['data']['balancesOnForeign']
       };
     } else {
@@ -238,7 +255,9 @@ class API extends Api {
     endpoint = tokenAddress.isNotEmpty
         ? '$endpoint?tokenAddress=$tokenAddress'
         : endpoint;
-    Map<String, dynamic> resp = await _get(endpoint, private: true);
+    Map<String, dynamic> resp = await _get(
+      endpoint,
+    );
     if (resp["data"] != null) {
       List<dynamic> transfers = [];
       for (dynamic transfer in resp['data']) {
@@ -276,7 +295,6 @@ class API extends Api {
     url = tokenAddress != null ? '$url&tokenAddress=$tokenAddress' : url;
     Map<String, dynamic> resp = await _get(
       url,
-      private: true,
     );
     return resp['data'];
   }
@@ -284,7 +302,6 @@ class API extends Api {
   Future<dynamic> getJob(String id) async {
     Map<String, dynamic> resp = await _get(
       'v2/jobs/$id',
-      private: true,
     );
     if (resp["data"] != null) {
       return resp["data"];
@@ -298,7 +315,6 @@ class API extends Api {
   ) async {
     Map<String, dynamic> resp = await _get(
       'v2/wallets/$phoneNumber',
-      private: true,
     );
     if (resp["data"] != null) {
       return {
@@ -320,7 +336,6 @@ class API extends Api {
     Map<String, dynamic> resp = await _put(
       'v2/wallets/token/$walletAddress',
       body: {"firebaseToken": firebaseToken},
-      private: true,
     );
     return resp;
   }
@@ -332,7 +347,6 @@ class API extends Api {
     Map<String, dynamic> resp = await _put(
       'v2/wallets/token/$walletAddress/delete',
       body: {"firebaseToken": firebaseToken},
-      private: true,
     );
     return resp;
   }
@@ -344,7 +358,6 @@ class API extends Api {
     Map<String, dynamic> resp = await _post(
       'v2/wallets/backup',
       body: {"communityAddress": communityAddress},
-      private: true,
     );
     return resp;
   }
@@ -368,7 +381,6 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
-      private: true,
       body: data,
     );
     return resp;
@@ -391,7 +403,6 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
-      private: true,
       body: data,
     );
     return resp;
@@ -414,7 +425,6 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
-      private: true,
       body: data,
     );
     return resp;
@@ -432,7 +442,6 @@ class API extends Api {
         network: network);
     Map<String, dynamic> resp = await _post(
       'v2/relay',
-      private: true,
       body: data,
     );
     return resp;
@@ -453,7 +462,6 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
-      private: true,
       body: data,
     );
     return resp;
@@ -476,7 +484,6 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
-      private: true,
       body: signedData,
     );
     return resp;
@@ -506,7 +513,6 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
-      private: true,
       body: signedData,
     );
     return resp;
@@ -517,7 +523,6 @@ class API extends Api {
   ) async {
     Map<String, dynamic> resp = await _post(
       'v2/relay/multi',
-      private: true,
       body: {'items': items},
     );
     return resp;
@@ -564,7 +569,6 @@ class API extends Api {
     Map<String, dynamic> resp = await _post(
       'v2/contacts',
       body: {"contacts": phoneNumbers},
-      private: true,
     );
     return resp["data"];
   }
@@ -572,7 +576,6 @@ class API extends Api {
   Future<dynamic> ackSync(int nonce) async {
     Map<String, dynamic> resp = await _post(
       'v2/contacts/$nonce',
-      private: true,
     );
     return resp;
   }
@@ -594,7 +597,6 @@ class API extends Api {
         "symbol": symbol,
         'isFunderDeprecated': isFunderDeprecated,
       },
-      private: true,
     );
     return resp;
   }
@@ -615,7 +617,6 @@ class API extends Api {
     Map<String, dynamic> resp = await _put(
       'v2/users/$accountAddress/avatar',
       body: {"avatarHash": avatarHash},
-      private: true,
     );
     return resp;
   }
@@ -627,7 +628,6 @@ class API extends Api {
     Map<String, dynamic> resp = await _put(
       'v2/users/$accountAddress/name',
       body: {"displayName": displayName},
-      private: true,
     );
     return resp;
   }

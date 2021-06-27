@@ -73,7 +73,8 @@ class Web3 {
   }
 
   Future<String> _sendTransactionAndWaitForReceipt(
-      Transaction transaction) async {
+    Transaction transaction,
+  ) async {
     print('sendTransactionAndWaitForReceipt');
     String txHash = await _client.sendTransaction(_credentials, transaction,
         chainId: _networkId);
@@ -112,7 +113,10 @@ class Web3 {
     return await _client.getBalance(a);
   }
 
-  Future<String> transfer(String receiverAddress, int amountInWei) async {
+  Future<String> transfer(
+    String receiverAddress,
+    int amountInWei,
+  ) async {
     print('transfer --> receiver: $receiverAddress, amountInWei: $amountInWei');
 
     bool isApproved = await _approveCb;
@@ -479,11 +483,17 @@ class Web3 {
     BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
 
     String nonce = await getNonceForRelay();
-    DeployedContract contract =
-        await _contract('TransferManager', _transferManagerContractAddress);
-    Uint8List data = contract
-        .function('transferToken')
-        .encodeCall([wallet, token, receiver, amount, hexToBytes('0x')]);
+    DeployedContract contract = await _contract(
+      'TransferManager',
+      _transferManagerContractAddress,
+    );
+    Uint8List data = contract.function('transferToken').encodeCall([
+      wallet,
+      token,
+      receiver,
+      amount,
+      hexToBytes('0x'),
+    ]);
     String encodedData = '0x' + HEX.encode(data);
 
     String signature = await signOffChain(
@@ -517,6 +527,7 @@ class Web3 {
         'type': 'SEND',
         'tokenName': tokenDetails['name'],
         'tokenDecimal': tokenDecimals,
+        'tokenSymbol': tokenSymbol,
       }
     };
   }
@@ -687,8 +698,12 @@ class Web3 {
     };
   }
 
-  Future<String> getEncodedDataForContractCall(String contractName,
-      String contractAddress, String methodName, List params) async {
+  Future<String> getEncodedDataForContractCall(
+    String contractName,
+    String contractAddress,
+    String methodName,
+    List params,
+  ) async {
     DeployedContract contract = await _contract(contractName, contractAddress);
     Uint8List data = contract.function(methodName).encodeCall(params);
     String encodedData = HEX.encode(data);
