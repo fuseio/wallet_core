@@ -340,6 +340,16 @@ class API extends Api {
     return resp;
   }
 
+  Future<dynamic> addUserContext(
+    Map<dynamic, dynamic> body,
+  ) async {
+    Map<String, dynamic> resp = await _put(
+      'v2/wallets/context',
+      body: body,
+    );
+    return resp;
+  }
+
   Future<dynamic> deleteFirebaseToken(
     String walletAddress,
     String firebaseToken,
