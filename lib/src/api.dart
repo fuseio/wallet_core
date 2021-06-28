@@ -27,7 +27,7 @@ class API extends Api {
 
   Future<Map<String, dynamic>> _get(
     String endpoint, {
-    bool private = true,
+    bool private = false,
     bool isRopsten = false,
   }) async {
     print('GET $endpoint');
@@ -49,7 +49,7 @@ class API extends Api {
   Future<Map<String, dynamic>> _post(
     String endpoint, {
     dynamic body,
-    bool private = true,
+    bool private = false,
     bool isRopsten = false,
   }) async {
     print('POST $endpoint $body');
@@ -69,7 +69,9 @@ class API extends Api {
       response = await _client.post(
         Uri.parse('$uri/$endpoint'),
         body: body,
-        headers: {"Content-Type": 'application/json'},
+        headers: {
+          "Content-Type": 'application/json',
+        },
       );
     }
     return responseHandler(response);
@@ -192,19 +194,6 @@ class API extends Api {
     }
   }
 
-  Future<dynamic> createWalletOnForeign({bool force = false}) async {
-    String endpoint = 'v2/wallets/foreign';
-    endpoint = force ? '$endpoint?force=true' : endpoint;
-    Map<String, dynamic> resp = await _post(
-      endpoint,
-    );
-    if (resp["job"] != null) {
-      return resp;
-    } else {
-      throw 'Error! Create foreign wallet request failed - accountAddress: $_accountAddress, phoneNumber: $_phoneNumber';
-    }
-  }
-
   Future<dynamic> createWallet({String? communityAddress}) async {
     dynamic wallet = await getWallet();
     if (wallet != null && wallet["walletAddress"] != null) {
@@ -217,6 +206,7 @@ class API extends Api {
     Map<String, dynamic> resp = await _post(
       'v2/wallets',
       body: body,
+      private: true,
     );
     if (resp["job"] != null) {
       return resp;
@@ -226,7 +216,10 @@ class API extends Api {
   }
 
   Future<dynamic> getWallet() async {
-    Map<String, dynamic> resp = await _get('v2/wallets');
+    Map<String, dynamic> resp = await _get(
+      'v2/wallets',
+      private: true,
+    );
     if (resp["data"] != null) {
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
@@ -247,45 +240,6 @@ class API extends Api {
     }
   }
 
-  Future<List<dynamic>> getWalletTransactions(
-    String walletAddress,
-    String tokenAddress,
-  ) async {
-    String endpoint = 'v2/wallets/transactions/$walletAddress';
-    endpoint = tokenAddress.isNotEmpty
-        ? '$endpoint?tokenAddress=$tokenAddress'
-        : endpoint;
-    Map<String, dynamic> resp = await _get(
-      endpoint,
-    );
-    if (resp["data"] != null) {
-      List<dynamic> transfers = [];
-      for (dynamic transfer in resp['data']) {
-        transfers.add({
-          "from": transfer['from'],
-          "isSwap": transfer['isSwap'],
-          "to": transfer['to'],
-          "tokenAddress": transfer["tokenAddress"],
-          "txHash": transfer["hash"],
-          "value": transfer['value'],
-          "timestamp": DateTime.fromMillisecondsSinceEpoch(
-                  DateTime.parse(transfer['timeStamp']).millisecondsSinceEpoch)
-              .millisecondsSinceEpoch,
-          "status": transfer['status']?.toUpperCase(),
-          'blockNumber':
-              transfer['blockNumber'] != null ? transfer['blockNumber'] : null,
-          "type": transfer["from"].toString().toLowerCase() ==
-                  walletAddress.toLowerCase()
-              ? 'SEND'
-              : 'RECEIVE',
-        });
-      }
-      return transfers;
-    } else {
-      return [];
-    }
-  }
-
   Future<Map<String, dynamic>> getActionsByWalletAddress(
     String walletAddress, {
     int updatedAt = 0,
@@ -295,6 +249,7 @@ class API extends Api {
     url = tokenAddress != null ? '$url&tokenAddress=$tokenAddress' : url;
     Map<String, dynamic> resp = await _get(
       url,
+      private: true,
     );
     return resp['data'];
   }
@@ -302,6 +257,7 @@ class API extends Api {
   Future<dynamic> getJob(String id) async {
     Map<String, dynamic> resp = await _get(
       'v2/jobs/$id',
+      private: true,
     );
     if (resp["data"] != null) {
       return resp["data"];
@@ -315,6 +271,7 @@ class API extends Api {
   ) async {
     Map<String, dynamic> resp = await _get(
       'v2/wallets/$phoneNumber',
+      private: true,
     );
     if (resp["data"] != null) {
       return {
@@ -336,6 +293,7 @@ class API extends Api {
     Map<String, dynamic> resp = await _put(
       'v2/wallets/token/$walletAddress',
       body: {"firebaseToken": firebaseToken},
+      private: true,
     );
     return resp;
   }
@@ -357,6 +315,7 @@ class API extends Api {
     Map<String, dynamic> resp = await _put(
       'v2/wallets/token/$walletAddress/delete',
       body: {"firebaseToken": firebaseToken},
+      private: true,
     );
     return resp;
   }
@@ -368,6 +327,7 @@ class API extends Api {
     Map<String, dynamic> resp = await _post(
       'v2/wallets/backup',
       body: {"communityAddress": communityAddress},
+      private: true,
     );
     return resp;
   }
@@ -391,6 +351,7 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
+      private: true,
       body: data,
     );
     return resp;
@@ -413,6 +374,7 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
+      private: true,
       body: data,
     );
     return resp;
@@ -435,6 +397,7 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
+      private: true,
       body: data,
     );
     return resp;
@@ -452,6 +415,7 @@ class API extends Api {
         network: network);
     Map<String, dynamic> resp = await _post(
       'v2/relay',
+      private: true,
       body: data,
     );
     return resp;
@@ -472,6 +436,7 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
+      private: true,
       body: data,
     );
     return resp;
@@ -494,6 +459,7 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
+      private: true,
       body: signedData,
     );
     return resp;
@@ -523,6 +489,7 @@ class API extends Api {
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
+      private: true,
       body: signedData,
     );
     return resp;
@@ -533,6 +500,7 @@ class API extends Api {
   ) async {
     Map<String, dynamic> resp = await _post(
       'v2/relay/multi',
+      private: true,
       body: {'items': items},
     );
     return resp;
@@ -548,7 +516,6 @@ class API extends Api {
         : 'v1/communities/$communityAddress';
     Map<String, dynamic> resp = await _get(
       url,
-      private: false,
       isRopsten: isRopsten,
     );
     return resp['data'];
@@ -579,6 +546,7 @@ class API extends Api {
     Map<String, dynamic> resp = await _post(
       'v2/contacts',
       body: {"contacts": phoneNumbers},
+      private: true,
     );
     return resp["data"];
   }
@@ -586,6 +554,7 @@ class API extends Api {
   Future<dynamic> ackSync(int nonce) async {
     Map<String, dynamic> resp = await _post(
       'v2/contacts/$nonce',
+      private: true,
     );
     return resp;
   }
@@ -600,6 +569,7 @@ class API extends Api {
   }) async {
     Map<String, dynamic> resp = await _post(
       'v2/wallets/invite/$phoneNumber',
+      private: true,
       body: {
         "communityAddress": communityAddress,
         "name": name,
@@ -615,7 +585,6 @@ class API extends Api {
     Map<String, dynamic> resp = await _post(
       'v2/users',
       body: body,
-      private: false,
     );
     return resp;
   }
@@ -627,6 +596,7 @@ class API extends Api {
     Map<String, dynamic> resp = await _put(
       'v2/users/$accountAddress/avatar',
       body: {"avatarHash": avatarHash},
+      private: true,
     );
     return resp;
   }
@@ -638,6 +608,7 @@ class API extends Api {
     Map<String, dynamic> resp = await _put(
       'v2/users/$accountAddress/name',
       body: {"displayName": displayName},
+      private: true,
     );
     return resp;
   }
@@ -656,56 +627,12 @@ class API extends Api {
     return responseHandler(response);
   }
 
-  Future<dynamic> createProfile(
-    String communityAddress,
-    Map publicData,
-  ) async {
-    Map<String, dynamic> resp = await _put(
-      'v1/profiles/$communityAddress',
-      body: {"publicData": publicData},
-      private: false,
-    );
-    return resp;
-  }
-
   Future<dynamic> fetchMetadata(String uri, {bool isRopsten = false}) async {
     Map<String, dynamic> resp = await _get(
       'v1/metadata/$uri',
-      private: false,
       isRopsten: isRopsten,
     );
     return resp['data'];
-  }
-
-  Future<dynamic> totleSwap(
-    Web3 web3,
-    String walletAddress,
-    String tokenAddress,
-    num tokensAmount,
-    String approvalContractAddress,
-    String swapContractAddress,
-    String swapData, {
-    String? network,
-  }) async {
-    Map<String, dynamic> signedApprovalData = await web3.approveTokenOffChain(
-      walletAddress,
-      tokenAddress,
-      tokensAmount,
-      spenderContract: approvalContractAddress,
-      network: network,
-    );
-    Map<String, dynamic> signedSwapData = await web3.callContractOffChain(
-      walletAddress,
-      swapContractAddress,
-      0,
-      swapData.replaceFirst('0x', ''),
-      network: network,
-    );
-    Map<String, dynamic> resp = await multiRelay([
-      signedApprovalData,
-      signedSwapData,
-    ]);
-    return resp;
   }
 
   Future<dynamic> transferTokenToHomeWithAMBBridge(
@@ -747,52 +674,6 @@ class API extends Api {
       tokensAmount,
       tokenDecimals,
       network: network,
-    );
-    Map<String, dynamic> resp = await multiRelay(
-      signData,
-    );
-    return resp;
-  }
-
-  // SEEDBED CONTRACTS
-  Future<dynamic> sellToken(
-    String reserveContractAddress,
-    String daiTokenAddress,
-    Web3 web3,
-    String tokenToApprove,
-    String walletAddress,
-    num tokensAmount, {
-    String? network,
-  }) async {
-    List<dynamic> signData = await web3.sellToken(
-      reserveContractAddress,
-      daiTokenAddress,
-      tokenToApprove,
-      walletAddress,
-      tokensAmount,
-    );
-    Map<String, dynamic> resp = await multiRelay(
-      signData,
-    );
-    return resp;
-  }
-
-  // SEEDBED CONTRACTS
-  Future<dynamic> buyToken(
-    String reserveContractAddress,
-    String daiTokenAddress,
-    Web3 web3,
-    String tokenToApprove,
-    String walletAddress,
-    num tokensAmount, {
-    String? network,
-  }) async {
-    List<dynamic> signData = await web3.buyToken(
-      reserveContractAddress,
-      daiTokenAddress,
-      tokenToApprove,
-      walletAddress,
-      tokensAmount,
     );
     Map<String, dynamic> resp = await multiRelay(
       signData,
