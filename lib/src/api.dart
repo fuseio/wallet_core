@@ -27,13 +27,13 @@ class API extends Api {
 
   Future<Map<String, dynamic>> _get(
     String endpoint, {
-    bool private = false,
+    bool? private,
     bool isRopsten = false,
   }) async {
     print('GET $endpoint');
     Response response;
     String uri = isRopsten ? toRopsten(_base) : _base;
-    if (private) {
+    if (private != null && private) {
       response = await _client.get(
         Uri.parse('$uri/$endpoint'),
         headers: {
@@ -49,14 +49,14 @@ class API extends Api {
   Future<Map<String, dynamic>> _post(
     String endpoint, {
     dynamic body,
-    bool private = false,
+    bool? private,
     bool isRopsten = false,
   }) async {
     print('POST $endpoint $body');
     Response response;
     body = body == null ? body : json.encode(body);
     String uri = isRopsten ? toRopsten(_base) : _base;
-    if (private) {
+    if (private != null && private) {
       response = await _client.post(
         Uri.parse('$uri/$endpoint'),
         body: body,
@@ -205,8 +205,8 @@ class API extends Api {
         : null;
     Map<String, dynamic> resp = await _post(
       'v2/wallets',
-      body: body,
       private: true,
+      body: body,
     );
     if (resp["job"] != null) {
       return resp;
@@ -216,10 +216,7 @@ class API extends Api {
   }
 
   Future<dynamic> getWallet() async {
-    Map<String, dynamic> resp = await _get(
-      'v2/wallets',
-      private: true,
-    );
+    Map<String, dynamic> resp = await _get('v2/wallets', private: true);
     if (resp["data"] != null) {
       return {
         "phoneNumber": resp["data"]["phoneNumber"],
@@ -516,6 +513,7 @@ class API extends Api {
         : 'v1/communities/$communityAddress';
     Map<String, dynamic> resp = await _get(
       url,
+      private: false,
       isRopsten: isRopsten,
     );
     return resp['data'];
@@ -569,7 +567,6 @@ class API extends Api {
   }) async {
     Map<String, dynamic> resp = await _post(
       'v2/wallets/invite/$phoneNumber',
-      private: true,
       body: {
         "communityAddress": communityAddress,
         "name": name,
@@ -577,6 +574,7 @@ class API extends Api {
         "symbol": symbol,
         'isFunderDeprecated': isFunderDeprecated,
       },
+      private: true,
     );
     return resp;
   }
@@ -585,6 +583,7 @@ class API extends Api {
     Map<String, dynamic> resp = await _post(
       'v2/users',
       body: body,
+      private: false,
     );
     return resp;
   }
@@ -630,6 +629,7 @@ class API extends Api {
   Future<dynamic> fetchMetadata(String uri, {bool isRopsten = false}) async {
     Map<String, dynamic> resp = await _get(
       'v1/metadata/$uri',
+      private: false,
       isRopsten: isRopsten,
     );
     return resp['data'];
