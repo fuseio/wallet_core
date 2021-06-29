@@ -301,6 +301,7 @@ class API extends Api {
     Map<String, dynamic> resp = await _put(
       'v2/wallets/context',
       body: body,
+      private: true,
     );
     return resp;
   }
