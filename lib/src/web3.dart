@@ -52,6 +52,10 @@ class Web3 {
     );
   }
 
+  static bool validateMnemonic(String mnemonic) {
+    return bip39.validateMnemonic(mnemonic);
+  }
+
   static String privateKeyFromMnemonic(String mnemonic, {int childIndex = 0}) {
     String seed = bip39.mnemonicToSeedHex(mnemonic);
     bip32.BIP32 root = bip32.BIP32.fromSeed(HEX.decode(seed) as Uint8List);
@@ -471,6 +475,7 @@ class Web3 {
     String receiverAddress,
     num tokensAmount, {
     String? network,
+    String? externalId,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
@@ -517,6 +522,7 @@ class Web3 {
       "gasLimit": _defaultGasLimit,
       "signature": signature,
       "walletModule": "TransferManager",
+      "externalId": externalId,
       "transactionBody": {
         "tokenAddress": tokenAddress,
         "from": walletAddress,
@@ -528,7 +534,7 @@ class Web3 {
         'tokenName': tokenDetails['name'],
         'tokenDecimal': tokenDecimals,
         'tokenSymbol': tokenSymbol,
-      }
+      },
     };
   }
 

@@ -385,6 +385,7 @@ class API extends Api {
     String receiverAddress,
     num tokensAmount, {
     String network = 'fuse',
+    String? externalId,
   }) async {
     Map<String, dynamic> data = await web3.transferTokenOffChain(
       walletAddress,
@@ -392,6 +393,7 @@ class API extends Api {
       receiverAddress,
       tokensAmount,
       network: network,
+      externalId: externalId,
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',

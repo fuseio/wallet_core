@@ -37,7 +37,7 @@ class Graph {
       },
     ));
     if (result.hasException) {
-      throw 'Error! Get community request failed - communityAddress: $communityAddress';
+      throw 'Error! Get community request failed - communityAddress: $communityAddress ${result.exception.toString()}';
     } else {
       return result.data?["communities"][0];
     }
@@ -51,7 +51,7 @@ class Graph {
       },
     ));
     if (result.hasException) {
-      throw 'Error! Get community businesses request failed - communityAddress: $communityAddress';
+      throw 'Error! Get community businesses request failed - communityAddress: $communityAddress ${result.exception.toString()}';
     } else {
       return result.data?["communities"][0]['entitiesList']
           ['communityEntities'];
@@ -59,7 +59,9 @@ class Graph {
   }
 
   Future<dynamic> getHomeBridgedToken(
-      String foreignTokenAddress, bool isRopsten) async {
+    String foreignTokenAddress,
+    bool isRopsten,
+  ) async {
     GraphQLClient client =
         isRopsten ? _clientFuseRopstenBridge : _clientFuseMainnetBridge;
     QueryResult result = await client.query(QueryOptions(
@@ -76,7 +78,9 @@ class Graph {
   }
 
   Future<bool> isCommunityMember(
-      String accountAddress, String entitiesListAddress) async {
+    String accountAddress,
+    String entitiesListAddress,
+  ) async {
     QueryResult result = await _clientFuseEntities.query(QueryOptions(
       document: gql(isCommunityMemberQuery),
       variables: <String, dynamic>{
@@ -85,7 +89,7 @@ class Graph {
       },
     ));
     if (result.hasException) {
-      throw 'Error! Is community member request failed - accountAddress: $accountAddress, entitiesListAddress: $entitiesListAddress';
+      throw 'Error! Is community member request failed - accountAddress: $accountAddress, entitiesListAddress: $entitiesListAddress ${result.exception.toString()}';
     } else {
       return result.data?["communityEntities"].length > 0;
     }
