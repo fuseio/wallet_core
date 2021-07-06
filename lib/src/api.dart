@@ -153,6 +153,7 @@ class API extends Api {
     String verificationCode,
     String phoneNumber,
     String accountAddress,
+    String appName,
   ) async {
     Map<String, dynamic> resp = await _post(
       'v2/login/wallet/sms/verify',
@@ -160,6 +161,7 @@ class API extends Api {
         "code": verificationCode,
         "phoneNumber": phoneNumber,
         "accountAddress": accountAddress,
+        "appName": appName,
       },
     );
     if (resp["token"] != "") {
@@ -176,12 +178,14 @@ class API extends Api {
   Future<String> requestToken(
     String phoneNumber,
     String accountAddress,
+    String appName,
   ) async {
     Map<String, dynamic> resp = await _post(
       'v2/login/wallet/request',
       body: {
         "phoneNumber": phoneNumber,
         "accountAddress": accountAddress,
+        "appName": appName
       },
     );
     if (resp["token"] != "") {
