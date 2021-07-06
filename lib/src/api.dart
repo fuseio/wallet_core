@@ -152,9 +152,9 @@ class API extends Api {
   Future<String> verifySMS(
     String verificationCode,
     String phoneNumber,
-    String accountAddress,
-    String appName,
-  ) async {
+    String accountAddress, {
+    String? appName,
+  }) async {
     Map<String, dynamic> resp = await _post(
       'v2/login/wallet/sms/verify',
       body: {
@@ -177,9 +177,9 @@ class API extends Api {
   // Request token
   Future<String> requestToken(
     String phoneNumber,
-    String accountAddress,
-    String appName,
-  ) async {
+    String accountAddress, {
+    String? appName,
+  }) async {
     Map<String, dynamic> resp = await _post(
       'v2/login/wallet/request',
       body: {
