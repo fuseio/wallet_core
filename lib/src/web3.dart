@@ -596,28 +596,41 @@ class Web3 {
   Future<Map<String, dynamic>> callContractOffChain(
     String walletAddress,
     String contractAddress,
-    num ethAmount,
     String data, {
     String? network = "fuse",
     Map? transactionBody,
+    num? ethAmount,
+    BigInt? amountInWei,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
-    Decimal ethAmountDecimal = Decimal.parse(ethAmount.toString());
-    Decimal decimals = Decimal.parse(pow(10, 18).toString());
-    BigInt amount = BigInt.parse((ethAmountDecimal * decimals).toString());
-
+    Uint8List callContractData;
+    String encodedCallContractData;
     String nonce = await getNonceForRelay();
     DeployedContract TransferManagerContract =
         await _contract('TransferManager', _transferManagerContractAddress);
-    Uint8List callContractData =
-        TransferManagerContract.function('callContract').encodeCall([
-      wallet,
-      contract,
-      amount,
-      HEX.decode(data),
-    ]);
-    String encodedCallContractData = '0x' + HEX.encode(callContractData);
+    if (ethAmount != null) {
+      Decimal ethAmountDecimal = Decimal.parse(ethAmount.toString());
+      Decimal decimals = Decimal.parse(pow(10, 18).toString());
+      BigInt amount = BigInt.parse((ethAmountDecimal * decimals).toString());
+      callContractData =
+          TransferManagerContract.function('callContract').encodeCall([
+        wallet,
+        contract,
+        amount,
+        HEX.decode(data),
+      ]);
+      encodedCallContractData = '0x' + HEX.encode(callContractData);
+    } else {
+      callContractData =
+          TransferManagerContract.function('callContract').encodeCall([
+        wallet,
+        contract,
+        amountInWei,
+        HEX.decode(data),
+      ]);
+      encodedCallContractData = '0x' + HEX.encode(callContractData);
+    }
 
     String signature = await signOffChain(
       _transferManagerContractAddress,
@@ -745,9 +758,9 @@ class Web3 {
     Map<String, dynamic> transferToHomeData = await callContractOffChain(
       walletAddress,
       foreignBridgeMediator,
-      0,
       data,
       network: network,
+      ethAmount: 0,
     );
     return [approveTokenData, transferToHomeData];
   }
@@ -783,9 +796,9 @@ class Web3 {
     Map<String, dynamic> transferToHomeData = await callContractOffChain(
       walletAddress,
       homeBridgeMediatorAddress,
-      0,
       data,
       network: network,
+      ethAmount: 0,
     );
     return [approveTokenData, transferToHomeData];
   }

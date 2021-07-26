@@ -255,6 +255,26 @@ class API extends Api {
     return resp['data'];
   }
 
+  Future<Map<String, dynamic>> getNextReward(
+    String walletAddress,
+  ) async {
+    Map<String, dynamic> resp = await _get(
+      'v2/wallets/apy/reward/$walletAddress',
+      private: true,
+    );
+    return resp['data'];
+  }
+
+  Future<Map<String, dynamic>> claimReward(
+    String walletAddress,
+  ) async {
+    Map<String, dynamic> resp = await _post(
+      'v2/wallets/apy/claim/$walletAddress',
+      private: true,
+    );
+    return resp['data'];
+  }
+
   Future<dynamic> getJob(String id) async {
     Map<String, dynamic> resp = await _get(
       'v2/jobs/$id',
@@ -450,16 +470,18 @@ class API extends Api {
     Web3 web3,
     String walletAddress,
     String contractAddress,
-    num ethAmount,
     String data, {
     String? network,
+    num? ethAmount,
+    BigInt? amountInWei,
   }) async {
     Map<String, dynamic> signedData = await web3.callContractOffChain(
       walletAddress,
       contractAddress,
-      ethAmount,
       data,
       network: network,
+      ethAmount: ethAmount,
+      amountInWei: amountInWei,
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
