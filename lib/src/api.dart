@@ -255,6 +255,41 @@ class API extends Api {
     return resp['data'];
   }
 
+  Future<dynamic> getAvailableUpgrades(
+    String walletAddress,
+  ) async {
+    Map<String, dynamic> resp = await _get(
+      'v2/wallets/upgrades/available/$walletAddress',
+      private: true,
+    );
+    return resp['data'];
+  }
+
+  Future<dynamic> installUpgrades(
+    Web3 web3,
+    String walletAddress,
+    String disableModuleName,
+    String disableModuleAddress,
+    String enableModuleAddress,
+    String upgradeId,
+  ) async {
+    Map<String, dynamic> relayParams = await web3.addModule(
+      walletAddress,
+      disableModuleName,
+      disableModuleAddress,
+      enableModuleAddress,
+    );
+    Map<String, dynamic> resp = await _post(
+      'v2/wallets/upgrades/install/$walletAddress',
+      private: true,
+      body: {
+        "upgradeId": upgradeId,
+        "relayParams": relayParams,
+      },
+    );
+    return resp['data'];
+  }
+
   Future<Map<String, dynamic>> getNextReward(
     String walletAddress,
   ) async {

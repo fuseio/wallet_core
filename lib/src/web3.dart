@@ -469,6 +469,53 @@ class Web3 {
     };
   }
 
+  Future<Map<String, dynamic>> addModule(
+    String walletAddress,
+    String disableModuleName,
+    String disableModuleAddress,
+    String enableModuleAddress, {
+    String network = "fuse",
+    Map? transactionBody,
+    String? methodName = 'transferToken',
+  }) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress newModule = EthereumAddress.fromHex(enableModuleAddress);
+    String nonce = await getNonceForRelay();
+    DeployedContract contract = await _contract(
+      disableModuleName,
+      disableModuleAddress,
+    );
+    Uint8List data = contract.function('addModule').encodeCall([
+      wallet,
+      newModule,
+    ]);
+    String encodedData = '0x' + HEX.encode(data);
+
+    String signature = await signOffChain(
+      disableModuleAddress,
+      walletAddress,
+      BigInt.from(0),
+      encodedData,
+      nonce,
+      BigInt.from(0),
+      BigInt.from(_defaultGasLimit),
+    );
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedData,
+      "communityAddress": _defaultCommunityContractAddress,
+      "nonce": nonce,
+      "network": network,
+      "methodName": methodName,
+      "gasPrice": 0,
+      "gasLimit": _defaultGasLimit,
+      "signature": signature,
+      "walletModule": disableModuleName,
+      "transactionBody": transactionBody,
+    };
+  }
+
   Future<Map<String, dynamic>> transferTokenOffChain(
     String walletAddress,
     String tokenAddress,
