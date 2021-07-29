@@ -1,52 +1,42 @@
-import 'dart:async';
+// import 'dart:async';
 
-import 'package:wallet_core/wallet_core.dart';
+// import 'package:wallet_core/wallet_core.dart';
 
-Future<bool> approvalCallback() async {
-  return true;
-}
+// Future<bool> approvalCallback() async {
+//   return true;
+// }
 
-void main() async {
-  // init web3 module
-  Web3 web3 = new Web3(
-    approvalCallback,
-    defaultCommunityAddress: 'DEFAULT_COMMUNITY_ADDRESS',
-    communityManagerAddress: 'COMMUNITY_MANAGER_ADDRESS',
-    transferManagerAddress: 'TRANSFER_MANAGER_ADDRESS',
-    daiPointsManagerAddress: 'DAI_POINTS_MANAGER_ADDRESS'
-  );
+// void main() async {
+//   // init web3 module
+//   Web3 web3 = new Web3(
+//     approveCb: approvalCallback,
+//     networkId: 122,
+//     url: 'https://rpc.fuse.io',
+//     defaultCommunityAddress: 'DEFAULT_COMMUNITY_ADDRESS',
+//     communityManagerAddress: 'COMMUNITY_MANAGER_ADDRESS',
+//     transferManagerAddress: 'TRANSFER_MANAGER_ADDRESS',
+//     daiPointsManagerAddress: 'DAI_POINTS_MANAGER_ADDRESS',
+//   );
 
-  // set web3 credentials with private key
-  await web3.setCredentials('YOUR_PRIVATE_KEY');
+//   // set web3 credentials with private key
+//   await web3.setCredentials('YOUR_PRIVATE_KEY');
 
-  // get account address
-  String accountAddress = await web3.getAddress();
-  print('account address: $accountAddress');
+//   // get account address
+//   String accountAddress = await web3.getAddress();
+//   print('account address: $accountAddress');
 
-  // init api module
-  API api = new API(
-    base: 'https://studio.fuse.io/api',
-    funderBase: 'https://funder.fuse.io/api'
-  );
+//   // init api module
+//   API api = new API('https://studio.fuse.io/api');
 
-  api.setJwtToken('YOUR_JWT');
+//   api.setJwtToken('YOUR_JWT');
 
-  String walletAddress = 'YOUR_WALLET_ADDRESS';
+//   String walletAddress = 'YOUR_WALLET_ADDRESS';
 
-  String data = await web3.getEncodedDataForContractCall(
-    'Community',
-    web3.getDefaultCommunity(),
-    'join',
-    []
-  );
-  print('data: $data');
+//   String data = await web3.getEncodedDataForContractCall(
+//       'Community', web3.getDefaultCommunity(), 'join', []);
+//   print('data: $data');
 
-  dynamic result = await api.callContract(
-    web3,
-    walletAddress,
-    web3.getDefaultCommunity(),
-    0,
-    data
-  );
-  print('result: $result');
-}
+//   dynamic result = await api.callContract(
+//       web3, walletAddress, web3.getDefaultCommunity(), 0, data);
+//   print('result: $result');
+// }

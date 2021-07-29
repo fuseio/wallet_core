@@ -11,9 +11,16 @@ abstract class Api {
         return obj;
       case 401:
         throw 'Error! Unauthorized';
-        break;
       default:
         throw 'Error! status: ${response.statusCode}, reason: ${response.reasonPhrase}';
+    }
+  }
+
+  String toRopsten(String baseURI) {
+    if (baseURI.contains('qa')) {
+      return baseURI;
+    } else {
+      return baseURI.replaceAll('studio', 'studio-ropsten');
     }
   }
 }

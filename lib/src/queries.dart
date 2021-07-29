@@ -10,19 +10,6 @@ const String getHomeBridgedTokenQuery = r'''
   }
 ''';
 
-const String getTokenByAddressQuery = r'''
-  query getTokenByAddress($address: String!) {
-      tokens(where: {address: $address}) {
-        name
-        decimals
-        symbol
-        address
-        totalSupply
-        originNetwork
-      }
-  }
-''';
-
 const String getCommunityByAddressQuery = r'''
   query getCommunityByAddress($address: String!) {
       communities(where:{address: $address}) {
@@ -58,19 +45,6 @@ const String getCommunityBusinessesQuery = r'''
   }
 ''';
 
-const String getTokenOfCommunityQuery = r'''
-  query getTokenOfCommunity($address: String!) {
-      tokens(where:{communityAddress: $address}) {
-        id,
-        symbol,
-        name,
-        address,
-        decimals,
-        originNetwork
-      }
-  }
-''';
-
 const String isCommunityMemberQuery = r'''
   query getCommunityEntities($address: String!, $entitiesList: String!) {
       communityEntities(where:{address: $address, entitiesList: $entitiesList}) {
@@ -78,27 +52,6 @@ const String isCommunityMemberQuery = r'''
         address
         isAdmin
         isApproved
-      }
-  }
-''';
-
-const String getTransferEventsQuery = r'''
-  query getTransferEvents(
-    $to: String!,
-    $skip: Int,
-    $first: Int,
-  ) {
-    transferEvents(where: {
-        to: $to,
-    }, skip: $skip, first: $first) {
-        id
-        from
-        to
-        value
-        blockNumber
-        txHash
-        tokenAddress
-        timestamp
       }
   }
 ''';
