@@ -1,7 +1,7 @@
 library graph;
 
 import 'dart:async';
-
+import 'package:gql/language.dart';
 import 'package:graphql/client.dart';
 import 'package:wallet_core/src/queries.dart';
 
@@ -31,7 +31,7 @@ class Graph {
 
   Future<dynamic> getCommunityByAddress(String communityAddress) async {
     QueryResult result = await _clientFuseEntities.query(QueryOptions(
-      document: gql(getCommunityByAddressQuery),
+      document: parseString(getCommunityByAddressQuery),
       variables: <String, dynamic>{
         'address': communityAddress,
       },
@@ -45,7 +45,7 @@ class Graph {
 
   Future<dynamic> getCommunityBusinesses(String communityAddress) async {
     QueryResult result = await _clientFuseEntities.query(QueryOptions(
-      document: gql(getCommunityBusinessesQuery),
+      document: parseString(getCommunityBusinessesQuery),
       variables: <String, dynamic>{
         'address': communityAddress,
       },
@@ -65,7 +65,7 @@ class Graph {
     GraphQLClient client =
         isRopsten ? _clientFuseRopstenBridge : _clientFuseMainnetBridge;
     QueryResult result = await client.query(QueryOptions(
-      document: gql(getHomeBridgedTokenQuery),
+      document: parseString(getHomeBridgedTokenQuery),
       variables: <String, dynamic>{
         'foreignAddress': foreignTokenAddress,
       },
@@ -82,7 +82,7 @@ class Graph {
     String entitiesListAddress,
   ) async {
     QueryResult result = await _clientFuseEntities.query(QueryOptions(
-      document: gql(isCommunityMemberQuery),
+      document: parseString(isCommunityMemberQuery),
       variables: <String, dynamic>{
         'address': accountAddress,
         'entitiesList': entitiesListAddress

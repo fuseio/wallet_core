@@ -587,32 +587,40 @@ class Web3 {
 
   Future<Map<String, dynamic>> approveTokenOffChain(
     String walletAddress,
-    String tokenAddress,
-    num tokensAmount, {
+    String tokenAddress, {
     String? spenderContract,
     String? network = "fuse",
     Map? transactionBody,
+    num? tokensAmount,
+    BigInt? amountInWei,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
-    dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
-    Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
-    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
-    BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
-    EthereumAddress spender = wallet;
-    if (spenderContract != null) {
-      spender = EthereumAddress.fromHex(spenderContract);
-    }
-
     String nonce = await getNonceForRelay();
     DeployedContract contract = await _contract(
       'TransferManager',
       _transferManagerContractAddress,
     );
-    Uint8List data = contract.function('approveToken').encodeCall(
-      [wallet, token, spender, amount],
-    );
+    Uint8List data;
+    EthereumAddress spender = wallet;
+    if (spenderContract != null) {
+      spender = EthereumAddress.fromHex(spenderContract);
+    }
+    if (tokensAmount != null) {
+      dynamic tokenDetails = await getTokenDetails(tokenAddress);
+      int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+      Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
+      Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+      BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+      data = contract.function('approveToken').encodeCall(
+        [wallet, token, spender, amount],
+      );
+    } else {
+      data = contract.function('approveToken').encodeCall(
+        [wallet, token, spender, amountInWei],
+      );
+    }
+
     String encodedData = '0x' + HEX.encode(data);
 
     String signature = await signOffChain(
@@ -791,7 +799,7 @@ class Web3 {
     Map approveTokenData = await approveTokenOffChain(
       walletAddress,
       tokenAddress,
-      tokensAmount,
+      tokensAmount: tokensAmount,
       network: network,
       spenderContract: foreignBridgeMediator,
     );
@@ -829,7 +837,7 @@ class Web3 {
     Map approveTokenData = await approveTokenOffChain(
       walletAddress,
       tokenAddress,
-      tokensAmount,
+      tokensAmount: tokensAmount,
       network: network,
       spenderContract: homeBridgeMediatorAddress,
     );

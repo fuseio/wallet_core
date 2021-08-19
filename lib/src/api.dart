@@ -234,7 +234,8 @@ class API extends Api {
             resp['data']['walletModules']['DAIPointsManager'] ?? null,
         "networks": resp['data']['networks'],
         "backup": resp["data"]['backup'],
-        "balancesOnForeign": resp['data']['balancesOnForeign']
+        "balancesOnForeign": resp['data']['balancesOnForeign'],
+        "apy": resp['data']['apy']
       };
     } else {
       return {};
@@ -305,6 +306,16 @@ class API extends Api {
   ) async {
     Map<String, dynamic> resp = await _post(
       'v2/wallets/apy/claim/$walletAddress',
+      private: true,
+    );
+    return resp['data'];
+  }
+
+  Future<Map<String, dynamic>> enableWalletApy(
+    String walletAddress,
+  ) async {
+    Map<String, dynamic> resp = await _post(
+      'v2/wallets/apy/enable/$walletAddress',
       private: true,
     );
     return resp['data'];
@@ -465,13 +476,18 @@ class API extends Api {
   Future<dynamic> approveTokenTransfer(
     Web3 web3,
     String walletAddress,
-    String tokenAddress,
-    num tokensAmount, {
-    String? network,
+    String tokenAddress, {
+    String network = 'fuse',
+    num? tokensAmount,
+    BigInt? amountInWei,
   }) async {
     Map<String, dynamic> data = await web3.approveTokenOffChain(
-        walletAddress, tokenAddress, tokensAmount,
-        network: network);
+      walletAddress,
+      tokenAddress,
+      tokensAmount: tokensAmount,
+      amountInWei: amountInWei,
+      network: network,
+    );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
       private: true,
