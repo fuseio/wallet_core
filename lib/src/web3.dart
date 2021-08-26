@@ -656,6 +656,7 @@ class Web3 {
     Map? transactionBody,
     num? ethAmount,
     BigInt? amountInWei,
+    Map? txMetadata,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
@@ -709,6 +710,7 @@ class Web3 {
       "signature": signature,
       "walletModule": "TransferManager",
       "transactionBody": transactionBody,
+      "txMetadata": txMetadata,
     };
   }
 

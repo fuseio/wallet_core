@@ -525,6 +525,8 @@ class API extends Api {
     String? network,
     num? ethAmount,
     BigInt? amountInWei,
+    Map? transactionBody,
+    Map? txMetadata,
   }) async {
     Map<String, dynamic> signedData = await web3.callContractOffChain(
       walletAddress,
@@ -533,6 +535,8 @@ class API extends Api {
       network: network,
       ethAmount: ethAmount,
       amountInWei: amountInWei,
+      transactionBody: transactionBody,
+      txMetadata: txMetadata,
     );
     Map<String, dynamic> resp = await _post(
       'v2/relay',
