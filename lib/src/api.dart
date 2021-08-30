@@ -198,14 +198,14 @@ class API extends Api {
     }
   }
 
-  Future<dynamic> createWallet({String? communityAddress}) async {
+  Future<dynamic> createWallet({String? communityAddress, String? referralAddress}) async {
     dynamic wallet = await getWallet();
     if (wallet != null && wallet["walletAddress"] != null) {
       print('Wallet already exists - wallet: $wallet');
       return wallet;
     }
     final dynamic body = communityAddress != null
-        ? Map<String, String>.from({"communityAddress": communityAddress})
+        ? Map<String, String>.from({"communityAddress": communityAddress, "referralAddress":referralAddress})
         : null;
     Map<String, dynamic> resp = await _post(
       'v2/wallets',
