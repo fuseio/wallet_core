@@ -204,13 +204,9 @@ class API extends Api {
       print('Wallet already exists - wallet: $wallet');
       return wallet;
     }
-    final dynamic body = {};
-    // = communityAddress != null
-    //     ? Map<String, String>.from({"communityAddress": communityAddress, "referralAddress":referralAddress})
-    //     : null;
+    final Map body = {};
     if(communityAddress != null) body['communityAddress'] = communityAddress;
     if(referralAddress != null) body['referralAddress'] = referralAddress;
-    print('referralAddress is: (in fuse core)\n$referralAddress');
     Map<String, dynamic> resp = await _post(
       'v2/wallets',
       private: true,
