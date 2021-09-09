@@ -9,9 +9,11 @@ class Graph {
   late final GraphQLClient _clientFuseEntities;
   late final GraphQLClient _clientFuseRopstenBridge;
   late final GraphQLClient _clientFuseMainnetBridge;
+  late final GraphQLClient _clientNFT;
 
   Graph(
     String baseUrl,
+    String nftSubgraph,
   ) {
     _clientFuseEntities = GraphQLClient(
       link: HttpLink('$baseUrl/fuse-entities'),
@@ -27,6 +29,25 @@ class Graph {
       link: HttpLink('$baseUrl/fuse-ethereum-bridge'),
       cache: GraphQLCache(),
     );
+
+    _clientNFT = GraphQLClient(
+      link: HttpLink(nftSubgraph),
+      cache: GraphQLCache(),
+    );
+  }
+
+  Future<dynamic> getCollectiblesByOwner(String owner) async {
+    QueryResult result = await _clientNFT.query(QueryOptions(
+      document: parseString(getCollectiblesByOwnerQuery),
+      variables: <String, dynamic>{
+        'owner': owner.toLowerCase(),
+      },
+    ));
+    if (result.hasException) {
+      throw 'Error! Get Collectibles By Owner request failed - owner: $owner ${result.exception.toString()}';
+    } else {
+      return result.data?["collectibles"];
+    }
   }
 
   Future<dynamic> getCommunityByAddress(String communityAddress) async {
