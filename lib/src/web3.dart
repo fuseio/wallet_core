@@ -859,4 +859,47 @@ class Web3 {
     );
     return [approveTokenData, transferToHomeData];
   }
+
+  Future<dynamic> tokenOfOwnerByIndex(
+    String contractAddress,
+    String owner,
+    int index,
+  ) async {
+    return (await _readFromContract(
+      'ERC721',
+      contractAddress,
+      'tokenOfOwnerByIndex',
+      [
+        owner,
+        index,
+      ],
+    ))
+        .first;
+  }
+
+  Future<int> balanceOfERC721(
+    String contractAddress,
+    String owner,
+  ) async {
+    return (await _readFromContract(
+      'ERC721',
+      contractAddress,
+      'balanceOf',
+      [owner],
+    ))
+        .first;
+  }
+
+  Future<dynamic> tokenURI(
+    String contractAddress,
+    int index,
+  ) async {
+    return (await _readFromContract(
+      'ERC721',
+      contractAddress,
+      'tokenURI',
+      [index],
+    ))
+        .first;
+  }
 }
