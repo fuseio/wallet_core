@@ -247,9 +247,10 @@ class API extends Api {
 
   Future<Map<String, dynamic>> getActionsByWalletAddress(
     String walletAddress, {
+    int updatedAt = 0,
     String? tokenAddress,
   }) async {
-    String url = 'v2/wallets/actions/$walletAddress';
+    String url = 'v2/wallets/actions/$walletAddress?updatedAt=$updatedAt';
     url = tokenAddress != null ? '$url&tokenAddress=$tokenAddress' : url;
     Map<String, dynamic> resp = await _get(
       url,
@@ -258,10 +259,9 @@ class API extends Api {
     return resp['data'];
   }
 
-    Future<Map<String, dynamic>> getPaginatedActionsByWalletAddress(
+  Future<Map<String, dynamic>> getPaginatedActionsByWalletAddress(
     String walletAddress,
     int pageIndex, {
-    int updatedAt = 0,
     String? tokenAddress,
   }) async {
     String url = 'v2/wallets/actions/paginated/$walletAddress?page=$pageIndex';
