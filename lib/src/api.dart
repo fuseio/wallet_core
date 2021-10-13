@@ -781,4 +781,14 @@ class API extends Api {
     );
     return resp;
   }
+    
+
+    Future<Map<String, dynamic>> getBeaconByWalletAddress(String walletAddress) async {
+    String url = 'v2/wallets/beacons/$walletAddress';
+    Map<String, dynamic> resp = await _post(
+      url,
+      private: true,
+    );
+    return resp['data'];
+  }
 }
