@@ -20,7 +20,7 @@ import './abi.dart';
 class Web3 {
   final Web3Client _client;
   final Future<bool> _approveCb;
-  late final Credentials _credentials;
+  late final EthPrivateKey _credentials;
   final int _networkId;
   final String _defaultCommunityContractAddress;
   final String _communityManagerContractAddress;
@@ -65,11 +65,11 @@ class Web3 {
   }
 
   Future<void> setCredentials(String privateKey) async {
-    _credentials = await _client.credentialsFromPrivateKey(privateKey);
+    _credentials = await EthPrivateKey.fromHex(privateKey);
   }
 
   Future<String> getAddress() async {
-    return (await _credentials.extractAddress()).toString();
+    return (await _credentials.address).toString();
   }
 
   Future<int> getBlockNumber() async {
@@ -591,6 +591,7 @@ class Web3 {
     String? spenderContract,
     String? network = "fuse",
     Map? transactionBody,
+    Map? txMetadata,
     num? tokensAmount,
     BigInt? amountInWei,
   }) async {
@@ -645,6 +646,7 @@ class Web3 {
       "signature": signature,
       "walletModule": "TransferManager",
       "transactionBody": transactionBody,
+      "txMetadata": txMetadata,
     };
   }
 
