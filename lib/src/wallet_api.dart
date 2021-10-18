@@ -685,4 +685,27 @@ class WalletApi extends Api {
     );
     return resp;
   }
+
+  Future<Map<String, dynamic>> getBeaconByWalletAddress(
+    String walletAddress,
+  ) async {
+    String url = 'v2/wallets/beacons/$walletAddress';
+    Map<String, dynamic> resp = await _post(
+      url,
+      private: true,
+    );
+    return resp['data'];
+  }
+
+  Future<Map<String, dynamic>> getWalletAddressByMajorAndMonirIds(
+    int major,
+    int minor,
+  ) async {
+    String url = 'v2/wallets/beacons/$major/$minor';
+    Map<String, dynamic> resp = await _get(
+      url,
+      private: true,
+    );
+    return resp['data'];
+  }
 }
