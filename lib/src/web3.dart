@@ -369,7 +369,6 @@ class Web3 {
     String network = 'fuse',
     String? originNetwork = 'mainnet',
     String? tokenAddress,
-    bool isFunderDeprecated = true,
     String? communityName,
   }) async {
     String nonce = await getNonceForRelay();
@@ -397,7 +396,6 @@ class Web3 {
     );
 
     return {
-      'isFunderDeprecated': isFunderDeprecated,
       "walletAddress": walletAddress,
       "methodData": encodedData,
       "communityAddress": communityAddress,
