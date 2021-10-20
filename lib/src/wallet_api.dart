@@ -402,7 +402,6 @@ class WalletApi extends Api {
 
   Future<dynamic> backupWallet({
     String? communityAddress,
-    bool isFunderDeprecated = true,
   }) async {
     Map<String, dynamic> resp = await _post(
       'v1/wallets/backup',
@@ -624,7 +623,6 @@ class WalletApi extends Api {
     String name = '',
     String amount = '',
     String symbol = '',
-    bool isFunderDeprecated = true,
   }) async {
     Map<String, dynamic> resp = await _post(
       'v1/wallets/invite/$phoneNumber',
@@ -633,7 +631,6 @@ class WalletApi extends Api {
         "name": name,
         "amount": amount,
         "symbol": symbol,
-        'isFunderDeprecated': isFunderDeprecated,
       },
       private: true,
     );
@@ -704,6 +701,16 @@ class WalletApi extends Api {
     String url = 'v1/wallets/beacons/$major/$minor';
     Map<String, dynamic> resp = await _get(
       url,
+      private: true,
+    );
+    return resp['data'];
+  }
+
+  Future<Map<String, dynamic>> getReferralInfo(
+    String walletAddress,
+  ) async {
+    Map<String, dynamic> resp = await _get(
+      'v1/wallets/referral/total/$walletAddress',
       private: true,
     );
     return resp['data'];
