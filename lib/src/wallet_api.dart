@@ -715,4 +715,15 @@ class WalletApi extends Api {
     );
     return resp['data'];
   }
+
+  Future<Map<String, dynamic>> getUserProfile(
+    String walletAddress,
+  ) async {
+    String url = 'v1/wallets/profiles/$walletAddress';
+    Map<String, dynamic> resp = await _get(
+      url,
+      private: true,
+    );
+    return resp['data'];
+  }
 }
