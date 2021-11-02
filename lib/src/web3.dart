@@ -161,9 +161,10 @@ class Web3 {
   ) async {
     DeployedContract contract = await _contract(contractName, contractAddress);
     return await _client.call(
-        contract: contract,
-        function: contract.function(functionName),
-        params: params);
+      contract: contract,
+      function: contract.function(functionName),
+      params: params,
+    );
   }
 
   Future<String> _callContract(
@@ -984,5 +985,62 @@ class Web3 {
       [index],
     ))
         .first;
+  }
+
+  Future<Map<String, dynamic>> callManagerContractFunction(
+    String walletAddress,
+    String managerContractName,
+    String managerContractAddress,
+    String functionName,
+    List<dynamic> params, {
+    Map? transactionBody,
+    Map? txMetadata,
+    String? network = "fuse",
+  }) async {
+    String nonce = await getNonceForRelay();
+    DeployedContract contract = await _contract(
+      managerContractName,
+      managerContractAddress,
+    );
+    Uint8List data = contract.function(functionName).encodeCall(params);
+    String encodedData = '0x' + HEX.encode(data);
+
+    String signature = await signOffChain(
+      managerContractAddress,
+      walletAddress,
+      BigInt.from(0),
+      encodedData,
+      nonce,
+      BigInt.from(0),
+      BigInt.from(_defaultGasLimit),
+    );
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedData,
+      "nonce": nonce,
+      "communityAddress": _defaultCommunityContractAddress,
+      "methodName": functionName,
+      "gasPrice": 0,
+      "gasLimit": _defaultGasLimit,
+      "network": network,
+      "signature": signature,
+      "walletModule": managerContractName,
+      "transactionBody": transactionBody,
+      "txMetadata": txMetadata,
+    };
+  }
+
+  Future<dynamic> getGuardiansInfo(
+    String contractAddress,
+  ) async {
+    return {
+      "guardianCount": (await _readFromContract(
+              'GuardianManager', contractAddress, 'guardianCount', []))
+          .first,
+      "guardians": (await _readFromContract(
+              'GuardianManager', contractAddress, 'getGuardians', []))
+          .first,
+    };
   }
 }

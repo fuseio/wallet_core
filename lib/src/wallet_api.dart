@@ -587,6 +587,35 @@ class WalletApi extends Api {
     return resp;
   }
 
+  Future<dynamic> callManagerContractFunction(
+    Web3 web3,
+    String walletAddress,
+    String managerContractName,
+    String managerContractAddress,
+    String functionName,
+    List<dynamic> params, {
+    String? network,
+    Map? transactionBody,
+    Map? txMetadata,
+  }) async {
+    Map<String, dynamic> signedData = await web3.callManagerContractFunction(
+      walletAddress,
+      managerContractName,
+      managerContractAddress,
+      functionName,
+      params,
+      network: network,
+      txMetadata: txMetadata,
+      transactionBody: transactionBody,
+    );
+    Map<String, dynamic> resp = await _post(
+      'v1/relay',
+      private: true,
+      body: signedData,
+    );
+    return resp;
+  }
+
   Future<dynamic> approveTokenAndCallContract(
     Web3 web3,
     String walletAddress,
