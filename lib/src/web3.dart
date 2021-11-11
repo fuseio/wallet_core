@@ -1031,15 +1031,25 @@ class Web3 {
     };
   }
 
-  Future<dynamic> getGuardiansInfo(
+  Future<Map<String, dynamic>> getGuardiansInfo(
     String contractAddress,
+    String walletAddress,
   ) async {
+    final EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     return {
       "guardianCount": (await _readFromContract(
-              'GuardianManager', contractAddress, 'guardianCount', []))
+        'GuardianManager',
+        contractAddress,
+        'guardianCount',
+        [wallet],
+      ))
           .first,
       "guardians": (await _readFromContract(
-              'GuardianManager', contractAddress, 'getGuardians', []))
+        'GuardianManager',
+        contractAddress,
+        'getGuardians',
+        [wallet],
+      ))
           .first,
     };
   }
