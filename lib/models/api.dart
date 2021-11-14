@@ -10,9 +10,14 @@ abstract class Api {
         Map<String, dynamic> obj = json.decode(response.body);
         return obj;
       case 401:
-        throw 'Error! Unauthorized';
+        throw Exception('Error! Unauthorized');
+      case 403:
+        Map<String, dynamic> obj = json.decode(response.body);
+        throw Exception(obj['error'] ?? 'Error! Unauthorized');
       default:
-        throw 'Error! status: ${response.statusCode}, reason: ${response.reasonPhrase}';
+        Map<String, dynamic> obj = json.decode(response.body);
+        throw Exception(
+            'Error! status: ${response.statusCode}, reason: ${response.reasonPhrase} ${obj['error'] ?? obj.toString()}');
     }
   }
 
