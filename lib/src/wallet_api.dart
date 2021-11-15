@@ -226,6 +226,7 @@ class WalletApi extends Api {
         "walletAddress": resp["data"]["walletAddress"],
         "createdAt": resp["data"]["createdAt"],
         "updatedAt": resp["data"]["updatedAt"],
+        "walletModules": resp['data']['walletModules'],
         "communityManager": resp['data']['walletModules']['CommunityManager'],
         "transferManager": resp['data']['walletModules']['TransferManager'],
         "dAIPointsManager":
