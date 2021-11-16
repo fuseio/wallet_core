@@ -727,4 +727,39 @@ class WalletApi extends Api {
     );
     return resp['data'];
   }
+
+  Future<dynamic> saveUserProfile(Map body) async {
+    String url = 'v1/wallets/profiles';
+    Map<String, dynamic> resp = await _post(
+      url,
+      body: body,
+    );
+    return resp;
+  }
+
+  Future<dynamic> updateAvatar(
+    String accountAddress,
+    String avatarHash,
+  ) async {
+    String url = 'v1/wallets/profiles/$accountAddress/avatar';
+    Map<String, dynamic> resp = await _put(
+      url,
+      body: {"avatarHash": avatarHash},
+      private: true,
+    );
+    return resp;
+  }
+
+  Future<dynamic> updateDisplayName(
+    String accountAddress,
+    String displayName,
+  ) async {
+    String url = 'v1/wallets/profiles/$accountAddress/name';
+    Map<String, dynamic> resp = await _put(
+      url,
+      body: {"displayName": displayName},
+      private: true,
+    );
+    return resp;
+  }
 }

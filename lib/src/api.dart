@@ -137,38 +137,6 @@ class API extends Api {
     return resp['data'];
   }
 
-  Future<dynamic> saveUserToDb(Map body) async {
-    Map<String, dynamic> resp = await _post(
-      'v2/users',
-      body: body,
-    );
-    return resp;
-  }
-
-  Future<dynamic> updateAvatar(
-    String accountAddress,
-    String avatarHash,
-  ) async {
-    Map<String, dynamic> resp = await _put(
-      'v2/users/$accountAddress/avatar',
-      body: {"avatarHash": avatarHash},
-      private: true,
-    );
-    return resp;
-  }
-
-  Future<dynamic> updateDisplayName(
-    String accountAddress,
-    String displayName,
-  ) async {
-    Map<String, dynamic> resp = await _put(
-      'v2/users/$accountAddress/name',
-      body: {"displayName": displayName},
-      private: true,
-    );
-    return resp;
-  }
-
   Future<dynamic> uploadImage(
     File imageFile,
   ) async {
