@@ -1,5 +1,4 @@
 name: wallet_core
-author: Lior Rabin <lior9586@gmail.com>
 version: 0.3.0
 homepage: https://github.com/fuseio/wallet_core
 description: Fuse wallet core Dart library to interact with Ethereum based networks and APIs.
@@ -11,6 +10,6 @@ dependencies:
   hex: ^0.2.0
   http: ^0.13.3
   resource: ^2.1.7
-  web3dart: ^2.3.1
+  web3dart: ^2.3.3
   graphql: ^5.0.0
-  decimal: ^1.2.0
+  decimal: ^2.0.0
