@@ -63,7 +63,8 @@ const String getCollectiblesByOwnerQuery = r'''
         name
         imageURL
         description
-        collectibleURI
+        collectionName
+        collectionSymbol
       }
   }
 ''';
