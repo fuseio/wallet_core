@@ -472,9 +472,9 @@ class Web3 {
     String disableModuleName,
     String disableModuleAddress,
     String enableModuleAddress, {
+    String methodName = 'addModule',
     String network = "fuse",
     Map? transactionBody,
-    String? methodName = 'transferToken',
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress newModule = EthereumAddress.fromHex(enableModuleAddress);
@@ -483,7 +483,7 @@ class Web3 {
       disableModuleName,
       disableModuleAddress,
     );
-    Uint8List data = contract.function('addModule').encodeCall([
+    Uint8List data = contract.function(methodName).encodeCall([
       wallet,
       newModule,
     ]);
