@@ -65,6 +65,7 @@ const String getCollectiblesByOwnerQuery = r'''
         description
         collectionName
         collectionSymbol
+        collectionAddress
       }
   }
 ''';
