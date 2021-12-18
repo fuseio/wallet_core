@@ -718,35 +718,50 @@ class Web3 {
     String walletAddress,
     String tokenAddress,
     String contractAddress,
-    num tokensAmount,
     String data, {
     String? network = "fuse",
+    num? tokensAmount,
+    BigInt? amountInWei,
     Map? transactionBody,
     Map? txMetadata,
   }) async {
     EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
     EthereumAddress token = EthereumAddress.fromHex(tokenAddress);
     EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
-    dynamic tokenDetails = await getTokenDetails(tokenAddress);
-    int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
-    Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
-    Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
-    BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
-
+    String encodedApproveTokenAndCallContractData;
     String nonce = await getNonceForRelay();
     DeployedContract TransferManagerContract =
         await _contract('TransferManager', _transferManagerContractAddress);
-    Uint8List approveTokenAndCallContractData =
-        TransferManagerContract.function('approveTokenAndCallContract')
-            .encodeCall([
-      wallet,
-      token,
-      contract,
-      amount,
-      HEX.decode(data),
-    ]);
-    String encodedApproveTokenAndCallContractData =
-        '0x' + HEX.encode(approveTokenAndCallContractData);
+    if (tokensAmount != null) {
+      dynamic tokenDetails = await getTokenDetails(tokenAddress);
+      int tokenDecimals = int.parse(tokenDetails["decimals"].toString());
+      Decimal tokensAmountDecimal = Decimal.parse(tokensAmount.toString());
+      Decimal decimals = Decimal.parse(pow(10, tokenDecimals).toString());
+      BigInt amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+      Uint8List approveTokenAndCallContractData =
+          TransferManagerContract.function('approveTokenAndCallContract')
+              .encodeCall([
+        wallet,
+        token,
+        contract,
+        amount,
+        HEX.decode(data),
+      ]);
+      encodedApproveTokenAndCallContractData =
+          '0x' + HEX.encode(approveTokenAndCallContractData);
+    } else {
+      Uint8List approveTokenAndCallContractData =
+          TransferManagerContract.function('approveTokenAndCallContract')
+              .encodeCall([
+        wallet,
+        token,
+        contract,
+        amountInWei,
+        HEX.decode(data),
+      ]);
+      encodedApproveTokenAndCallContractData =
+          '0x' + HEX.encode(approveTokenAndCallContractData);
+    }
 
     String signature = await signOffChain(
       _transferManagerContractAddress,
