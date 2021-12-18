@@ -563,9 +563,10 @@ class WalletApi extends Api {
     String walletAddress,
     String tokenAddress,
     String contractAddress,
-    num tokensAmount,
     String data, {
     String? network,
+    num? tokensAmount,
+    BigInt? amountInWei,
     Map? transactionBody,
     Map? txMetadata,
   }) async {
@@ -574,8 +575,9 @@ class WalletApi extends Api {
       walletAddress,
       tokenAddress,
       contractAddress,
-      tokensAmount,
       data,
+      amountInWei: amountInWei,
+      tokensAmount: tokensAmount,
       network: network,
       transactionBody: transactionBody,
       txMetadata: txMetadata,
