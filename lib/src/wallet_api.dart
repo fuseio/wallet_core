@@ -234,7 +234,9 @@ class WalletApi extends Api {
         "networks": resp['data']['networks'],
         "backup": resp["data"]['backup'],
         "balancesOnForeign": resp['data']['balancesOnForeign'],
-        "apy": resp['data']['apy']
+        "apy": resp['data']['apy'],
+        "version": resp['data']['version'],
+        "paddedVersion": resp['data']['paddedVersion'],
       };
     } else {
       return {};
