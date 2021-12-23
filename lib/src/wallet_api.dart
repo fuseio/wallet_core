@@ -470,7 +470,6 @@ class WalletApi extends Api {
     String receiverAddress,
     num tokenId, {
     String network = 'fuse',
-    String? externalId,
     Map? transactionBody,
   }) async {
     Map<String, dynamic> data = await web3.transferNFTOffChain(
