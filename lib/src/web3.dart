@@ -654,6 +654,7 @@ class Web3 {
     String contractAddress,
     String receiverAddress,
     num tokenId, {
+    bool? safe = false,
     String? network = "fuse",
     Map? transactionBody = const {},
   }) async {
@@ -673,6 +674,7 @@ class Web3 {
         contract,
         receiver,
         id,
+        safe,
         hexToBytes('0x'),
       ],
     );
