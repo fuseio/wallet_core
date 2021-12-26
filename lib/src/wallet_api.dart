@@ -237,6 +237,7 @@ class WalletApi extends Api {
         "apy": resp['data']['apy'],
         "version": resp['data']['version'],
         "paddedVersion": resp['data']['paddedVersion'],
+        "isBlacklisted": resp['data']['isBlacklisted'] ?? false,
       };
     } else {
       return {};
