@@ -462,6 +462,33 @@ class WalletApi extends Api {
     return resp;
   }
 
+  Future<dynamic> nftTransfer(
+    Web3 web3,
+    String nftTransferContractAddress,
+    String walletAddress,
+    String contractAddress,
+    String receiverAddress,
+    num tokenId, {
+    String network = 'fuse',
+    Map? transactionBody,
+  }) async {
+    Map<String, dynamic> data = await web3.transferNFTOffChain(
+      nftTransferContractAddress,
+      walletAddress,
+      contractAddress,
+      receiverAddress,
+      tokenId,
+      network: network,
+      transactionBody: transactionBody,
+    );
+    Map<String, dynamic> resp = await _post(
+      'v1/relay',
+      private: true,
+      body: data,
+    );
+    return resp;
+  }
+
   Future<dynamic> tokenTransfer(
     Web3 web3,
     String walletAddress,

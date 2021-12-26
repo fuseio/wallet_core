@@ -648,6 +648,66 @@ class Web3 {
     };
   }
 
+  Future<Map<String, dynamic>> transferNFTOffChain(
+    String nftTransferContractAddress,
+    String walletAddress,
+    String contractAddress,
+    String receiverAddress,
+    num tokenId, {
+    bool? safe = false,
+    String? network = "fuse",
+    Map? transactionBody = const {},
+  }) async {
+    EthereumAddress wallet = EthereumAddress.fromHex(walletAddress);
+    EthereumAddress contract = EthereumAddress.fromHex(contractAddress);
+    EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
+    BigInt id = BigInt.from(tokenId);
+    String nonce = await getNonceForRelay();
+    DeployedContract NftTransferContract = await _contract(
+      'NftTransfer',
+      nftTransferContractAddress,
+    );
+    Uint8List transferNFTContractData =
+        NftTransferContract.function('transferNFT').encodeCall(
+      [
+        wallet,
+        contract,
+        receiver,
+        id,
+        safe,
+        hexToBytes('0x'),
+      ],
+    );
+    String encodedCallContractData = '0x' +
+        HEX.encode(
+          transferNFTContractData,
+        );
+
+    String signature = await signOffChain(
+      nftTransferContractAddress,
+      walletAddress,
+      BigInt.from(0),
+      encodedCallContractData,
+      nonce,
+      BigInt.from(0),
+      BigInt.from(_defaultGasLimit),
+    );
+
+    return {
+      "walletAddress": walletAddress,
+      "methodData": encodedCallContractData,
+      "communityAddress": _defaultCommunityContractAddress,
+      "nonce": nonce,
+      "network": network,
+      "methodName": "transferNFT",
+      "gasPrice": 0,
+      "gasLimit": _defaultGasLimit,
+      "signature": signature,
+      "walletModule": "NftTransfer",
+      "transactionBody": transactionBody,
+    };
+  }
+
   Future<Map<String, dynamic>> callContractOffChain(
     String walletAddress,
     String contractAddress,
