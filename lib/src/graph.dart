@@ -39,6 +39,8 @@ class Graph {
   Future<dynamic> getCollectiblesByOwner(String owner) async {
     QueryResult result = await _clientNFT.query(QueryOptions(
       document: parseString(getCollectiblesByOwnerQuery),
+      fetchPolicy: FetchPolicy.networkOnly,
+      cacheRereadPolicy: CacheRereadPolicy.ignoreAll,
       variables: <String, dynamic>{
         'owner': owner.toLowerCase(),
       },
