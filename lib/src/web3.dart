@@ -417,8 +417,9 @@ class Web3 {
 
   Future<Map<String, dynamic>> transferOffChain(
     String walletAddress,
-    String receiverAddress,
-    num amountInWei, {
+    String receiverAddress, {
+    String? tokensAmount,
+    BigInt? amountInWei,
     String network = "fuse",
     Map? transactionBody,
   }) async {
@@ -427,7 +428,14 @@ class Web3 {
       Variables.NATIVE_TOKEN_ADDRESS,
     );
     EthereumAddress receiver = EthereumAddress.fromHex(receiverAddress);
-    BigInt amount = BigInt.from(amountInWei);
+    BigInt amount = BigInt.zero;
+    if (tokensAmount != null) {
+      Decimal tokensAmountDecimal = Decimal.parse(tokensAmount);
+      Decimal decimals = Decimal.parse(pow(10, 18).toString());
+      amount = BigInt.parse((tokensAmountDecimal * decimals).toString());
+    } else if (amountInWei != null) {
+      amount = amountInWei;
+    }
 
     String nonce = await getNonceForRelay();
     DeployedContract contract = await _contract(

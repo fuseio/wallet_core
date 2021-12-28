@@ -440,15 +440,17 @@ class WalletApi extends Api {
   Future<dynamic> transfer(
     Web3 web3,
     String walletAddress,
-    String receiverAddress,
-    num amountInWei, {
+    String receiverAddress, {
+    String? tokensAmount,
+    BigInt? amountInWei,
     String network = "fuse",
     Map? transactionBody,
   }) async {
     Map<String, dynamic> data = await web3.transferOffChain(
       walletAddress,
       receiverAddress,
-      amountInWei,
+      tokensAmount: tokensAmount,
+      amountInWei: amountInWei,
       network: network,
       transactionBody: transactionBody,
     );
