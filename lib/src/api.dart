@@ -27,7 +27,6 @@ class API extends Api {
     bool private = false,
     bool isRopsten = false,
   }) async {
-    print('GET $endpoint');
     Response response;
     String uri = isRopsten ? toRopsten(_base) : _base;
     if (private) {
@@ -49,7 +48,6 @@ class API extends Api {
     bool private = false,
     bool isRopsten = false,
   }) async {
-    print('POST $endpoint $body');
     Response response;
     body = body == null ? body : json.encode(body);
     String uri = isRopsten ? toRopsten(_base) : _base;
@@ -79,7 +77,6 @@ class API extends Api {
     dynamic body,
     bool private = false,
   }) async {
-    print('PUT $endpoint $body');
     Response response;
     body = body == null ? body : json.encode(body);
     if (private) {
