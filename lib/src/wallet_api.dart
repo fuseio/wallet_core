@@ -28,7 +28,6 @@ class WalletApi extends Api {
     bool private = false,
     bool isRopsten = false,
   }) async {
-    print('GET $endpoint');
     Response response;
     String uri = isRopsten ? toRopsten(_base) : _base;
     if (private) {
@@ -50,7 +49,6 @@ class WalletApi extends Api {
     bool private = false,
     bool isRopsten = false,
   }) async {
-    print('POST $endpoint $body');
     Response response;
     body = body == null ? body : json.encode(body);
     String uri = isRopsten ? toRopsten(_base) : _base;
@@ -80,7 +78,6 @@ class WalletApi extends Api {
     dynamic body,
     bool private = false,
   }) async {
-    print('PUT $endpoint $body');
     Response response;
     body = body == null ? body : json.encode(body);
     if (private) {
@@ -443,15 +440,17 @@ class WalletApi extends Api {
   Future<dynamic> transfer(
     Web3 web3,
     String walletAddress,
-    String receiverAddress,
-    num amountInWei, {
+    String receiverAddress, {
+    String? tokensAmount,
+    BigInt? amountInWei,
     String network = "fuse",
     Map? transactionBody,
   }) async {
     Map<String, dynamic> data = await web3.transferOffChain(
       walletAddress,
       receiverAddress,
-      amountInWei,
+      tokensAmount: tokensAmount,
+      amountInWei: amountInWei,
       network: network,
       transactionBody: transactionBody,
     );
@@ -495,7 +494,7 @@ class WalletApi extends Api {
     String walletAddress,
     String tokenAddress,
     String receiverAddress,
-    num tokensAmount, {
+    String tokensAmount, {
     String network = 'fuse',
     String? externalId,
   }) async {
