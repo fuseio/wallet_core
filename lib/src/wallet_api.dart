@@ -764,6 +764,7 @@ class WalletApi extends Api {
     Map<String, dynamic> resp = await _post(
       url,
       body: body,
+      private: true,
     );
     return resp;
   }
