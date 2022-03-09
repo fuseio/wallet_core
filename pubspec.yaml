@@ -10,6 +10,6 @@ dependencies:
   hex: ^0.2.0
   http: ^0.13.3
   resource: ^2.1.7
-  web3dart: ^2.3.3
-  graphql: ^5.0.0
-  decimal: ^2.0.0
+  web3dart: ^2.3.5
+  graphql: ^5.0.1
+  decimal: ^2.1.0
