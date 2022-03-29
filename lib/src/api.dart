@@ -1,125 +1,67 @@
 library api;
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
+import 'package:path/path.dart';
 
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-import 'package:wallet_core/models/api.dart';
+class StudioApi {
+  late Dio _dio;
 
-class API extends Api {
-  late String _base;
-  late Client _client;
-  String? _jwtToken;
-
-  API(
-    String base,
-  )   : _base = base,
-        _client = Client();
-
-  void setJwtToken(String jwtToken) {
-    _jwtToken = jwtToken;
-  }
-
-  Future<Map<String, dynamic>> _get(
-    String endpoint, {
-    bool private = false,
-    bool isRopsten = false,
-  }) async {
-    Response response;
-    String uri = isRopsten ? toRopsten(_base) : _base;
-    if (private) {
-      response = await _client.get(
-        Uri.parse('$uri/$endpoint'),
-        headers: {
-          "Authorization": "Bearer $_jwtToken",
+  StudioApi({
+    required String apiKey,
+    bool enableLogging = false,
+    String baseUrl = 'https://studio.fuse.io/api',
+  }) {
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        queryParameters: {
+          'apiKey': apiKey,
         },
-      );
-    } else {
-      response = await _client.get(Uri.parse('$uri/$endpoint'));
+        headers: {"Content-Type": 'application/json'},
+      ),
+    );
+    if (enableLogging) {
+      _dio.interceptors.add(PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+        responseHeader: true,
+        responseBody: true,
+        error: true,
+        compact: true,
+      ));
     }
-    return responseHandler(response);
-  }
-
-  Future<Map<String, dynamic>> _post(
-    String endpoint, {
-    dynamic body,
-    bool private = false,
-    bool isRopsten = false,
-  }) async {
-    Response response;
-    body = body == null ? body : json.encode(body);
-    String uri = isRopsten ? toRopsten(_base) : _base;
-    if (private) {
-      response = await _client.post(
-        Uri.parse('$uri/$endpoint'),
-        body: body,
-        headers: {
-          "Authorization": "Bearer $_jwtToken",
-          "Content-Type": 'application/json'
-        },
-      );
-    } else {
-      response = await _client.post(
-        Uri.parse('$uri/$endpoint'),
-        body: body,
-        headers: {
-          "Content-Type": 'application/json',
-        },
-      );
-    }
-    return responseHandler(response);
-  }
-
-  Future<Map<String, dynamic>> _put(
-    String endpoint, {
-    dynamic body,
-    bool private = false,
-  }) async {
-    Response response;
-    body = body == null ? body : json.encode(body);
-    if (private) {
-      response = await _client.put(
-        Uri.parse('$_base/$endpoint'),
-        body: body,
-        headers: {
-          "Authorization": "Bearer $_jwtToken",
-          "Content-Type": 'application/json'
-        },
-      );
-    } else {
-      response = await _client.put(
-        Uri.parse('$_base/$endpoint'),
-        body: body,
-        headers: {
-          "Content-Type": 'application/json',
-        },
-      );
-    }
-    return responseHandler(response);
   }
 
   Future<dynamic> getCommunityData(
     String communityAddress, {
-    bool isRopsten = false,
     String? walletAddress,
   }) async {
     String url = walletAddress != null
-        ? 'v1/communities/$communityAddress/$walletAddress'
-        : 'v1/communities/$communityAddress';
-    Map<String, dynamic> resp = await _get(
+        ? '/v1/communities/$communityAddress/$walletAddress'
+        : '/v1/communities/$communityAddress';
+    Response response = await _dio.get(
       url,
-      isRopsten: isRopsten,
     );
-    return resp['data'];
+
+    return response.data['data'];
   }
 
-  Future<dynamic> getBusinessList(String communityAddress) async {
-    Map<String, dynamic> resp = await _get(
-      'v1/entities/$communityAddress?type=business&withMetadata=true',
+  Future<dynamic> getBusinessList(
+    String communityAddress,
+  ) async {
+    Response response = await _dio.get(
+      '/v1/entities/$communityAddress',
+      queryParameters: {
+        'type': 'business',
+        'withMetadata': true,
+      },
     );
-    return resp;
+
+    return response.data;
   }
 
   Future<dynamic> getEntityMetadata(
@@ -127,32 +69,37 @@ class API extends Api {
     String account, {
     bool isRopsten = false,
   }) async {
-    Map<String, dynamic> resp = await _get(
-      'v1/entities/metadata/$communityAddress/$account',
-      isRopsten: isRopsten,
+    Response response = await _dio.get(
+      '/v1/entities/metadata/$communityAddress/$account',
     );
-    return resp['data'];
+
+    return response.data['data'];
   }
 
   Future<dynamic> uploadImage(
     File imageFile,
   ) async {
-    MultipartRequest request =
-        new MultipartRequest("POST", Uri.parse('$_base/v1/images'));
-    request.files.add(await MultipartFile.fromPath(
-      'image',
-      imageFile.path,
-    ));
-    StreamedResponse streamedResponse = await request.send();
-    Response response = await Response.fromStream(streamedResponse);
-    return responseHandler(response);
+    FormData formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(
+        imageFile.path,
+        filename: basename(imageFile.path),
+      ),
+    });
+    Response response = await _dio.post(
+      '/v1/images',
+      data: formData,
+    );
+
+    return response.data;
   }
 
-  Future<dynamic> fetchMetadata(String uri, {bool isRopsten = false}) async {
-    Map<String, dynamic> resp = await _get(
-      'v1/metadata/$uri',
-      isRopsten: isRopsten,
+  Future<dynamic> fetchMetadata(
+    String uri,
+  ) async {
+    Response response = await _dio.get(
+      '/v1/metadata/$uri',
     );
-    return resp['data'];
+
+    return response.data['data'];
   }
 }

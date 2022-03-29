@@ -13,3 +13,5 @@ dependencies:
   web3dart: ^2.3.5
   graphql: ^5.0.1
   decimal: ^2.1.0
+  dio: ^4.0.4
+  pretty_dio_logger: ^1.2.0-beta-1

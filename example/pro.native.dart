@@ -12,7 +12,7 @@
 //   /* Fuse */
 
 //   // init web3 module
-//   Web3 web3 = new Web3(approvalCallback);
+//   Web3 web3 = Web3(approvalCallback);
 
 //   print('enter private key and press ENTER');
 //   String privateKey = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
@@ -43,7 +43,7 @@
 //   /* Ropsten */
 
 //   // init web3 module
-//   Web3 web3Ropsten = new Web3(approvalCallback,
+//   Web3 web3Ropsten = Web3(approvalCallback,
 //       url: 'https://ropsten.infura.io', networkId: 3);
 
 //   // set web3 credentials with same private key

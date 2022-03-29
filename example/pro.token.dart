@@ -11,7 +11,7 @@
 
 // void main() async {
 //   // init web3 module
-//   Web3 web3 = new Web3(approvalCallback);
+//   Web3 web3 = Web3(approvalCallback);
 
 //   print('enter private key and press ENTER');
 //   String privateKey = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));

@@ -18,7 +18,7 @@
 //   print('privateKey: $privateKey');
 
 //   // init web3 module
-//   Web3 web3 = new Web3(approvalCallback);
+//   Web3 web3 = Web3(approvalCallback);
 
 //   // set web3 credentials with private key
 //   await web3.setCredentials(privateKey);
@@ -28,7 +28,7 @@
 //   print('account address: $accountAddress');
 
 //   // init api module
-//   API api = new API();
+//   API api = API();
 
 //   // login
 //   print('enter phone number and press ENTER');
@@ -54,7 +54,7 @@
 //   String walletAddress = wallet["walletAddress"];
 
 //   // init graph module
-//   Graph graph = new Graph();
+//   Graph graph = Graph();
 
 //   dynamic defaultCommunity = web3.getDefaultCommunity();
 //   // get default community details
