@@ -11,7 +11,7 @@
 
 // void main() async {
 //   // init web3 module
-//   Web3 web3 = new Web3(
+//   Web3 web3 = Web3(
 //     approveCb: approvalCallback,
 //     networkId: 122,
 //     url: 'https://rpc.fuse.io',
@@ -38,7 +38,7 @@
 //       'balance before transaction: ${balance.getInWei} wei (${balance.getValueInUnit(EtherUnit.ether)} ether)');
 
 //   // init api module
-//   API api = new API('https://studio.fuse.io/api');
+//   API api = API('https://studio.fuse.io/api');
 
 //   // transfer 0.1 ETH to another address
 //   String receiverAddress = '0xF3a4C2862188781365966A040B1f47b9614b2DC7';

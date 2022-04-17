@@ -10,7 +10,7 @@
 
 // void main() async {
 //   // init web3 module
-//   Web3 web3 = new Web3(
+//   Web3 web3 = Web3(
 //     approveCb: approvalCallback,
 //     networkId: 122,
 //     url: 'https://rpc.fuse.io',
@@ -28,7 +28,7 @@
 //   print('account address: $accountAddress');
 
 //   // init api module
-//   API api = new API('https://studio.fuse.io/api');
+//   API api = API('https://studio.fuse.io/api');
 
 //   api.setJwtToken('YOUR_JWT');
 

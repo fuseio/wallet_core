@@ -1,105 +1,47 @@
 library api;
 
 import 'dart:async';
-import 'dart:convert';
-
-import 'package:http/http.dart';
-
-import 'package:wallet_core/models/api.dart';
+import 'package:dio/dio.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:wallet_core/src/web3.dart';
 
-class WalletApi extends Api {
-  late String _base;
-  late Client _client;
-  String? _jwtToken;
-  late String _phoneNumber;
+class WalletApi {
+  late String _jwtToken;
+  late Dio _dio;
 
-  WalletApi(
-    String base,
-  )   : _base = base,
-        _client = Client();
-
-  void setJwtToken(String jwtToken) {
-    _jwtToken = jwtToken;
-  }
-
-  Future<Map<String, dynamic>> _get(
-    String endpoint, {
-    bool private = false,
-    bool isRopsten = false,
-  }) async {
-    Response response;
-    String uri = isRopsten ? toRopsten(_base) : _base;
-    if (private) {
-      response = await _client.get(
-        Uri.parse('$uri/$endpoint'),
+  WalletApi({
+    String baseUrl = 'https://wallet.fuse.io/api',
+    bool enableLogging = false,
+  }) {
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
         headers: {
-          "Authorization": "Bearer $_jwtToken",
+          'Content-Type': 'application/json',
         },
-      );
-    } else {
-      response = await _client.get(Uri.parse('$uri/$endpoint'));
+      ),
+    );
+    if (enableLogging) {
+      _dio.interceptors.add(PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+        responseHeader: true,
+        responseBody: true,
+        error: true,
+        compact: true,
+      ));
     }
-    return responseHandler(response);
   }
 
-  Future<Map<String, dynamic>> _post(
-    String endpoint, {
-    dynamic body,
-    bool private = false,
-    bool isRopsten = false,
-  }) async {
-    Response response;
-    body = body == null ? body : json.encode(body);
-    String uri = isRopsten ? toRopsten(_base) : _base;
-    if (private) {
-      response = await _client.post(
-        Uri.parse('$uri/$endpoint'),
-        body: body,
-        headers: {
-          "Authorization": "Bearer $_jwtToken",
-          "Content-Type": 'application/json'
-        },
-      );
-    } else {
-      response = await _client.post(
-        Uri.parse('$uri/$endpoint'),
-        body: body,
-        headers: {
-          "Content-Type": 'application/json',
-        },
-      );
-    }
-    return responseHandler(response);
+  void setJwtToken(String value) {
+    _jwtToken = value;
   }
 
-  Future<Map<String, dynamic>> _put(
-    String endpoint, {
-    dynamic body,
-    bool private = false,
-  }) async {
-    Response response;
-    body = body == null ? body : json.encode(body);
-    if (private) {
-      response = await _client.put(
-        Uri.parse('$_base/$endpoint'),
-        body: body,
+  Options get options => Options(
         headers: {
-          "Authorization": "Bearer $_jwtToken",
-          "Content-Type": 'application/json'
+          'Authorization': 'Bearer $_jwtToken',
         },
       );
-    } else {
-      response = await _client.put(
-        Uri.parse('$_base/$endpoint'),
-        body: body,
-        headers: {
-          "Content-Type": 'application/json',
-        },
-      );
-    }
-    return responseHandler(response);
-  }
 
   // Login using Firebase
   Future<String> loginWithFirebase(
@@ -108,18 +50,18 @@ class WalletApi extends Api {
     String identifier, {
     String? appName,
   }) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/login/firebase/verify',
-      body: {
-        "token": token,
-        "accountAddress": accountAddress,
-        "identifier": identifier,
-        "appName": appName
+    Response response = await _dio.post(
+      '/v1/login/firebase/verify',
+      data: {
+        'token': token,
+        'accountAddress': accountAddress,
+        'identifier': identifier,
+        'appName': appName,
       },
     );
-    if (resp["token"] != "") {
-      _jwtToken = resp["token"];
-      return _jwtToken!;
+    if (response.data['token'] != '') {
+      _jwtToken = response.data['token'];
+      return response.data['token'];
     } else {
       throw 'Error! Login verify failed - accountAddress: $accountAddress, token: $token, identifier: $identifier';
     }
@@ -129,13 +71,13 @@ class WalletApi extends Api {
   Future<bool> loginWithSMS(
     String phoneNumber,
   ) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/login/sms/request',
-      body: {
-        "phoneNumber": phoneNumber,
+    Response response = await _dio.post(
+      '/v1/login/sms/request',
+      data: {
+        'phoneNumber': phoneNumber,
       },
     );
-    if (resp["response"] == "ok") {
+    if (response.data['response'] == 'ok') {
       return true;
     } else {
       throw 'Error! Login request failed - phoneNumber: $phoneNumber';
@@ -149,19 +91,18 @@ class WalletApi extends Api {
     String accountAddress, {
     String? appName,
   }) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/login/sms/verify',
-      body: {
-        "code": verificationCode,
-        "phoneNumber": phoneNumber,
-        "accountAddress": accountAddress,
-        "appName": appName,
+    Response response = await _dio.post(
+      '/v1/login/sms/verify',
+      data: {
+        'code': verificationCode,
+        'phoneNumber': phoneNumber,
+        'accountAddress': accountAddress,
+        'appName': appName,
       },
     );
-    if (resp["token"] != "") {
-      _jwtToken = resp["token"];
-      _phoneNumber = phoneNumber;
-      return _jwtToken!;
+    if (response.data['token'] != '') {
+      _jwtToken = response.data['token'];
+      return response.data['token'];
     } else {
       throw 'Error! Login verify failed - phoneNumber: $phoneNumber, verificationCode: $verificationCode';
     }
@@ -173,18 +114,17 @@ class WalletApi extends Api {
     String accountAddress, {
     String? appName,
   }) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/login/request',
-      body: {
-        "phoneNumber": phoneNumber,
-        "accountAddress": accountAddress,
-        "appName": appName
+    Response response = await _dio.post(
+      '/v1/login/request',
+      data: {
+        'phoneNumber': phoneNumber,
+        'accountAddress': accountAddress,
+        'appName': appName,
       },
     );
-    if (resp["token"] != "") {
-      _jwtToken = resp["token"];
-      _phoneNumber = phoneNumber;
-      return _jwtToken!;
+    if (response.data['token'] != '') {
+      _jwtToken = response.data['token'];
+      return response.data['token'];
     } else {
       throw 'Error! Login verify failed - phoneNumber: $phoneNumber';
     }
@@ -195,46 +135,49 @@ class WalletApi extends Api {
     String? referralAddress,
   }) async {
     dynamic wallet = await getWallet();
-    if (wallet != null && wallet["walletAddress"] != null) {
+    if (wallet != null && wallet['walletAddress'] != null) {
       print('Wallet already exists - wallet: $wallet');
       return wallet;
     }
-    final Map body = {};
-    if (communityAddress != null) body['communityAddress'] = communityAddress;
-    if (referralAddress != null) body['referralAddress'] = referralAddress;
-    Map<String, dynamic> resp = await _post(
-      'v1/wallets',
-      private: true,
-      body: body,
+    Response response = await _dio.post(
+      '/v1/wallets',
+      data: {
+        'communityAddress': communityAddress,
+        'referralAddress': referralAddress,
+      },
+      options: options,
     );
-    if (resp["job"] != null) {
-      return resp;
+    if (response.data['job'] != null) {
+      return response.data;
     } else {
-      throw 'Error! Create wallet request failed for phoneNumber: $_phoneNumber';
+      throw 'Error! Create wallet request failed';
     }
   }
 
   Future<dynamic> getWallet() async {
-    Map<String, dynamic> resp = await _get('v1/wallets', private: true);
-    if (resp["data"] != null) {
+    Response response = await _dio.get(
+      '/v1/wallets',
+      options: options,
+    );
+    if (response.data['data'] != null) {
+      final Map<String, dynamic> data = response.data['data'];
       return {
-        "phoneNumber": resp["data"]["phoneNumber"],
-        "accountAddress": resp["data"]["accountAddress"],
-        "walletAddress": resp["data"]["walletAddress"],
-        "createdAt": resp["data"]["createdAt"],
-        "updatedAt": resp["data"]["updatedAt"],
-        "walletModules": resp['data']['walletModules'],
-        "communityManager": resp['data']['walletModules']['CommunityManager'],
-        "transferManager": resp['data']['walletModules']['TransferManager'],
-        "dAIPointsManager":
-            resp['data']['walletModules']['DAIPointsManager'] ?? null,
-        "networks": resp['data']['networks'],
-        "backup": resp["data"]['backup'],
-        "balancesOnForeign": resp['data']['balancesOnForeign'],
-        "apy": resp['data']['apy'],
-        "version": resp['data']['version'],
-        "paddedVersion": resp['data']['paddedVersion'],
-        "isBlacklisted": resp['data']['isBlacklisted'] ?? false,
+        'phoneNumber': data['phoneNumber'],
+        'accountAddress': data['accountAddress'],
+        'walletAddress': data['walletAddress'],
+        'createdAt': data['createdAt'],
+        'updatedAt': data['updatedAt'],
+        'walletModules': data['walletModules'],
+        'communityManager': data['walletModules']['CommunityManager'],
+        'transferManager': data['walletModules']['TransferManager'],
+        'dAIPointsManager': data['walletModules']['DAIPointsManager'] ?? null,
+        'networks': data['networks'],
+        'backup': data['backup'],
+        'balancesOnForeign': data['balancesOnForeign'],
+        'apy': data['apy'],
+        'version': data['version'],
+        'paddedVersion': data['paddedVersion'],
+        'isBlacklisted': data['isBlacklisted'] ?? false,
       };
     } else {
       return {};
@@ -246,13 +189,15 @@ class WalletApi extends Api {
     int updatedAt = 0,
     String? tokenAddress,
   }) async {
-    String url = 'v1/wallets/actions/$walletAddress?updatedAt=$updatedAt';
-    url = tokenAddress != null ? '$url&tokenAddress=$tokenAddress' : url;
-    Map<String, dynamic> resp = await _get(
-      url,
-      private: true,
+    Response response = await _dio.get(
+      '/v1/wallets/actions/$walletAddress',
+      queryParameters: {
+        'updatedAt': updatedAt,
+        'tokenAddress': tokenAddress,
+      },
+      options: options,
     );
-    return resp['data'];
+    return response.data['data'];
   }
 
   Future<Map<String, dynamic>> getPaginatedActionsByWalletAddress(
@@ -260,23 +205,25 @@ class WalletApi extends Api {
     int pageIndex, {
     String? tokenAddress,
   }) async {
-    String url = 'v1/wallets/actions/paginated/$walletAddress?page=$pageIndex';
-    url = tokenAddress != null ? '$url&tokenAddress=$tokenAddress' : url;
-    Map<String, dynamic> resp = await _get(
-      url,
-      private: true,
+    Response response = await _dio.get(
+      '/v1/wallets/actions/paginated/$walletAddress',
+      queryParameters: {
+        'page': pageIndex,
+        'tokenAddress': tokenAddress,
+      },
+      options: options,
     );
-    return resp['data'];
+    return response.data['data'];
   }
 
   Future<dynamic> getAvailableUpgrades(
     String walletAddress,
   ) async {
-    Map<String, dynamic> resp = await _get(
-      'v1/wallets/upgrades/available/$walletAddress',
-      private: true,
+    Response response = await _dio.get(
+      '/v1/wallets/upgrades/available/$walletAddress',
+      options: options,
     );
-    return resp['data'];
+    return response.data['data'];
   }
 
   Future<dynamic> installUpgrades(
@@ -293,54 +240,58 @@ class WalletApi extends Api {
       disableModuleAddress,
       enableModuleAddress,
     );
-    Map<String, dynamic> resp = await _post(
-      'v1/wallets/upgrades/install/$walletAddress',
-      private: true,
-      body: {
-        "upgradeId": upgradeId,
-        "relayParams": relayParams,
+    Response response = await _dio.post(
+      '/v1/wallets/upgrades/install/$walletAddress',
+      data: {
+        'upgradeId': upgradeId,
+        'relayParams': relayParams,
       },
+      options: options,
     );
-    return resp['data'];
+
+    return response.data['data'];
   }
 
   Future<Map<String, dynamic>> getNextReward(
     String walletAddress,
   ) async {
-    Map<String, dynamic> resp = await _get(
-      'v1/wallets/apy/reward/$walletAddress',
-      private: true,
+    Response response = await _dio.get(
+      '/v1/wallets/apy/reward/$walletAddress',
+      options: options,
     );
-    return resp['data'];
+
+    return response.data['data'];
   }
 
   Future<Map<String, dynamic>> claimReward(
     String walletAddress,
   ) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/wallets/apy/claim/$walletAddress',
-      private: true,
+    Response response = await _dio.post(
+      '/v1/wallets/apy/claim/$walletAddress',
+      options: options,
     );
-    return resp['data'];
+
+    return response.data['data'];
   }
 
   Future<Map<String, dynamic>> enableWalletApy(
     String walletAddress,
   ) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/wallets/apy/enable/$walletAddress',
-      private: true,
+    Response response = await _dio.post(
+      '/v1/wallets/apy/enable/$walletAddress',
+      options: options,
     );
-    return resp['data'];
+
+    return response.data['data'];
   }
 
   Future<dynamic> getJob(String id) async {
-    Map<String, dynamic> resp = await _get(
-      'v1/jobs/$id',
-      private: true,
+    Response response = await _dio.get(
+      '/v1/jobs/$id',
+      options: options,
     );
-    if (resp["data"] != null) {
-      return resp["data"];
+    if (response.data['data'] != null) {
+      return response.data['data'];
     } else {
       return null;
     }
@@ -349,17 +300,17 @@ class WalletApi extends Api {
   Future<dynamic> getWalletByPhoneNumber(
     String phoneNumber,
   ) async {
-    Map<String, dynamic> resp = await _get(
-      'v1/wallets/$phoneNumber',
-      private: true,
+    Response response = await _dio.get(
+      '/v1/wallets/$phoneNumber',
+      options: options,
     );
-    if (resp["data"] != null) {
+    if (response.data['data'] != null) {
       return {
-        "phoneNumber": resp["data"]["phoneNumber"],
-        "accountAddress": resp["data"]["accountAddress"],
-        "walletAddress": resp["data"]["walletAddress"],
-        "createdAt": resp["data"]["createdAt"],
-        "updatedAt": resp["data"]["updatedAt"]
+        'phoneNumber': response.data['data']['phoneNumber'],
+        'accountAddress': response.data['data']['accountAddress'],
+        'walletAddress': response.data['data']['walletAddress'],
+        'createdAt': response.data['data']['createdAt'],
+        'updatedAt': response.data['data']['updatedAt']
       };
     } else {
       return {};
@@ -370,46 +321,46 @@ class WalletApi extends Api {
     String walletAddress,
     String firebaseToken,
   ) async {
-    Map<String, dynamic> resp = await _put(
-      'v1/wallets/token/$walletAddress',
-      body: {"firebaseToken": firebaseToken},
-      private: true,
+    Response response = await _dio.put(
+      '/v1/wallets/token/$walletAddress',
+      data: {'firebaseToken': firebaseToken},
+      options: options,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> addUserContext(
     Map<dynamic, dynamic> body,
   ) async {
-    Map<String, dynamic> resp = await _put(
-      'v1/wallets/context',
-      body: body,
-      private: true,
+    Response response = await _dio.put(
+      '/v1/wallets/context',
+      data: body,
+      options: options,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> deleteFirebaseToken(
     String walletAddress,
     String firebaseToken,
   ) async {
-    Map<String, dynamic> resp = await _put(
-      'v1/wallets/token/$walletAddress/delete',
-      body: {"firebaseToken": firebaseToken},
-      private: true,
+    Response response = await _dio.put(
+      '/v1/wallets/token/$walletAddress/delete',
+      data: {'firebaseToken': firebaseToken},
+      options: options,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> backupWallet({
     String? communityAddress,
   }) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/wallets/backup',
-      body: {"communityAddress": communityAddress},
-      private: true,
+    Response response = await _dio.post(
+      '/v1/wallets/backup',
+      data: {'communityAddress': communityAddress},
+      options: options,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> joinCommunity(
@@ -429,12 +380,12 @@ class WalletApi extends Api {
       originNetwork: originNetwork,
       communityName: communityName,
     );
-    Map<String, dynamic> resp = await _post(
-      'v1/relay',
-      private: true,
-      body: data,
+    Response response = await _dio.post(
+      '/v1/relay',
+      data: data,
+      options: options,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> transfer(
@@ -443,7 +394,7 @@ class WalletApi extends Api {
     String receiverAddress, {
     String? tokensAmount,
     BigInt? amountInWei,
-    String network = "fuse",
+    String network = 'fuse',
     Map? transactionBody,
   }) async {
     Map<String, dynamic> data = await web3.transferOffChain(
@@ -454,12 +405,12 @@ class WalletApi extends Api {
       network: network,
       transactionBody: transactionBody,
     );
-    Map<String, dynamic> resp = await _post(
-      'v1/relay',
-      private: true,
-      body: data,
+    Response response = await _dio.post(
+      '/v1/relay',
+      options: options,
+      data: data,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> nftTransfer(
@@ -481,12 +432,12 @@ class WalletApi extends Api {
       network: network,
       transactionBody: transactionBody,
     );
-    Map<String, dynamic> resp = await _post(
-      'v1/relay',
-      private: true,
-      body: data,
+    Response response = await _dio.post(
+      '/v1/relay',
+      options: options,
+      data: data,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> tokenTransfer(
@@ -506,12 +457,12 @@ class WalletApi extends Api {
       network: network,
       externalId: externalId,
     );
-    Map<String, dynamic> resp = await _post(
-      'v1/relay',
-      private: true,
-      body: data,
+    Response response = await _dio.post(
+      '/v1/relay',
+      options: options,
+      data: data,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> approveTokenTransfer(
@@ -529,12 +480,12 @@ class WalletApi extends Api {
       amountInWei: amountInWei,
       network: network,
     );
-    Map<String, dynamic> resp = await _post(
-      'v1/relay',
-      private: true,
-      body: data,
+    Response response = await _dio.post(
+      '/v1/relay',
+      options: options,
+      data: data,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> transferDaiToDaiPointsOffChain(
@@ -550,12 +501,12 @@ class WalletApi extends Api {
       tokenDecimals,
       network: network,
     );
-    Map<String, dynamic> resp = await _post(
-      'v1/relay',
-      private: true,
-      body: data,
+    Response response = await _dio.post(
+      '/v1/relay',
+      options: options,
+      data: data,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> callContract(
@@ -579,12 +530,12 @@ class WalletApi extends Api {
       transactionBody: transactionBody,
       txMetadata: txMetadata,
     );
-    Map<String, dynamic> resp = await _post(
-      'v1/relay',
-      private: true,
-      body: signedData,
+    Response response = await _dio.post(
+      '/v1/relay',
+      options: options,
+      data: signedData,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> approveTokenAndCallContract(
@@ -611,42 +562,48 @@ class WalletApi extends Api {
       transactionBody: transactionBody,
       txMetadata: txMetadata,
     );
-    Map<String, dynamic> resp = await _post(
-      'v1/relay',
-      private: true,
-      body: signedData,
+    Response response = await _dio.post(
+      '/v1/relay',
+      options: options,
+      data: signedData,
     );
-    return resp;
+
+    return response.data;
   }
 
   Future<dynamic> multiRelay(
     List<dynamic> items,
   ) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/relay/multi',
-      private: true,
-      body: {'items': items},
+    Response response = await _dio.post(
+      '/v1/relay/multi',
+      options: options,
+      data: {
+        'items': items,
+      },
     );
-    return resp;
+
+    return response.data;
   }
 
   Future<dynamic> syncContacts(
     List<String> phoneNumbers,
   ) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/contacts',
-      body: {"contacts": phoneNumbers},
-      private: true,
+    Response response = await _dio.post(
+      '/v1/contacts',
+      data: {'contacts': phoneNumbers},
+      options: options,
     );
-    return resp["data"];
+
+    return response.data['data'];
   }
 
   Future<dynamic> ackSync(int nonce) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/contacts/$nonce',
-      private: true,
+    Response response = await _dio.post(
+      '/v1/contacts/$nonce',
+      options: options,
     );
-    return resp;
+
+    return response.data;
   }
 
   Future<dynamic> invite(
@@ -656,17 +613,17 @@ class WalletApi extends Api {
     String amount = '',
     String symbol = '',
   }) async {
-    Map<String, dynamic> resp = await _post(
-      'v1/wallets/invite/$phoneNumber',
-      body: {
-        "communityAddress": communityAddress,
-        "name": name,
-        "amount": amount,
-        "symbol": symbol,
+    Response response = await _dio.post(
+      '/v1/wallets/invite/$phoneNumber',
+      data: {
+        'communityAddress': communityAddress,
+        'name': name,
+        'amount': amount,
+        'symbol': symbol,
       },
-      private: true,
+      options: options,
     );
-    return resp;
+    return response.data;
   }
 
   Future<dynamic> transferTokenToHomeWithAMBBridge(
@@ -718,80 +675,84 @@ class WalletApi extends Api {
   Future<Map<String, dynamic>> getBeaconByWalletAddress(
     String walletAddress,
   ) async {
-    String url = 'v1/wallets/beacons/$walletAddress';
-    Map<String, dynamic> resp = await _post(
+    String url = '/v1/wallets/beacons/$walletAddress';
+    Response response = await _dio.post(
       url,
-      private: true,
+      options: options,
     );
-    return resp['data'];
+    return response.data['data'];
   }
 
   Future<Map<String, dynamic>> getWalletAddressByMajorAndMonirIds(
     int major,
     int minor,
   ) async {
-    String url = 'v1/wallets/beacons/$major/$minor';
-    Map<String, dynamic> resp = await _get(
+    String url = '/v1/wallets/beacons/$major/$minor';
+    Response response = await _dio.get(
       url,
-      private: true,
+      options: options,
     );
-    return resp['data'];
+    return response.data['data'];
   }
 
   Future<Map<String, dynamic>> getReferralInfo(
     String walletAddress,
   ) async {
-    Map<String, dynamic> resp = await _get(
-      'v1/wallets/referral/total/$walletAddress',
-      private: true,
+    Response response = await _dio.get(
+      '/v1/wallets/referral/total/$walletAddress',
+      options: options,
     );
-    return resp['data'];
+    return response.data['data'];
   }
 
   Future<Map<String, dynamic>> getUserProfile(
     String walletAddress,
   ) async {
-    String url = 'v1/wallets/profiles/$walletAddress';
-    Map<String, dynamic> resp = await _get(
+    String url = '/v1/wallets/profiles/$walletAddress';
+    Response response = await _dio.get(
       url,
-      private: true,
+      options: options,
     );
-    return resp['data'];
+
+    return response.data['data'];
   }
 
   Future<dynamic> saveUserProfile(Map body) async {
-    String url = 'v1/wallets/profiles';
-    Map<String, dynamic> resp = await _post(
+    String url = '/v1/wallets/profiles';
+    Response response = await _dio.post(
       url,
-      body: body,
-      private: true,
+      data: body,
+      options: options,
     );
-    return resp;
+
+    return response.data;
   }
 
   Future<dynamic> updateAvatar(
     String accountAddress,
     String avatarHash,
   ) async {
-    String url = 'v1/wallets/profiles/$accountAddress/avatar';
-    Map<String, dynamic> resp = await _put(
+    String url = '/v1/wallets/profiles/$accountAddress/avatar';
+    Response response = await _dio.put(
       url,
-      body: {"avatarHash": avatarHash},
-      private: true,
+      data: {'avatarHash': avatarHash},
+      options: options,
     );
-    return resp;
+
+    return response.data;
   }
 
   Future<dynamic> updateDisplayName(
     String accountAddress,
     String displayName,
   ) async {
-    String url = 'v1/wallets/profiles/$accountAddress/name';
-    Map<String, dynamic> resp = await _put(
+    String url = '/v1/wallets/profiles/$accountAddress/name';
+    Response response = await _dio.put(
       url,
-      body: {"displayName": displayName},
-      private: true,
+      data: {'displayName': displayName},
+      options: options,
     );
-    return resp;
+
+    return response.data;
   }
 }

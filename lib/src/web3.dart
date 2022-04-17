@@ -37,7 +37,7 @@ class Web3 {
     required String daiPointsManagerAddress,
     required String transferManagerAddress,
     int defaultGasLimit = Variables.DEFAULT_GAS_LIMIT,
-  })  : _client = new Web3Client(url, new Client()),
+  })  : _client = Web3Client(url, Client()),
         _approveCb = approveCb(),
         _networkId = networkId,
         _defaultCommunityContractAddress = defaultCommunityAddress,
@@ -92,7 +92,7 @@ class Web3 {
     int retries = 10;
     while (receipt == null) {
       print('waiting for receipt');
-      await Future.delayed(new Duration(seconds: delay));
+      await Future.delayed(Duration(seconds: delay));
       delay *= 2;
       retries--;
       if (retries == 0) {
@@ -274,7 +274,7 @@ class Web3 {
   Future<String> getNonceForRelay() async {
     BigInt block = BigInt.from(await _client.getBlockNumber());
     print('block: $block');
-    BigInt timestamp = BigInt.from(new DateTime.now().millisecondsSinceEpoch);
+    BigInt timestamp = BigInt.from(DateTime.now().millisecondsSinceEpoch);
     print('timestamp: $timestamp');
     String blockHex = hexZeroPad(hexlify(block), 16);
     String timestampHex = hexZeroPad(hexlify(timestamp), 16);

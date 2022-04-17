@@ -11,7 +11,7 @@
 
 // void main() async {
 //   // init web3 module
-//   Web3 web3 = new Web3(
+//   Web3 web3 = Web3(
 //     approveCb: approvalCallback,
 //     networkId: 122,
 //     url: 'https://rpc.fuse.io',
@@ -45,7 +45,7 @@
 //   tokenDecimals = BigInt.from(pow(10, tokenDecimals));
 
 //   // init graph module
-//   Graph graph = new Graph('https://graph.fuse.io/subgraphs/name/fuseio');
+//   Graph graph = Graph('https://graph.fuse.io/subgraphs/name/fuseio');
 
 //   // get own token balance before transfer
 //   dynamic tokenBalance =
@@ -61,7 +61,7 @@
 //       '$receiverAddress has $tokenBalance $tokenName($tokenSymbol) tokens before transfer');
 
 //   // init api module
-//   API api = new API();
+//   API api = API();
 
 //   // transfer tokens
 //   await api.tokenTransfer(
