@@ -5,6 +5,7 @@ description: Fuse wallet core Dart library to interact with Ethereum based netwo
 environment:
   sdk: ">=2.15.0 <3.0.0"
 dependencies:
+  path: ^1.8.1
   gql: ^0.13.1
   bip32: ^2.0.0
   bip39: ^1.0.6
