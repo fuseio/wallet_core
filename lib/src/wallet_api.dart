@@ -2,7 +2,6 @@ library api;
 
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:wallet_core/src/web3.dart';
 
 class WalletApi {
@@ -11,7 +10,7 @@ class WalletApi {
 
   WalletApi({
     String baseUrl = 'https://wallet.fuse.io/api',
-    bool enableLogging = false,
+    List<Interceptor> interceptors = const [],
   }) {
     _dio = Dio(
       BaseOptions(
@@ -21,15 +20,8 @@ class WalletApi {
         },
       ),
     );
-    if (enableLogging) {
-      _dio.interceptors.add(PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: true,
-        responseBody: true,
-        error: true,
-        compact: true,
-      ));
+    if (interceptors.isNotEmpty) {
+      _dio.interceptors.addAll(interceptors);
     }
   }
 
