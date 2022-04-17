@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:path/path.dart' show basename;
 
 import 'package:dio/dio.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class StudioApi {
   late Dio _dio;
@@ -14,6 +13,7 @@ class StudioApi {
     String? apiKey,
     bool enableLogging = false,
     String baseUrl = 'https://studio.fuse.io/api',
+    List<Interceptor> interceptors = const [],
   }) {
     _dio = Dio(
       BaseOptions(
@@ -27,14 +27,7 @@ class StudioApi {
       ),
     );
     if (enableLogging) {
-      _dio.interceptors.add(PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: true,
-        responseBody: true,
-        error: true,
-        compact: true,
-      ));
+      _dio.interceptors.addAll(interceptors);
     }
   }
 

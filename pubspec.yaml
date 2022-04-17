@@ -15,4 +15,3 @@ dependencies:
   graphql: ^5.1.1
   decimal: ^2.1.0
   dio: ^4.0.6
-  pretty_dio_logger: ^1.2.0-beta-1
