@@ -11,16 +11,18 @@ class StudioApi {
   late Dio _dio;
 
   StudioApi({
-    required String apiKey,
+    String? apiKey,
     bool enableLogging = false,
     String baseUrl = 'https://studio.fuse.io/api',
   }) {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
-        queryParameters: {
-          'apiKey': apiKey,
-        },
+        queryParameters: apiKey != null
+            ? {
+                'apiKey': apiKey,
+              }
+            : null,
         headers: {"Content-Type": 'application/json'},
       ),
     );
@@ -40,11 +42,11 @@ class StudioApi {
     String communityAddress, {
     String? walletAddress,
   }) async {
-    String url = walletAddress != null
+    String path = walletAddress != null
         ? '/v1/communities/$communityAddress/$walletAddress'
         : '/v1/communities/$communityAddress';
     Response response = await _dio.get(
-      url,
+      path,
     );
 
     return response.data['data'];
