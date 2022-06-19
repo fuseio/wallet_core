@@ -1,15 +1,19 @@
-library wallet_api;
+library charge_api;
 
 import 'dart:async';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:path/path.dart' show basename;
 import 'package:wallet_core/src/web3.dart';
 
-class WalletApi {
+class ChargeApi {
   late String _jwtToken;
   late Dio _dio;
 
-  WalletApi({
-    String baseUrl = 'https://wallet.fuse.io/api',
+  ChargeApi(
+    String publicAPI, {
+    String baseUrl = 'https://charge-api.fuse.io/api',
     List<Interceptor> interceptors = const [],
   }) {
     _dio = Dio(
@@ -17,6 +21,9 @@ class WalletApi {
         baseUrl: baseUrl,
         headers: {
           'Content-Type': 'application/json',
+        },
+        queryParameters: {
+          'apiKey': publicAPI,
         },
       ),
     );
@@ -35,6 +42,77 @@ class WalletApi {
         },
       );
 
+  // Start of studio API's
+  Future<dynamic> getCommunityData(
+    String communityAddress, {
+    String? walletAddress,
+  }) async {
+    String path = walletAddress != null
+        ? '/v0/studio/communities/$communityAddress/$walletAddress'
+        : '/v0/studio/communities/$communityAddress';
+    Response response = await _dio.get(
+      path,
+    );
+
+    return response.data['data'];
+  }
+
+  Future<dynamic> getBusinessList(
+    String communityAddress,
+  ) async {
+    Response response = await _dio.get(
+      '/v0/studio/entities/$communityAddress',
+      queryParameters: {
+        'type': 'business',
+        'withMetadata': true,
+      },
+    );
+
+    return response.data;
+  }
+
+  Future<dynamic> getEntityMetadata(
+    String communityAddress,
+    String account, {
+    bool isRopsten = false,
+  }) async {
+    Response response = await _dio.get(
+      '/v0/studio/entities/metadata/$communityAddress/$account',
+    );
+
+    return response.data['data'];
+  }
+
+  Future<dynamic> uploadImage(
+    File imageFile,
+  ) async {
+    FormData formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(
+        imageFile.path,
+        filename: basename(imageFile.path),
+      ),
+    });
+    Response response = await _dio.post(
+      '/v0/studio/images',
+      data: formData,
+    );
+
+    return response.data;
+  }
+
+  Future<dynamic> fetchMetadata(
+    String uri,
+  ) async {
+    Response response = await _dio.get(
+      '/v0/studio/metadata/$uri',
+    );
+
+    return response.data['data'];
+  }
+  // End of studio API's
+
+  // Start of Wallet API's
+
   // Login using Firebase
   Future<String> loginWithFirebase(
     String token,
@@ -43,7 +121,7 @@ class WalletApi {
     String? appName,
   }) async {
     Response response = await _dio.post(
-      '/v1/login/firebase/verify',
+      '/v0/wallets/login/firebase/verify',
       data: {
         'token': token,
         'accountAddress': accountAddress,
@@ -64,7 +142,7 @@ class WalletApi {
     String phoneNumber,
   ) async {
     Response response = await _dio.post(
-      '/v1/login/sms/request',
+      '/v0/wallets/login/sms/request',
       data: {
         'phoneNumber': phoneNumber,
       },
@@ -84,7 +162,7 @@ class WalletApi {
     String? appName,
   }) async {
     Response response = await _dio.post(
-      '/v1/login/sms/verify',
+      '/v0/wallets/login/sms/verify',
       data: {
         'code': verificationCode,
         'phoneNumber': phoneNumber,
@@ -107,7 +185,7 @@ class WalletApi {
     String? appName,
   }) async {
     Response response = await _dio.post(
-      '/v1/login/request',
+      '/v0/wallets/login/request',
       data: {
         'phoneNumber': phoneNumber,
         'accountAddress': accountAddress,
@@ -132,7 +210,7 @@ class WalletApi {
       return wallet;
     }
     Response response = await _dio.post(
-      '/v1/wallets',
+      '/v0/wallets/wallets',
       data: {
         'communityAddress': communityAddress,
         'referralAddress': referralAddress,
@@ -148,7 +226,7 @@ class WalletApi {
 
   Future<dynamic> getWallet() async {
     Response response = await _dio.get(
-      '/v1/wallets',
+      '/v0/wallets/wallets',
       options: options,
     );
     if (response.data['data'] != null) {
@@ -182,7 +260,7 @@ class WalletApi {
     String? tokenAddress,
   }) async {
     Response response = await _dio.get(
-      '/v1/wallets/actions/$walletAddress',
+      '/v0/wallets/wallets/actions/$walletAddress',
       queryParameters: {
         'updatedAt': updatedAt,
         'tokenAddress': tokenAddress,
@@ -198,7 +276,7 @@ class WalletApi {
     String? tokenAddress,
   }) async {
     Response response = await _dio.get(
-      '/v1/wallets/actions/paginated/$walletAddress',
+      '/v0/wallets/wallets/actions/paginated/$walletAddress',
       queryParameters: {
         'page': pageIndex,
         'tokenAddress': tokenAddress,
@@ -212,7 +290,7 @@ class WalletApi {
     String walletAddress,
   ) async {
     Response response = await _dio.get(
-      '/v1/wallets/upgrades/available/$walletAddress',
+      '/v0/wallets/wallets/upgrades/available/$walletAddress',
       options: options,
     );
     return response.data['data'];
@@ -233,7 +311,7 @@ class WalletApi {
       enableModuleAddress,
     );
     Response response = await _dio.post(
-      '/v1/wallets/upgrades/install/$walletAddress',
+      '/v0/wallets/wallets/upgrades/install/$walletAddress',
       data: {
         'upgradeId': upgradeId,
         'relayParams': relayParams,
@@ -248,7 +326,7 @@ class WalletApi {
     String walletAddress,
   ) async {
     Response response = await _dio.get(
-      '/v1/wallets/apy/reward/$walletAddress',
+      '/v0/wallets/wallets/apy/reward/$walletAddress',
       options: options,
     );
 
@@ -259,7 +337,7 @@ class WalletApi {
     String walletAddress,
   ) async {
     Response response = await _dio.post(
-      '/v1/wallets/apy/claim/$walletAddress',
+      '/v0/wallets/wallets/apy/claim/$walletAddress',
       options: options,
     );
 
@@ -270,7 +348,7 @@ class WalletApi {
     String walletAddress,
   ) async {
     Response response = await _dio.post(
-      '/v1/wallets/apy/enable/$walletAddress',
+      '/v0/wallets/wallets/apy/enable/$walletAddress',
       options: options,
     );
 
@@ -279,7 +357,7 @@ class WalletApi {
 
   Future<dynamic> getJob(String id) async {
     Response response = await _dio.get(
-      '/v1/jobs/$id',
+      '/v0/jobs/$id',
       options: options,
     );
     if (response.data['data'] != null) {
@@ -293,7 +371,7 @@ class WalletApi {
     String phoneNumber,
   ) async {
     Response response = await _dio.get(
-      '/v1/wallets/$phoneNumber',
+      '/v0/wallets/wallets/$phoneNumber',
       options: options,
     );
     if (response.data['data'] != null) {
@@ -314,7 +392,7 @@ class WalletApi {
     String firebaseToken,
   ) async {
     Response response = await _dio.put(
-      '/v1/wallets/token/$walletAddress',
+      '/v0/wallets/wallets/token/$walletAddress',
       data: {'firebaseToken': firebaseToken},
       options: options,
     );
@@ -325,7 +403,7 @@ class WalletApi {
     Map<dynamic, dynamic> body,
   ) async {
     Response response = await _dio.put(
-      '/v1/wallets/context',
+      '/v0/wallets/wallets/context',
       data: body,
       options: options,
     );
@@ -337,7 +415,7 @@ class WalletApi {
     String firebaseToken,
   ) async {
     Response response = await _dio.put(
-      '/v1/wallets/token/$walletAddress/delete',
+      '/v0/wallets/wallets/token/$walletAddress/delete',
       data: {'firebaseToken': firebaseToken},
       options: options,
     );
@@ -348,7 +426,7 @@ class WalletApi {
     String? communityAddress,
   }) async {
     Response response = await _dio.post(
-      '/v1/wallets/backup',
+      '/v0/wallets/wallets/backup',
       data: {'communityAddress': communityAddress},
       options: options,
     );
@@ -373,7 +451,7 @@ class WalletApi {
       communityName: communityName,
     );
     Response response = await _dio.post(
-      '/v1/relay',
+      '/v0/wallets/relay',
       data: data,
       options: options,
     );
@@ -398,7 +476,7 @@ class WalletApi {
       transactionBody: transactionBody,
     );
     Response response = await _dio.post(
-      '/v1/relay',
+      '/v0/wallets/relay',
       options: options,
       data: data,
     );
@@ -425,7 +503,7 @@ class WalletApi {
       transactionBody: transactionBody,
     );
     Response response = await _dio.post(
-      '/v1/relay',
+      '/v0/wallets/relay',
       options: options,
       data: data,
     );
@@ -450,7 +528,7 @@ class WalletApi {
       externalId: externalId,
     );
     Response response = await _dio.post(
-      '/v1/relay',
+      '/v0/wallets/relay',
       options: options,
       data: data,
     );
@@ -473,28 +551,7 @@ class WalletApi {
       network: network,
     );
     Response response = await _dio.post(
-      '/v1/relay',
-      options: options,
-      data: data,
-    );
-    return response.data;
-  }
-
-  Future<dynamic> transferDaiToDaiPointsOffChain(
-    Web3 web3,
-    String walletAddress,
-    num tokensAmount,
-    int tokenDecimals, {
-    String? network,
-  }) async {
-    Map<String, dynamic> data = await web3.transferDaiToDAIpOffChain(
-      walletAddress,
-      tokensAmount,
-      tokenDecimals,
-      network: network,
-    );
-    Response response = await _dio.post(
-      '/v1/relay',
+      '/v0/wallets/relay',
       options: options,
       data: data,
     );
@@ -523,7 +580,7 @@ class WalletApi {
       txMetadata: txMetadata,
     );
     Response response = await _dio.post(
-      '/v1/relay',
+      '/v0/wallets/relay',
       options: options,
       data: signedData,
     );
@@ -555,7 +612,7 @@ class WalletApi {
       txMetadata: txMetadata,
     );
     Response response = await _dio.post(
-      '/v1/relay',
+      '/v0/wallets/relay',
       options: options,
       data: signedData,
     );
@@ -567,7 +624,7 @@ class WalletApi {
     List<dynamic> items,
   ) async {
     Response response = await _dio.post(
-      '/v1/relay/multi',
+      '/v0/wallets/relay/multi',
       options: options,
       data: {
         'items': items,
@@ -581,7 +638,7 @@ class WalletApi {
     List<String> phoneNumbers,
   ) async {
     Response response = await _dio.post(
-      '/v1/contacts',
+      '/v0/wallets/contacts',
       data: {'contacts': phoneNumbers},
       options: options,
     );
@@ -589,9 +646,11 @@ class WalletApi {
     return response.data['data'];
   }
 
-  Future<dynamic> ackSync(int nonce) async {
+  Future<dynamic> ackSync(
+    int nonce,
+  ) async {
     Response response = await _dio.post(
-      '/v1/contacts/$nonce',
+      '/v0/wallets/contacts/$nonce',
       options: options,
     );
 
@@ -606,7 +665,7 @@ class WalletApi {
     String symbol = '',
   }) async {
     Response response = await _dio.post(
-      '/v1/wallets/invite/$phoneNumber',
+      '/v0/wallets/wallets/invite/$phoneNumber',
       data: {
         'communityAddress': communityAddress,
         'name': name,
@@ -618,80 +677,11 @@ class WalletApi {
     return response.data;
   }
 
-  Future<dynamic> transferTokenToHomeWithAMBBridge(
-    Web3 web3,
-    String walletAddress,
-    String foreignBridgeMediator,
-    String tokenAddress,
-    num tokensAmount,
-    int tokenDecimals, {
-    String network = 'mainnet',
-  }) async {
-    List<dynamic> signData = await web3.transferTokenToHome(
-      walletAddress,
-      foreignBridgeMediator,
-      tokenAddress,
-      tokensAmount,
-      tokenDecimals,
-      network: network,
-    );
-    Map<String, dynamic> resp = await multiRelay(
-      signData,
-    );
-    return resp;
-  }
-
-  Future<dynamic> transferTokenToForeignWithAMBBridge(
-    Web3 web3,
-    String walletAddress,
-    String homeBridgeMediatorAddress,
-    String tokenAddress,
-    num tokensAmount,
-    int tokenDecimals, {
-    String network = 'fuse',
-  }) async {
-    List<dynamic> signData = await web3.transferTokenToForeign(
-      walletAddress,
-      homeBridgeMediatorAddress,
-      tokenAddress,
-      tokensAmount,
-      tokenDecimals,
-      network: network,
-    );
-    Map<String, dynamic> resp = await multiRelay(
-      signData,
-    );
-    return resp;
-  }
-
-  Future<Map<String, dynamic>> getBeaconByWalletAddress(
-    String walletAddress,
-  ) async {
-    String url = '/v1/wallets/beacons/$walletAddress';
-    Response response = await _dio.post(
-      url,
-      options: options,
-    );
-    return response.data['data'];
-  }
-
-  Future<Map<String, dynamic>> getWalletAddressByMajorAndMonirIds(
-    int major,
-    int minor,
-  ) async {
-    String url = '/v1/wallets/beacons/$major/$minor';
-    Response response = await _dio.get(
-      url,
-      options: options,
-    );
-    return response.data['data'];
-  }
-
   Future<Map<String, dynamic>> getReferralInfo(
     String walletAddress,
   ) async {
     Response response = await _dio.get(
-      '/v1/wallets/referral/total/$walletAddress',
+      '/v0/wallets/wallets/referral/total/$walletAddress',
       options: options,
     );
     return response.data['data'];
@@ -700,19 +690,19 @@ class WalletApi {
   Future<Map<String, dynamic>> getUserProfile(
     String walletAddress,
   ) async {
-    String url = '/v1/wallets/profiles/$walletAddress';
     Response response = await _dio.get(
-      url,
+      '/v0/wallets/wallets/profiles/$walletAddress',
       options: options,
     );
 
     return response.data['data'];
   }
 
-  Future<dynamic> saveUserProfile(Map body) async {
-    String url = '/v1/wallets/profiles';
+  Future<dynamic> saveUserProfile(
+    Map body,
+  ) async {
     Response response = await _dio.post(
-      url,
+      '/v0/wallets/wallets/profiles',
       data: body,
       options: options,
     );
@@ -724,9 +714,8 @@ class WalletApi {
     String accountAddress,
     String avatarHash,
   ) async {
-    String url = '/v1/wallets/profiles/$accountAddress/avatar';
     Response response = await _dio.put(
-      url,
+      '/v0/wallets/wallets/profiles/$accountAddress/avatar',
       data: {'avatarHash': avatarHash},
       options: options,
     );
@@ -738,13 +727,86 @@ class WalletApi {
     String accountAddress,
     String displayName,
   ) async {
-    String url = '/v1/wallets/profiles/$accountAddress/name';
     Response response = await _dio.put(
-      url,
+      '/v0/wallets/wallets/profiles/$accountAddress/name',
       data: {'displayName': displayName},
       options: options,
     );
 
     return response.data;
   }
+
+  // End of Wallet API's
+
+  // Start of FuseSwap API's
+
+  Future<Map<String, dynamic>> requestParameters(
+    String currencyIn,
+    String currencyOut,
+    String amountIn,
+    String recipient,
+  ) async {
+    Response response = await _dio.post(
+      '/v0/fuseswap/swap/requestparameters',
+      data: {
+        "currencyIn": currencyIn,
+        "currencyOut": currencyOut,
+        "amountIn": amountIn,
+        "recipient": recipient,
+      },
+    );
+    return response.data;
+  }
+
+  Future<Map<dynamic, dynamic>> quote(
+    String currencyIn,
+    String currencyOut,
+    String amountIn,
+    String recipient,
+  ) async {
+    Response response = await _dio.post(
+      '/v0/fuseswap/swap/quote',
+      data: {
+        "currencyIn": currencyIn,
+        "currencyOut": currencyOut,
+        "amountIn": amountIn,
+        "recipient": recipient,
+      },
+    );
+    if (response.data['error'] != null) {
+      throw response.data['error']['message'];
+    }
+    return response.data['data'];
+  }
+
+  Future<Map<dynamic, dynamic>> price(
+    String tokenAddress, {
+    String currency = 'usd',
+  }) async {
+    Response response = await _dio.get(
+      '/v0/fuseswap/price/$tokenAddress',
+    );
+    return response.data['data'];
+  }
+
+  Future<num> priceChange(
+    String tokenAddress,
+  ) async {
+    Response response = await _dio.get(
+      '/v0/fuseswap/pricechange/$tokenAddress',
+    );
+    return response.data['data'];
+  }
+
+  Future<List<dynamic>> interval(
+    String tokenAddress, {
+    String? timeFrame,
+  }) async {
+    Response response = await _dio.get(
+      '/v0/fuseswap/pricechange/interval/${timeFrame}/$tokenAddress',
+    );
+    return response.data['data'];
+  }
+
+  // End of FuseSwap API's
 }

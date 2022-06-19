@@ -6,3 +6,4 @@ export 'src/graph.dart';
 export 'src/web3.dart';
 export 'src/studio_api.dart';
 export 'src/wallet_api.dart';
+export 'src/charge_api.dart';

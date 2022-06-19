@@ -1,4 +1,4 @@
-library api;
+library studio_api;
 
 import 'dart:async';
 import 'dart:io';
