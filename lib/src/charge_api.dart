@@ -5,6 +5,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:path/path.dart' show basename;
+import 'package:wallet_core/constants/enum.dart';
+import 'package:wallet_core/models/models.dart';
 import 'package:wallet_core/src/web3.dart';
 
 class ChargeApi {
@@ -12,8 +14,8 @@ class ChargeApi {
   late Dio _dio;
 
   ChargeApi(
-    String publicAPI, {
-    String baseUrl = 'https://charge-api.fuse.io/api',
+    String publicApiKey, {
+    String baseUrl = 'https://api.chargeweb3.com/api',
     List<Interceptor> interceptors = const [],
   }) {
     _dio = Dio(
@@ -23,7 +25,7 @@ class ChargeApi {
           'Content-Type': 'application/json',
         },
         queryParameters: {
-          'apiKey': publicAPI,
+          'apiKey': publicApiKey,
         },
       ),
     );
@@ -42,47 +44,6 @@ class ChargeApi {
         },
       );
 
-  // Start of studio API's
-  Future<dynamic> getCommunityData(
-    String communityAddress, {
-    String? walletAddress,
-  }) async {
-    String path = walletAddress != null
-        ? '/v0/studio/communities/$communityAddress/$walletAddress'
-        : '/v0/studio/communities/$communityAddress';
-    Response response = await _dio.get(
-      path,
-    );
-
-    return response.data['data'];
-  }
-
-  Future<dynamic> getBusinessList(
-    String communityAddress,
-  ) async {
-    Response response = await _dio.get(
-      '/v0/studio/entities/$communityAddress',
-      queryParameters: {
-        'type': 'business',
-        'withMetadata': true,
-      },
-    );
-
-    return response.data;
-  }
-
-  Future<dynamic> getEntityMetadata(
-    String communityAddress,
-    String account, {
-    bool isRopsten = false,
-  }) async {
-    Response response = await _dio.get(
-      '/v0/studio/entities/metadata/$communityAddress/$account',
-    );
-
-    return response.data['data'];
-  }
-
   Future<dynamic> uploadImage(
     File imageFile,
   ) async {
@@ -100,15 +61,6 @@ class ChargeApi {
     return response.data;
   }
 
-  Future<dynamic> fetchMetadata(
-    String uri,
-  ) async {
-    Response response = await _dio.get(
-      '/v0/studio/metadata/$uri',
-    );
-
-    return response.data['data'];
-  }
   // End of studio API's
 
   // Start of Wallet API's
@@ -201,7 +153,6 @@ class ChargeApi {
   }
 
   Future<dynamic> createWallet({
-    String? communityAddress,
     String? referralAddress,
   }) async {
     dynamic wallet = await getWallet();
@@ -212,7 +163,6 @@ class ChargeApi {
     Response response = await _dio.post(
       '/v0/wallets/wallets',
       data: {
-        'communityAddress': communityAddress,
         'referralAddress': referralAddress,
       },
       options: options,
@@ -422,37 +372,9 @@ class ChargeApi {
     return response.data;
   }
 
-  Future<dynamic> backupWallet({
-    String? communityAddress,
-  }) async {
+  Future<dynamic> backupWallet() async {
     Response response = await _dio.post(
       '/v0/wallets/wallets/backup',
-      data: {'communityAddress': communityAddress},
-      options: options,
-    );
-    return response.data;
-  }
-
-  Future<dynamic> joinCommunity(
-    Web3 web3,
-    String walletAddress,
-    String communityAddress, {
-    String? tokenAddress,
-    String network = 'fuse',
-    String? originNetwork,
-    String? communityName,
-  }) async {
-    Map<String, dynamic> data = await web3.joinCommunityOffChain(
-      walletAddress,
-      communityAddress,
-      tokenAddress: tokenAddress,
-      network: network,
-      originNetwork: originNetwork,
-      communityName: communityName,
-    );
-    Response response = await _dio.post(
-      '/v0/wallets/relay',
-      data: data,
       options: options,
     );
     return response.data;
@@ -659,7 +581,6 @@ class ChargeApi {
 
   Future<dynamic> invite(
     String phoneNumber, {
-    String communityAddress = '',
     String name = '',
     String amount = '',
     String symbol = '',
@@ -667,7 +588,6 @@ class ChargeApi {
     Response response = await _dio.post(
       '/v0/wallets/wallets/invite/$phoneNumber',
       data: {
-        'communityAddress': communityAddress,
         'name': name,
         'amount': amount,
         'symbol': symbol,
@@ -738,75 +658,60 @@ class ChargeApi {
 
   // End of Wallet API's
 
-  // Start of FuseSwap API's
+  // Start of Voltage API's
 
-  Future<Map<String, dynamic>> requestParameters(
-    String currencyIn,
-    String currencyOut,
-    String amountIn,
-    String recipient,
+  Future<SwapRequestParametersData> requestParameters(
+    TradeRequestBody swapRequestBody,
   ) async {
     Response response = await _dio.post(
-      '/v0/fuseswap/swap/requestparameters',
-      data: {
-        "currencyIn": currencyIn,
-        "currencyOut": currencyOut,
-        "amountIn": amountIn,
-        "recipient": recipient,
-      },
+      '/v0/trade/swap/requestparameters',
+      data: swapRequestBody.toJson(),
     );
-    return response.data;
+    return SwapRequestParametersData.fromJson(response.data);
   }
 
-  Future<Map<dynamic, dynamic>> quote(
-    String currencyIn,
-    String currencyOut,
-    String amountIn,
-    String recipient,
+  Future<Trade> quote(
+    TradeRequestBody swapRequestBody,
   ) async {
     Response response = await _dio.post(
-      '/v0/fuseswap/swap/quote',
-      data: {
-        "currencyIn": currencyIn,
-        "currencyOut": currencyOut,
-        "amountIn": amountIn,
-        "recipient": recipient,
-      },
+      '/v0/trade/swap/quote',
+      data: swapRequestBody.toJson(),
     );
     if (response.data['error'] != null) {
       throw response.data['error']['message'];
     }
-    return response.data['data'];
+    return Trade.fromJson(response.data['data']['info']);
   }
 
-  Future<Map<dynamic, dynamic>> price(
+  Future<String> price(
     String tokenAddress, {
     String currency = 'usd',
   }) async {
     Response response = await _dio.get(
-      '/v0/fuseswap/price/$tokenAddress',
+      '/v0/trade/price/$tokenAddress',
     );
-    return response.data['data'];
+    return response.data['data']['price'] ?? '0';
   }
 
-  Future<num> priceChange(
+  Future<String> priceChange(
     String tokenAddress,
   ) async {
     Response response = await _dio.get(
-      '/v0/fuseswap/pricechange/$tokenAddress',
+      '/v0/trade/pricechange/$tokenAddress',
     );
-    return response.data['data'];
+    return response.data['data']['priceChange'] ?? '0';
   }
 
-  Future<List<dynamic>> interval(
-    String tokenAddress, {
-    String? timeFrame,
-  }) async {
+  Future<List<ChartItem>> interval(
+    String tokenAddress,
+    TimeFrame timeFrame,
+  ) async {
     Response response = await _dio.get(
-      '/v0/fuseswap/pricechange/interval/${timeFrame}/$tokenAddress',
+      '/v0/trade/pricechange/interval/${timeFrame.name.toUpperCase()}/$tokenAddress',
     );
-    return response.data['data'];
+    return (response.data['data'] as List<dynamic>)
+        .map((stats) => ChartItem.fromJson(stats))
+        .toList();
   }
-
-  // End of FuseSwap API's
+  // End of Voltage API's
 }
